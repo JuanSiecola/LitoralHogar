@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Propiedad extends Model
 {
+    //esto es para especificar el nombre de la tabla exacto en la bd
     protected $table = 'propiedad';
 
     public function usuario(): BelongsTo
