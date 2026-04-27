@@ -3,8 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ubicacion extends Model
 {
-    //
+    protected $table = 'ubicacion';
+
+    public function propiedad(): BelongsTo
+    {
+        return $this->belongsTo(Propiedad::class, 'propiedad_id');
+    }
 }

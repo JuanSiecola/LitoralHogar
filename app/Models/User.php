@@ -52,9 +52,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Rol::class, 'rol_usuario', 'usuario_id', 'rol_id');
     }
 
-    public function favoritos(): HasMany
+    public function favoritos(): BelongsToMany
     {
-        return $this->hasMany(Favorito::class, 'usuario_id');
+        return $this->belongsToMany(Propiedad::class, 'favoritos', 'usuario_id', 'propiedad_id');
     }
 
     public function imagenes_propiedad(): HasMany

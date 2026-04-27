@@ -12,4 +12,8 @@ class ImagenPropiedad extends Model
     {
         return $this->belongsTo(User::class, 'usuario_id');
     }
+    public function propiedad(): BelongsTo
+    {
+        return $this->belongsTo(Propiedad::class, 'propiedad_id');
+    }
 }
