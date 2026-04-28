@@ -43,62 +43,64 @@ defineOptions({
                 <InputError :message="errors.cedula" />
             </div>
 
-            <div class="grid gap-2">
-                <Label for="nombre">Nombre</Label>
-                <Input
-                    id="nombre"
-                    type="text"
-                    required
-                    autofocus
-                    :tabindex="1"
-                    autocomplete="name"
-                    name="nombre"
-                    placeholder="Juan"
-                />
-                <InputError :message="errors.nombre" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid gap-2">
+                    <Label for="nombre">Nombre</Label>
+                    <Input
+                        id="nombre"
+                        type="text"
+                        required
+                        autofocus
+                        :tabindex="1"
+                        autocomplete="name"
+                        name="nombre"
+                        placeholder="Juan"
+                    />
+                    <InputError :message="errors.nombre" />
+                </div>
+                <div class="grid gap-2">
+                    <Label for="apellido">Apellido</Label>
+                    <Input
+                        id="apellido"
+                        type="text"
+                        required
+                        autofocus
+                        :tabindex="1"
+                        autocomplete="apellido"
+                        name="apellido"
+                        placeholder="Pérez"
+                    />
+                    <InputError :message="errors.apellido" />
+                </div>
             </div>
 
-            <div class="grid gap-2">
-                <Label for="apellido">Apellido</Label>
-                <Input
-                    id="apellido"
-                    type="text"
-                    required
-                    autofocus
-                    :tabindex="1"
-                    autocomplete="apellido"
-                    name="apellido"
-                    placeholder="Pérez"
-                />
-                <InputError :message="errors.apellido" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="email">Correo electrónico</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    required
-                    :tabindex="2"
-                    autocomplete="email"
-                    name="email"
-                    placeholder="juanperez@gmail.com"
-                />
-                <InputError :message="errors.email" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="telefono">Teléfono</Label>
-                <Input
-                    id="telefono"
-                    type="text"
-                    required
-                    :tabindex="2"
-                    autocomplete="tel"
-                    name="telefono"
-                    placeholder="092247856"
-                />
-                <InputError :message="errors.telefono" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid gap-2">
+                    <Label for="email">Correo electrónico</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        required
+                        :tabindex="2"
+                        autocomplete="email"
+                        name="email"
+                        placeholder="juanperez@gmail.com"
+                    />
+                    <InputError :message="errors.email" />
+                </div>
+                <div class="grid gap-2">
+                    <Label for="telefono">Teléfono</Label>
+                    <Input
+                        id="telefono"
+                        type="text"
+                        required
+                        :tabindex="2"
+                        autocomplete="tel"
+                        name="telefono"
+                        placeholder="092247856"
+                    />
+                    <InputError :message="errors.telefono" />
+                </div>
             </div>
 
             <div class="grid gap-2">
@@ -129,6 +131,7 @@ defineOptions({
 
             <Button
                 type="submit"
+                size="lg"
                 class="mt-2 w-full"
                 tabindex="5"
                 :disabled="processing"
@@ -140,7 +143,7 @@ defineOptions({
         </div>
 
         <div class="text-center text-sm text-muted-foreground">
-            Ya tienes una cuenta?
+            ¿Ya tienes una cuenta?
             <TextLink
                 :href="login()"
                 class="underline underline-offset-4"
