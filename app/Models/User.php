@@ -14,7 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['nombre', 'email', 'password', 'cedula', 'telefono', 'apellido'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -49,7 +49,7 @@ class User extends Authenticatable
 
     public function rol_usuario(): BelongsToMany
     {
-        return $this->belongsToMany(Rol::class, 'rol_usuario', 'usuario_id', 'rol_id');
+        return $this->belongsToMany(Rol::class, 'usuario_rol', 'usuario_id', 'rol_id');
     }
 
     public function favoritos(): BelongsToMany

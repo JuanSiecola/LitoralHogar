@@ -16,8 +16,26 @@ trait ProfileValidationRules
     protected function profileRules(?int $userId = null): array
     {
         return [
-            'name' => $this->nameRules(),
-            'email' => $this->emailRules($userId),
+            'cedula'   => $this->cedulaRules($userId),
+            'nombre'   => $this->nameRules(),
+            'apellido' => $this->nameRules(),
+            'email'    => $this->emailRules($userId),
+            'telefono' => $this->telefonoRules(),
+        ];
+    }
+
+    protected function cedulaRules(?int $userId = null): array
+    {
+        return [
+            'required', 'numeric', 'regex:/^[0-9]{6,8}$/', 'unique:usuarios,cedula',
+            Rule::unique('usuarios', 'cedula')->when($userId !== null, fn($q) => $q->ignore($userId)),
+        ];
+    }
+
+    protected function telefonoRules(): array
+    {
+        return[
+            'required', 'string', 'max:9', 'regex:/^(?:09\d|5989\d)\s?\d{3}\s?\d{3}$/',
         ];
     }
 

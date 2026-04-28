@@ -12,8 +12,8 @@ import { store } from '@/routes/register';
 
 defineOptions({
     layout: {
-        title: 'Create an account',
-        description: 'Enter your details below to create your account',
+        title: 'Crear cuenta',
+        description: 'Ingresa tus datos para crear una cuenta en LitoralHogar.',
     },
 });
 </script>
@@ -29,22 +29,52 @@ defineOptions({
     >
         <div class="grid gap-6">
             <div class="grid gap-2">
-                <Label for="name">Name</Label>
+                <Label for="cedula">Cédula</Label>
                 <Input
-                    id="name"
+                    id="cedula"
+                    type="text"
+                    required
+                    autofocus
+                    :tabindex="1"
+                    autocomplete="cedula"
+                    name="cedula"
+                    placeholder="12345678"
+                />
+                <InputError :message="errors.cedula" />
+            </div>
+
+            <div class="grid gap-2">
+                <Label for="nombre">Nombre</Label>
+                <Input
+                    id="nombre"
                     type="text"
                     required
                     autofocus
                     :tabindex="1"
                     autocomplete="name"
-                    name="name"
-                    placeholder="Full name"
+                    name="nombre"
+                    placeholder="Juan"
                 />
-                <InputError :message="errors.name" />
+                <InputError :message="errors.nombre" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="apellido">Apellido</Label>
+                <Input
+                    id="apellido"
+                    type="text"
+                    required
+                    autofocus
+                    :tabindex="1"
+                    autocomplete="apellido"
+                    name="apellido"
+                    placeholder="Pérez"
+                />
+                <InputError :message="errors.apellido" />
+            </div>
+
+            <div class="grid gap-2">
+                <Label for="email">Correo electrónico</Label>
                 <Input
                     id="email"
                     type="email"
@@ -52,33 +82,47 @@ defineOptions({
                     :tabindex="2"
                     autocomplete="email"
                     name="email"
-                    placeholder="email@example.com"
+                    placeholder="juanperez@gmail.com"
                 />
                 <InputError :message="errors.email" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password">Password</Label>
+                <Label for="telefono">Teléfono</Label>
+                <Input
+                    id="telefono"
+                    type="text"
+                    required
+                    :tabindex="2"
+                    autocomplete="tel"
+                    name="telefono"
+                    placeholder="092247856"
+                />
+                <InputError :message="errors.telefono" />
+            </div>
+
+            <div class="grid gap-2">
+                <Label for="password">Contraseña</Label>
                 <PasswordInput
                     id="password"
                     required
                     :tabindex="3"
                     autocomplete="new-password"
                     name="password"
-                    placeholder="Password"
+                    placeholder="Contraseña"
                 />
                 <InputError :message="errors.password" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password_confirmation">Confirm password</Label>
+                <Label for="password_confirmation">Confirmar contraseña</Label>
                 <PasswordInput
                     id="password_confirmation"
                     required
                     :tabindex="4"
                     autocomplete="new-password"
                     name="password_confirmation"
-                    placeholder="Confirm password"
+                    placeholder="Confirmar contraseña"
                 />
                 <InputError :message="errors.password_confirmation" />
             </div>
@@ -91,17 +135,17 @@ defineOptions({
                 data-test="register-user-button"
             >
                 <Spinner v-if="processing" />
-                Create account
+                Crear cuenta
             </Button>
         </div>
 
         <div class="text-center text-sm text-muted-foreground">
-            Already have an account?
+            Ya tienes una cuenta?
             <TextLink
                 :href="login()"
                 class="underline underline-offset-4"
                 :tabindex="6"
-                >Log in</TextLink
+                >Iniciar sesión</TextLink
             >
         </div>
     </Form>
