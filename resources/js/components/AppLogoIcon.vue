@@ -13,5 +13,10 @@ defineProps<Props>();
 </script>
 
 <template>
-    <img src="logo.webp" alt="Litoral Hogar Logo">
+    <img 
+        src="/logo.svg"
+        alt="Litoral Hogar Logo"
+        :class="['object-contain', className, $attrs.class]"
+        v-bind="$attrs"
+    />
 </template>
