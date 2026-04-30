@@ -27,7 +27,7 @@ trait ProfileValidationRules
     protected function cedulaRules(?int $userId = null): array
     {
         return [
-            'required', 'numeric', 'regex:/^[0-9]{6,8}$/', 'unique:usuarios,cedula',
+            'required', 'numeric', 'digits:8', 'unique:usuarios,cedula',
             Rule::unique('usuarios', 'cedula')->when($userId !== null, fn($q) => $q->ignore($userId)),
         ];
     }
@@ -35,7 +35,7 @@ trait ProfileValidationRules
     protected function telefonoRules(): array
     {
         return[
-            'required', 'string', 'max:9', 'regex:/^(?:09\d|5989\d)\s?\d{3}\s?\d{3}$/',
+            'required', 'string', 'regex:/^09\d{7}$/',
         ];
     }
 
@@ -65,5 +65,18 @@ trait ProfileValidationRules
                 ? Rule::unique(User::class)
                 : Rule::unique(User::class)->ignore($userId),
         ];
+    }
+    protected function profileMessages(): array 
+    {
+        return[
+            'cedula.required' => 'La cédula es obligatoria.',
+            'cedula.unique'   => 'Esta cédula ya existe en el sistema.',
+            'cedula.numeric'  => 'La cédula solo admite números',
+            'cedula.digits'   => 'La cédula debe tener exactamente 8 dígitos, sin puntos ni guiones bajo.',
+            'email.unique'    => 'Este correo electrónico ya ha sido registrado.',
+            'email.required'  => 'El correo electrónico es obligatorio',
+            'telefono.regex'=> 'El teléfono debe comenzar con 09 y tener 9 dígitos (ej: 099123456).',
+        ];
+
     }
 }
