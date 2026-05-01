@@ -178,22 +178,50 @@ function volver() {
                 </div>
             </div>
 
-            <!-- Cédula (solo agente y cliente) -->
-            <div v-if="tipo !== 'inmobiliaria'" class="grid gap-2">
-                <Label for="cedula">Cédula</Label>
-                <Input
-                    id="cedula"
-                    type="text"
-                    required
-                    autocomplete="off"
-                    name="cedula"
-                    placeholder="12345678"
-                />
-                <InputError :message="errors.cedula" />
+            <!-- Cédula + Teléfono (solo agente y cliente) -->
+            <div v-if="tipo !== 'inmobiliaria'" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div class="grid gap-2">
+                    <Label for="cedula">Cédula</Label>
+                    <Input
+                        id="cedula"
+                        type="text"
+                        required
+                        autocomplete="off"
+                        name="cedula"
+                        placeholder="12345678"
+                    />
+                    <InputError :message="errors.cedula" />
+                </div>
+                <div class="grid gap-2">
+                    <Label for="telefono">Teléfono</Label>
+                    <Input
+                        id="telefono"
+                        type="text"
+                        required
+                        autocomplete="tel"
+                        name="telefono"
+                        placeholder="092247856"
+                    />
+                    <InputError :message="errors.telefono" />
+                </div>
             </div>
 
-            <!-- Email y Teléfono (todos) -->
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <!-- Email (agente y cliente: ancho completo) -->
+            <div v-if="tipo !== 'inmobiliaria'" class="grid gap-2">
+                <Label for="email">Correo electrónico</Label>
+                <Input
+                    id="email"
+                    type="email"
+                    required
+                    autocomplete="email"
+                    name="email"
+                    placeholder="juanperez@gmail.com"
+                />
+                <InputError :message="errors.email" />
+            </div>
+
+            <!-- Email y Teléfono (inmobiliaria: juntos en 2 columnas) -->
+            <div v-if="tipo === 'inmobiliaria'" class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div class="grid gap-2">
                     <Label for="email">Correo electrónico</Label>
                     <Input
@@ -235,28 +263,29 @@ function volver() {
             </div>
 
             <!-- Contraseña (todos) -->
-            <div class="grid gap-2">
-                <Label for="password">Contraseña</Label>
-                <PasswordInput
-                    id="password"
-                    required
-                    autocomplete="new-password"
-                    name="password"
-                    placeholder="Contraseña"
-                />
-                <InputError :message="errors.password" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="password_confirmation">Confirmar contraseña</Label>
-                <PasswordInput
-                    id="password_confirmation"
-                    required
-                    autocomplete="new-password"
-                    name="password_confirmation"
-                    placeholder="Confirmar contraseña"
-                />
-                <InputError :message="errors.password_confirmation" />
+            <div class="grid gap-6">
+                <div class="grid gap-2">
+                    <Label for="password">Contraseña</Label>
+                    <PasswordInput
+                        id="password"
+                        required
+                        autocomplete="new-password"
+                        name="password"
+                        placeholder="Contraseña"
+                    />
+                    <InputError :message="errors.password" />
+                </div>
+                <div class="grid gap-2">
+                    <Label for="password_confirmation">Confirmar contraseña</Label>
+                    <PasswordInput
+                        id="password_confirmation"
+                        required
+                        autocomplete="new-password"
+                        name="password_confirmation"
+                        placeholder="Confirmar contraseña"
+                    />
+                    <InputError :message="errors.password_confirmation" />
+                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">

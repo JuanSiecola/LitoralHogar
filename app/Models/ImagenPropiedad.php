@@ -8,6 +8,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ImagenPropiedad extends Model
 {
     protected $table = 'imagen_propiedad';
+
+    protected $fillable = [
+        'url',
+        'public_id',
+        'orden',
+        'es_principal',
+        'titulo',
+        'descripcion',
+        'propiedad_id',
+        'usuario_id',
+    ];
+
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'usuario_id');

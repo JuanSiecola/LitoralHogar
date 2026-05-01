@@ -29,7 +29,7 @@ defineProps<{
                             class="mb-4 inline-flex items-center justify-center"
                         >
                             <AppLogoIcon
-                                class="h-16 w-16 text-black dark:text-white"
+                                class="h-24 w-24 text-black dark:text-white"
                             />
                         </Link>
                         <CardTitle class="text-xl">{{ title }}</CardTitle>

@@ -9,6 +9,8 @@ class Ubicacion extends Model
 {
     protected $table = 'ubicacion';
 
+    protected $fillable = ['direccion', 'ciudad', 'departamento', 'longitud', 'latitud', 'propiedad_id'];
+
     public function propiedad(): BelongsTo
     {
         return $this->belongsTo(Propiedad::class, 'propiedad_id');
