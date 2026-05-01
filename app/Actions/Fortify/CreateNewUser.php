@@ -4,86 +4,82 @@ namespace App\Actions\Fortify;
 
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
-use App\Models\Rol;
+use App\Models\Inmobiliaria;
+use App\Models\PerfilPersona;
+use App\Concerns\InmobiliariaValidationRules;
 use App\Models\User;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Rol;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Illuminate\Support\Facades\DB;
 
 class CreateNewUser implements CreatesNewUsers
 {
-    use PasswordValidationRules, ProfileValidationRules;
+    use PasswordValidationRules, ProfileValidationRules, InmobiliariaValidationRules;
 
-    /**
-     * Validate and create a newly registered user.
-     *
-     * @param  array<string, string>  $input
-     */
     public function create(array $input): User
     {
-        $rules = [
-            ...$this->profileRules(),
-            'password' => $this->passwordRules(),
-            'roles' => ['required', 'integer', 'exists:roles,id'],
-        ];
+        $esInmobiliaria = $input['tipo'] === 'inmobiliaria';
 
-        // Si selecciona inmobiliaria, validar campos adicionales
-        if ($this->isInmobiliariaRole($input['roles'] ?? null)) {
-            $rules = array_merge($rules, [
-                'razon_social' => ['required', 'string', 'max:255'],
-                'rut' => ['required', 'string', 'unique:detalle_inmobiliaria,rut'],
-                'direccion' => ['required', 'string', 'max:255'],
-                'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            ]);
+        $rules = $this->profileRules();
+        $rules['tipo'] = ['required', 'in:inmobiliaria,agente,cliente'];
+        $rules['password'] = $this->passwordRules();
+
+        if ($esInmobiliaria) {
+            $rules['nombre'] = ['nullable'];
+            $rules['apellido'] = ['nullable'];
         }
 
-        Validator::make($input, $rules, $this->profileMessages())->validate();
+        $messages = $this->profileMessages();
 
-        $user = User::create([
-            'cedula' => $input['cedula'],
-            'nombre' => $input['nombre'],
-            'apellido' => $input['apellido'],
-            'email' => $input['email'],
-            'telefono' => $input['telefono'],
-            'password' => $input['password'],
-        ]);
+        if ($esInmobiliaria) {
+            $rules    = array_merge($rules, $this->inmobiliariaRules());
+            $messages = array_merge($messages, $this->inmobiliariaMessages());
+        }
 
-        // Asignar rol
-        $user->rol_usuario()->attach($input['roles']);
+        Validator::make($input, $rules, $messages)->validate();
 
-        // Si es inmobiliaria, crear registro en detalle_inmobiliaria
-        if ($this->isInmobiliariaRole($input['roles'])) {
-            $logoUrl = null;
+        return DB::transaction(function () use ($input, $esInmobiliaria) {
+            $user = User::create([
+                'email'    => $input['email'],
+                'password' => $input['password'],
+            ]);
 
-            // Procesar imagen si existe
-            if (!empty($input['logo']) && $input['logo'] instanceof \Illuminate\Http\UploadedFile) {
-                $logoUrl = $input['logo']->store('inmobiliarias/logos', 'public');
+            if ($esInmobiliaria) {
+                Inmobiliaria::create([
+                    'usuario_id'   => $user->id,
+                    'razon_social' => $input['razon_social'],
+                    'rut'          => $input['rut'],
+                    'direccion'    => $input['direccion'],
+                    'telefono'     => $input['telefono'],
+                    'logo_url'     => null,
+                ]);
+            } else {
+                PerfilPersona::create([
+                    'usuario_id' => $user->id,
+                    'nombre'     => $input['nombre'],
+                    'apellido'   => $input['apellido'],
+                    'cedula'     => $input['cedula'] ?? null,
+                    'telefono'   => $input['telefono'],
+                ]);
             }
 
-            $user->detalle_inmobiliaria()->create([
-                'razon_social' => $input['razon_social'],
-                'rut' => $input['rut'],
-                'direccion' => $input['direccion'],
-                'logo_url' => $logoUrl,
-            ]);
-        }
+            $rolNombre = match($input['tipo']) {
+                'inmobiliaria' => 'inmobiliaria',
+                'agente'       => 'agente',
+                'cliente'      => 'cliente',
+            };
 
-        return $user;
-    }
+            $roles = [Rol::where('nombre', $rolNombre)->value('id')];
 
-    /**
-     * Verificar si el rol es inmobiliaria
-     */
-    private function isInmobiliariaRole($roleId): bool
-    {
-        if (!$roleId) {
-            return false;
-        }
+            // Cliente que también es agente
+            if ($input['tipo'] === 'cliente' && !empty($input['es_agente'])) {
+                $roles[] = Rol::where('nombre', 'agente')->value('id');
+            }
 
-        $inmobiliariaRole = Rol::where('nombre', 'inmobiliaria')
-            ->where('activo', true)
-            ->first();
+            $user->rol_usuario()->attach($roles, ['fecha_asignacion' => now()]);
 
-        return $inmobiliariaRole && $inmobiliariaRole->id == $roleId;
+            return $user;
+        });
     }
 }

@@ -9,6 +9,8 @@ class Amenidad extends Model
 {
     protected $table = "amenidad";
 
+    protected $fillable = ['nombre'];
+
     public function propiedades(): BelongsToMany 
     {
         return $this->belongsToMany(Propiedad::class, 'amenidad_propiedad', 'amenidad_id', 'propiedad_id');
