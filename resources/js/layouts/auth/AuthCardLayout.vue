@@ -21,26 +21,23 @@ defineProps<{
         class="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10"
     >
         <div class="flex w-full max-w-2xl flex-col gap-6">
-            <Link
-                :href="home()"
-                class="flex items-center gap-2 self-center font-medium"
-            >
-                <div class="flex h-24 w-24 items-center justify-center">
-                    <AppLogoIcon
-                        class="size-9 fill-current text-black dark:text-white"
-                    />
-                </div>
-            </Link>
-
             <div class="flex flex-col gap-6">
                 <Card class="rounded-xl">
                     <CardHeader class="px-10 pt-8 pb-0 text-center">
+                        <Link
+                            :href="home()"
+                            class="mb-4 inline-flex items-center justify-center"
+                        >
+                            <AppLogoIcon
+                                class="h-16 w-16 text-black dark:text-white"
+                            />
+                        </Link>
                         <CardTitle class="text-xl">{{ title }}</CardTitle>
                         <CardDescription>
                             {{ description }}
                         </CardDescription>
                     </CardHeader>
-                    <CardContent class="px-10 py-8">
+                    <CardContent class="px-10 pb-8 pt-4">
                         <slot />
                     </CardContent>
                 </Card>

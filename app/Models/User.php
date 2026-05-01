@@ -14,7 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['nombre', 'email', 'password', 'cedula', 'telefono', 'apellido'])]
+#[Fillable(['email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -42,9 +42,14 @@ class User extends Authenticatable
         return $this->hasMany(Propiedad::class, 'usuario_id');
     }
 
-    public function detalle_inmobiliaria(): HasOne
+    public function inmobiliaria(): HasOne
     {
-        return $this->hasOne(DetalleInmobiliaria::class, 'usuario_id');
+        return $this->hasOne(Inmobiliaria::class, 'usuario_id');
+    }
+
+    public function perfil_persona(): HasOne
+    {
+        return $this->hasOne(PerfilPersona::class, 'usuario_id');
     }
 
     public function rol_usuario(): BelongsToMany
