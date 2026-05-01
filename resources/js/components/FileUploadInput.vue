@@ -20,6 +20,10 @@ const fileInput = ref<HTMLInputElement>();
 const fileName = ref<string>('No file selected');
 const preview = ref<string>('');
 
+const emit = defineEmits<{
+    (e: 'change', event: Event): void;
+}>();
+
 const handleFileSelect = (event: Event) => {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
@@ -33,6 +37,8 @@ const handleFileSelect = (event: Event) => {
             preview.value = e.target?.result as string;
         };
         reader.readAsDataURL(file);
+
+        emit('change', event);
     }
 };
 
