@@ -12,3 +12,5 @@ const { title = '', description = '' } = defineProps<{
         <slot />
     </AuthLayout>
 </template>
+
+

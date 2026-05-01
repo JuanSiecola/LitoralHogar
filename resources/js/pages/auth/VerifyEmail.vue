@@ -8,9 +8,8 @@ import { send } from '@/routes/verification';
 
 defineOptions({
     layout: {
-        title: 'Verify email',
-        description:
-            'Please verify your email address by clicking on the link we just emailed to you.',
+        title: 'Verificar correo',
+        description: 'Verifica tu dirección de correo electrónico para continuar',
     },
 });
 
@@ -20,28 +19,59 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Email verification" />
+    <Head title="Verificar correo" />
 
-    <div
-        v-if="status === 'verification-link-sent'"
-        class="mb-4 text-center text-sm font-medium text-green-600"
-    >
-        A new verification link has been sent to the email address you provided
-        during registration.
+    <div class="space-y-6">
+        <div class="space-y-2">
+            <h1 class="text-2xl font-bold">Verifica tu correo</h1>
+            <p class="text-sm text-muted-foreground">
+                Hemos enviado un enlace de verificación a tu correo electrónico.
+                Por favor, haz clic en el enlace para continuar.
+            </p>
+        </div>
+
+        <div
+            v-if="status === 'verification-link-sent'"
+            class="rounded-lg bg-green-50 p-4 text-center text-sm font-medium text-green-700 border border-green-200"
+        >
+            ✓ Se ha enviado un nuevo enlace de verificación a tu correo electrónico
+        </div>
+
+        <Form
+            v-bind="send.form()"
+            class="space-y-6"
+            v-slot="{ processing }"
+        >
+            <div class="rounded-lg bg-blue-50 border border-blue-200 p-4 text-sm text-blue-700">
+                <p class="font-medium mb-2">¿No recibiste el correo?</p>
+                <p class="text-sm mb-4">
+                    Podemos reenviar el enlace de verificación a tu dirección de correo.
+                </p>
+            </div>
+
+            <Button 
+                type="submit"
+                size="lg"
+                class="w-full"
+                :disabled="processing"
+                data-test="resend-verification-button"
+            >
+                <Spinner v-if="processing" />
+                Reenviar correo de verificación
+            </Button>
+        </Form>
+
+        <div class="space-y-2 pt-4">
+            <Form method="post" :action="logout()">
+                <TextLink 
+                    as="button" 
+                    type="submit"
+                    href="#"
+                    class="mx-auto block text-sm text-muted-foreground hover:text-foreground underline underline-offset-4"
+                >
+                    Cerrar sesión
+                </TextLink>
+            </Form>
+        </div>
     </div>
-
-    <Form
-        v-bind="send.form()"
-        class="space-y-6 text-center"
-        v-slot="{ processing }"
-    >
-        <Button :disabled="processing" variant="secondary">
-            <Spinner v-if="processing" />
-            Resend verification email
-        </Button>
-
-        <TextLink :href="logout()" as="button" class="mx-auto block text-sm">
-            Log out
-        </TextLink>
-    </Form>
 </template>

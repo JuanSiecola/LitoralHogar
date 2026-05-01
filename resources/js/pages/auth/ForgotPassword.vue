@@ -11,8 +11,8 @@ import { email } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Forgot password',
-        description: 'Enter your email to receive a password reset link',
+        title: 'Recuperar contraseña',
+        description: 'Ingresa tu correo para recibir un enlace de recuperación',
     },
 });
 
@@ -22,45 +22,57 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Forgot password" />
+    <Head title="Recuperar contraseña" />
 
     <div
         v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
+        class="mb-4 rounded-lg bg-green-50 p-4 text-center text-sm font-medium text-green-700 border border-green-200"
     >
         {{ status }}
     </div>
 
     <div class="space-y-6">
+        <div class="space-y-2">
+            <h1 class="text-2xl font-bold">¿Olvidaste tu contraseña?</h1>
+            <p class="text-sm text-muted-foreground">
+                Ingresa tu correo electrónico y te enviaremos un enlace para recuperar tu contraseña.
+            </p>
+        </div>
+
         <Form v-bind="email.form()" v-slot="{ errors, processing }">
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email">Correo electrónico</Label>
                 <Input
                     id="email"
                     type="email"
                     name="email"
-                    autocomplete="off"
+                    autocomplete="email"
                     autofocus
-                    placeholder="email@example.com"
+                    placeholder="tu@email.com"
+                    required
                 />
                 <InputError :message="errors.email" />
             </div>
 
-            <div class="my-6 flex items-center justify-start">
-                <Button
-                    class="w-full"
-                    :disabled="processing"
-                    data-test="email-password-reset-link-button"
-                >
-                    <Spinner v-if="processing" />
-                    Email password reset link
-                </Button>
-            </div>
+            <Button
+                type="submit"
+                class="mt-6 w-full"
+                size="lg"
+                :disabled="processing"
+                data-test="email-password-reset-link-button"
+            >
+                <Spinner v-if="processing" />
+                Enviar enlace de recuperación
+            </Button>
         </Form>
 
-        <div class="space-x-1 text-center text-sm text-muted-foreground">
-            <span>Or, return to</span>
-            <TextLink :href="login()">log in</TextLink>
+        <div class="space-y-3 pt-4 text-center text-sm">
+            <div class="text-muted-foreground">
+                ¿Recordaste tu contraseña?
+                <TextLink :href="login()" class="underline underline-offset-4">
+                    Inicia sesión
+                </TextLink>
+            </div>
         </div>
     </div>
 </template>
