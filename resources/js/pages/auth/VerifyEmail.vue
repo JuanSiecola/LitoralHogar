@@ -65,6 +65,8 @@ defineProps<{
             <Form method="post" :action="logout()">
                 <TextLink 
                     as="button" 
+                    type="submit"
+                    href="#"
                     class="mx-auto block text-sm text-muted-foreground hover:text-foreground underline underline-offset-4"
                 >
                     Cerrar sesión
