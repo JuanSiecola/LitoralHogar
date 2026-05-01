@@ -20,10 +20,19 @@ defineOptions({
         description: 'Ingresa tus datos para crear una cuenta en LitoralHogar.',
     },
 });
+
+interface Role {
+    id: number;
+    nombre: string;
+}
+
+defineProps<{
+    roles: Role[];
+}>();
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head title="Crear cuenta" />
 
     <Form
         v-bind="store.form()"
@@ -54,9 +63,8 @@ defineOptions({
                         id="nombre"
                         type="text"
                         required
-                        autofocus
-                        :tabindex="1"
-                        autocomplete="name"
+                        :tabindex="2"
+                        autocomplete="given-name"
                         name="nombre"
                         placeholder="Juan"
                     />
@@ -68,9 +76,8 @@ defineOptions({
                         id="apellido"
                         type="text"
                         required
-                        autofocus
-                        :tabindex="1"
-                        autocomplete="apellido"
+                        :tabindex="3"
+                        autocomplete="family-name"
                         name="apellido"
                         placeholder="Pérez"
                     />
@@ -85,7 +92,7 @@ defineOptions({
                         id="email"
                         type="email"
                         required
-                        :tabindex="2"
+                        :tabindex="4"
                         autocomplete="email"
                         name="email"
                         placeholder="juanperez@gmail.com"
@@ -98,7 +105,7 @@ defineOptions({
                         id="telefono"
                         type="text"
                         required
-                        :tabindex="2"
+                        :tabindex="5"
                         autocomplete="tel"
                         name="telefono"
                         placeholder="092247856"
@@ -114,12 +121,12 @@ defineOptions({
                     v-model="selectedRole"
                     name="roles"
                     required
-                    :tabindex="3"
+                    :tabindex="6"
                     class="rounded border border-gray-300 px-3 py-2"
                 >
                     <option value="">Selecciona un tipo de usuario</option>
                     <option
-                        v-for="role in $page.props.roles"
+                        v-for="role in roles"
                         :key="role.id"
                         :value="role.id"
                     >
@@ -137,7 +144,7 @@ defineOptions({
                             id="razon_social"
                             type="text"
                             required
-                            :tabindex="4"
+                            :tabindex="7"
                             name="razon_social"
                             placeholder="Nombre de la inmobiliaria"
                         />
@@ -150,7 +157,7 @@ defineOptions({
                             id="rut"
                             type="text"
                             required
-                            :tabindex="4"
+                            :tabindex="8"
                             name="rut"
                             placeholder="12345678-9"
                         />
@@ -164,7 +171,7 @@ defineOptions({
                         id="direccion"
                         type="text"
                         required
-                        :tabindex="4"
+                        :tabindex="9"
                         name="direccion"
                         placeholder="Calle Principal 123"
                     />
@@ -175,7 +182,7 @@ defineOptions({
                     label="Logo"
                     name="logo"
                     accept="image/*"
-                    :tabindex="4"
+                    :tabindex="10"
                     :errors="errors.logo"
                 />
             </template>
@@ -185,7 +192,7 @@ defineOptions({
                 <PasswordInput
                     id="password"
                     required
-                    :tabindex="5"
+                    :tabindex="11"
                     autocomplete="new-password"
                     name="password"
                     placeholder="Contraseña"
@@ -198,7 +205,7 @@ defineOptions({
                 <PasswordInput
                     id="password_confirmation"
                     required
-                    :tabindex="6"
+                    :tabindex="12"
                     autocomplete="new-password"
                     name="password_confirmation"
                     placeholder="Confirmar contraseña"
@@ -210,7 +217,7 @@ defineOptions({
                 type="submit"
                 size="lg"
                 class="mt-2 w-full"
-                :tabindex="7"
+                :tabindex="13"
                 :disabled="processing"
                 data-test="register-user-button"
             >
@@ -224,7 +231,7 @@ defineOptions({
             <TextLink
                 :href="login()"
                 class="underline underline-offset-4"
-                :tabindex="8"
+                :tabindex="14"
                 >Iniciar sesión</TextLink
             >
         </div>

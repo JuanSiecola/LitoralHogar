@@ -103,5 +103,5 @@ const inputEmail = ref(props.email);
                 Vuelve al inicio
             </TextLink>
         </div>
-    </Form>
+    </div>
 </template>
