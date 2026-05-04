@@ -9,6 +9,8 @@ class DetallePropiedad extends Model
 {
     protected $table = 'detalle_propiedad';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'nro_habitaciones',
         'nro_banios',

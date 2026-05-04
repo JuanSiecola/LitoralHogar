@@ -9,6 +9,8 @@ class Ubicacion extends Model
 {
     protected $table = 'ubicacion';
 
+    public $timestamps = false;
+
     protected $fillable = ['direccion', 'ciudad', 'departamento', 'longitud', 'latitud', 'propiedad_id'];
 
     public function propiedad(): BelongsTo

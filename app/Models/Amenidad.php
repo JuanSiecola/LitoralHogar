@@ -9,6 +9,8 @@ class Amenidad extends Model
 {
     protected $table = "amenidad";
 
+    public $timestamps = false;
+
     protected $fillable = ['nombre'];
 
     public function propiedades(): BelongsToMany 

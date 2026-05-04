@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('apellido');
             $table->string('cedula')->unique();
             $table->string('telefono');
+            $table->string('foto_url')->nullable();
             $table->foreignId('usuario_id')->unique()->constrained('usuarios')->cascadeOnDelete();
         });
     }
