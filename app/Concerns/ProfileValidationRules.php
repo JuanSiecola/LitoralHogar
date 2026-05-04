@@ -22,6 +22,7 @@ trait ProfileValidationRules
                 : Rule::unique(User::class)->ignore($userId),
             ],
             'telefono' => ['required', 'string', 'regex:/^09\d{7}$/'],
+            'foto_url' => ['nullable', 'image', 'max:2048'],
         ];
     }
 
@@ -34,6 +35,7 @@ trait ProfileValidationRules
             'email.unique' => 'Este correo electrónico ya ha sido registrado.',
             'email.required' => 'El correo electrónico es obligatorio',
             'telefono.regex' => 'El teléfono debe comenzar con 09 y tener 9 dígitos (ej: 099123456).',
+            'foto_url.max' => 'La imagen no puede superar los 2MB.',
         ];
     }
 }

@@ -39,3 +39,17 @@ Este es un proyecto en laravel para la gestión de propiedades. Desarrollado par
    ```
    composer run dev
    ```
+8. Ejecutar los seeders para poblar la base de datos con datos de prueba:
+   ```
+   php artisan db:seed
+   ```
+9. Usuarios de prueba:
+   - Agentes:
+     - Email: agente1@litoralhogar.com
+     - Password: password123
+   - Clientes:
+     - Email: cliente1@gmail.com
+     - Password: password123
+   - Inmobiliaria:
+     - Email: inmobiliaria1@litoralhogar.com
+     - Password: password123

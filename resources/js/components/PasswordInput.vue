@@ -25,7 +25,8 @@ defineExpose({
         <Input
             ref="inputRef"
             :type="showPassword ? 'text' : 'password'"
-            :class="cn('pr-10', props.class)"
+            :class="props.class"
+            inputClass="pr-10"
             v-bind="$attrs"
         />
         <button

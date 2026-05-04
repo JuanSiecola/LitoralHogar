@@ -13,7 +13,9 @@ class Propiedad extends Model
     //esto es para especificar el nombre de la tabla exacto en la bd
     protected $table = 'propiedad';
 
-    protected $fillable = ['titulo', 'estado_propiedad', 'tipo_propiedad', 'tipo_operacion', 'calificacion', 'usuario_id']; 
+    protected $fillable = ['titulo', 'estado_propiedad', 'tipo_propiedad', 'tipo_operacion', 'calificacion', 'usuario_id'];
+
+    public $timestamps = false;
 
     public function usuario(): BelongsTo
     {
