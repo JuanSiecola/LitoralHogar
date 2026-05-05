@@ -14,8 +14,8 @@ import { request } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Log in to your account',
-        description: 'Enter your email and password below to log in',
+        title: 'Inicia sesión en tu cuenta',
+        description: 'Ingresa tus credenciales para acceder a tu cuenta.',
     },
 });
 
@@ -27,7 +27,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head title="Iniciar Sesión" />
 
     <div
         v-if="status"

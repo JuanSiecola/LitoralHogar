@@ -14,9 +14,6 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show the user's profile details page.
-     */
     public function view(Request $request): Response
     {
         return Inertia::render('settings/Profile', [
@@ -25,38 +22,47 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Show the user's profile edit page.
-     */
-    public function edit(Request $request): Response
+    public function edit(): RedirectResponse
     {
-        return Inertia::render('settings/EditProfile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => $request->session()->get('status'),
-        ]);
+        return to_route('profile.view');
     }
 
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->loadMissing(['rol_usuario', 'perfil_persona', 'inmobiliaria']);
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->email !== $validated['email']) {
+            $user->email = $validated['email'];
+            $user->email_verified_at = null;
+            $user->save();
         }
 
-        $request->user()->save();
+        $isInmobiliaria = $user->rol_usuario
+            ->contains(fn($r) => str_contains(strtolower($r->nombre), 'inmobiliaria'));
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Profile updated.')]);
+        if ($isInmobiliaria) {
+            $user->inmobiliaria()->updateOrCreate([], [
+                'razon_social' => $validated['razon_social'],
+                'rut'          => $validated['rut'],
+                'direccion'    => $validated['direccion'],
+                'telefono'     => $validated['telefono'],
+            ]);
+        } else {
+            $user->perfil_persona()->updateOrCreate([], [
+                'nombre'   => $validated['nombre'],
+                'apellido' => $validated['apellido'],
+                'cedula'   => $validated['cedula'] ?? null,
+                'telefono' => $validated['telefono'],
+            ]);
+        }
 
-        return to_route('profile.edit');
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Perfil actualizado correctamente.']);
+
+        return to_route('profile.view');
     }
 
-    /**
-     * Delete the user's profile.
-     */
     public function destroy(ProfileDeleteRequest $request): RedirectResponse
     {
         $user = $request->user();
