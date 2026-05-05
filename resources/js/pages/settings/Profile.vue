@@ -1,15 +1,46 @@
 <script setup lang="ts">
-import { Form, Head, Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { Form, Head, Link, usePage, useForm } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { Building2, Camera, User } from 'lucide-vue-next';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import ProfilePhotoController from '@/actions/App/Http/Controllers/Settings/ProfilePhotoController';
 import DeleteUser from '@/components/DeleteUser.vue';
 import Heading from '@/components/Heading.vue';
-import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { edit } from '@/routes/profile';
+import { Spinner } from '@/components/ui/spinner';
 import { send } from '@/routes/verification';
+import PersonalProfileSection from './partials/PersonalProfileSection.vue';
+import InmobiliariaProfileSection from './partials/InmobiliariaProfileSection.vue';
+
+interface PerfilPersona {
+    nombre: string;
+    apellido: string;
+    cedula: string | null;
+    telefono: string;
+    foto_url: string | null;
+}
+
+interface InmobiliariaData {
+    razon_social: string;
+    rut: string;
+    direccion: string;
+    telefono: string;
+    logo_url: string | null;
+}
+
+interface Rol {
+    id: number;
+    nombre: string;
+}
+
+interface User {
+    id: number;
+    email: string;
+    email_verified_at: string | null;
+    perfil_persona?: PerfilPersona;
+    inmobiliaria?: InmobiliariaData;
+    rol_usuario?: Rol[];
+}
 
 type Props = {
     mustVerifyEmail: boolean;
@@ -22,145 +53,242 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Profile settings',
-                href: edit(),
+                title: 'Editar perfil',
+                href: ProfileController.view.url(),
             },
         ],
     },
 });
 
-interface User {
-    nombre: string;
-    apellido: string;
-    cedula: string;
-    telefono: string;
-    email: string;
-    email_verified_at: string | null;
-}
-
 const page = usePage();
-const user = computed(() => page.props.auth.user);
+const user = computed(() => page.props.auth.user as User);
+
+const isInmobiliaria = computed(() =>
+    user.value.rol_usuario?.some(
+        (r) => r.nombre.toLowerCase().includes('inmobiliaria'),
+    ) ?? false,
+);
+
+const rolNombre = computed(() => {
+    const rol = user.value.rol_usuario?.[0]?.nombre ?? 'usuario';
+    return rol.charAt(0).toUpperCase() + rol.slice(1);
+});
+
+const displayName = computed(() => {
+    if (isInmobiliaria.value) {
+        return user.value.inmobiliaria?.razon_social ?? 'Inmobiliaria';
+    }
+    const p = user.value.perfil_persona;
+    return p ? `${p.nombre} ${p.apellido}` : user.value.email;
+});
+
+const avatarInitials = computed(() => {
+    if (isInmobiliaria.value) {
+        const name = user.value.inmobiliaria?.razon_social ?? '';
+        return name.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+    }
+    const p = user.value.perfil_persona;
+    const n = p?.nombre?.[0] ?? '';
+    const a = p?.apellido?.[0] ?? '';
+    return `${n}${a}`.toUpperCase();
+});
+
+const avatarBase = computed(() => {
+    if (isInmobiliaria.value) return user.value.inmobiliaria?.logo_url ?? '';
+    return user.value.perfil_persona?.foto_url ?? '';
+});
+
+const avatarPreview = ref<string>(avatarBase.value);
+
+const photoForm = useForm({ photo: null as File | null });
+
+const handleAvatarChange = (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    avatarPreview.value = URL.createObjectURL(file);
+
+    photoForm.photo = file;
+    photoForm.post(ProfilePhotoController.store.url(), {
+        forceFormData: true,
+    });
+};
 </script>
 
 <template>
-    <Head title="Profile settings" />
+    <Head title="Editar perfil" />
 
-    <h1 class="sr-only">Ajustes de perfil</h1>
+    <h1 class="sr-only">Editar perfil</h1>
 
-    <div class="flex flex-col space-y-6">
+    <div class="flex flex-col space-y-8">
+
         <Heading
             variant="small"
-            title="Profile information"
-            description="Update your user data"
+            title="Editar perfil"
+            :description="isInmobiliaria
+                ? 'Actualizá los datos de tu inmobiliaria'
+                : 'Actualizá tu información personal'"
         />
 
+        <!-- Avatar -->
+        <div class="flex items-center gap-5">
+            <div class="relative shrink-0">
+                <div
+                    class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-2 border-primary/20 text-primary shadow-sm"
+                >
+                    <img
+                        v-if="avatarPreview"
+                        :src="avatarPreview"
+                        alt="Foto de perfil"
+                        class="h-full w-full object-cover"
+                    />
+                    <span v-else class="font-heading text-3xl font-semibold">
+                        {{ avatarInitials }}
+                    </span>
+                </div>
+
+                <label
+                    for="avatar-input"
+                    :class="[
+                        'absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-primary text-white shadow-sm transition dark:border-neutral-800',
+                        photoForm.processing
+                            ? 'cursor-wait opacity-60 pointer-events-none'
+                            : 'cursor-pointer hover:bg-primary/80',
+                    ]"
+                    title="Cambiar foto"
+                >
+                    <Camera v-if="!photoForm.processing" class="h-4 w-4" />
+                    <Spinner v-else class="h-4 w-4" />
+                    <input
+                        id="avatar-input"
+                        type="file"
+                        accept="image/jpg,image/jpeg,image/png,image/webp"
+                        class="sr-only"
+                        @change="handleAvatarChange"
+                    />
+                </label>
+            </div>
+
+            <div>
+                <p class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">
+                    {{ displayName }}
+                </p>
+                <div class="mt-0.5 flex items-center gap-1.5">
+                    <component
+                        :is="isInmobiliaria ? Building2 : User"
+                        class="h-3.5 w-3.5 text-neutral-400"
+                    />
+                    <p class="text-xs text-neutral-500">
+                        {{ rolNombre }} · {{ user.email }}
+                    </p>
+                </div>
+                <p class="mt-1 text-xs text-neutral-400">JPG, PNG o WEBP · máx. 2 MB</p>
+            </div>
+        </div>
+
         <Form
-            v-bind="ProfileController.update.form()"
+            :action="ProfileController.update.url()"
+            method="patch"
             class="space-y-6"
             v-slot="{ errors, processing }"
         >
-            <div class="grid gap-4 md:grid-cols-2">
-                <div class="grid gap-2">
-                    <Label for="nombre">Nombre</Label>
-                    <Input
-                        id="nombre"
-                        class="mt-1 block w-full"
-                        name="nombre"
-                        :default-value="user.nombre"
-                        required
-                        autocomplete="given-name"
-                        placeholder="Nombre"
-                    />
-                    <InputError class="mt-2" :message="errors.nombre" />
+            <!-- Email (común a todos) -->
+            <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-card dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div class="mb-5 border-b border-neutral-100 pb-4 dark:border-neutral-700">
+                    <h2 class="text-sm font-semibold text-neutral-700 dark:text-neutral-200">
+                        Correo electrónico
+                    </h2>
                 </div>
 
-                <div class="grid gap-2">
-                    <Label for="apellido">Apellido</Label>
-                    <Input
-                        id="apellido"
-                        class="mt-1 block w-full"
-                        name="apellido"
-                        :default-value="user.apellido"
-                        required
-                        autocomplete="family-name"
-                        placeholder="Apellido"
-                    />
-                    <InputError class="mt-2" :message="errors.apellido" />
-                </div>
-            </div>
+                <div class="grid gap-form-gap">
+                    <div class="grid gap-1.5">
+                        <label for="email" class="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                            Correo electrónico <span class="text-danger">*</span>
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            :value="user.email"
+                            placeholder="juan@ejemplo.com"
+                            autocomplete="email"
+                            required
+                            :tabindex="0"
+                            :class="[
+                                'h-11 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow,border-color] duration-150',
+                                'placeholder:text-neutral-400',
+                                errors.email
+                                    ? 'border-danger focus-visible:border-danger focus-visible:ring-2 focus-visible:ring-danger/20'
+                                    : 'border-neutral-300 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 dark:border-neutral-600',
+                            ]"
+                        />
+                        <p
+                            v-if="errors.email"
+                            class="flex items-center gap-1 text-xs font-medium text-danger"
+                            role="alert"
+                        >
+                            {{ errors.email }}
+                        </p>
+                    </div>
 
-            <div class="grid gap-4 md:grid-cols-2">
-                <div class="grid gap-2">
-                    <Label for="cedula">Cédula</Label>
-                    <Input
-                        id="cedula"
-                        class="mt-1 block w-full"
-                        name="cedula"
-                        :default-value="user.cedula"
-                        required
-                        autocomplete="off"
-                        placeholder="Cédula"
-                    />
-                    <InputError class="mt-2" :message="errors.cedula" />
-                </div>
-
-                <div class="grid gap-2">
-                    <Label for="telefono">Teléfono</Label>
-                    <Input
-                        id="telefono"
-                        class="mt-1 block w-full"
-                        name="telefono"
-                        :default-value="user.telefono"
-                        required
-                        autocomplete="tel"
-                        placeholder="Teléfono"
-                    />
-                    <InputError class="mt-2" :message="errors.telefono" />
-                </div>
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="email">Correo electrónico</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    name="email"
-                    :default-value="user.email"
-                    required
-                    autocomplete="email"
-                    placeholder="Correo electrónico"
-                />
-                <InputError class="mt-2" :message="errors.email" />
-            </div>
-
-            <div v-if="mustVerifyEmail && !user.email_verified_at">
-                <p class="-mt-4 text-sm text-muted-foreground">
-                    Tu correo no está verificado.
-                    <Link
-                        :href="send()"
-                        as="button"
-                        class="text-foreground underline decoration-neutral-300 underline-offset-4 transition hover:decoration-current"
-                    >
-                        Haz clic aquí para reenviar el email de verificación.
-                    </Link>
-                </p>
-
-                <div
-                    v-if="status === 'verification-link-sent'"
-                    class="mt-2 text-sm font-medium text-green-600"
-                >
-                    Se ha enviado un nuevo enlace de verificación a tu correo.
+                    <!-- Verificación de email -->
+                    <div v-if="mustVerifyEmail && !user.email_verified_at" class="rounded-lg border border-warning/30 bg-warning/5 p-3">
+                        <p class="text-sm text-neutral-600 dark:text-neutral-300">
+                            Tu correo no está verificado.
+                            <Link
+                                :href="send()"
+                                as="button"
+                                class="font-medium text-primary underline underline-offset-2 hover:text-primary-600"
+                            >
+                                Reenviar email de verificación
+                            </Link>
+                        </p>
+                        <p
+                            v-if="status === 'verification-link-sent'"
+                            class="mt-1 text-xs font-medium text-success"
+                        >
+                            ✓ Enlace enviado a tu correo.
+                        </p>
+                    </div>
                 </div>
             </div>
 
+            <!-- Sección por rol -->
+            <PersonalProfileSection
+                v-if="!isInmobiliaria"
+                :perfil="user.perfil_persona"
+                :rol-nombre="rolNombre"
+                :errors="errors"
+            />
+            <InmobiliariaProfileSection
+                v-else
+                :inmobiliaria="user.inmobiliaria"
+                :errors="errors"
+            />
+
+            <!-- Botón guardar -->
             <div class="flex items-center gap-4">
-                <Button :disabled="processing" data-test="update-profile-button">
+                <Button
+                    type="submit"
+                    size="lg"
+                    :disabled="processing"
+                    :tabindex="11"
+                    data-test="update-profile-button"
+                    class="bg-primary hover:bg-primary-600"
+                >
+                    <Spinner v-if="processing" />
                     Guardar cambios
                 </Button>
+                <span
+                    v-if="status === 'profile-updated'"
+                    class="text-sm font-medium text-success"
+                >
+                    ✓ Cambios guardados
+                </span>
             </div>
         </Form>
-    </div>
 
-    <DeleteUser />
+        <!-- Eliminar cuenta -->
+        <DeleteUser />
+    </div>
 </template>

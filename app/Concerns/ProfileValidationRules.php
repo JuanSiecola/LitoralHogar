@@ -10,9 +10,9 @@ trait ProfileValidationRules
     protected function profileRules(?int $userId = null): array
     {
         return [
-            'cedula' => ['nullable', 'numeric','digits:8',
+            'cedula' => ['nullable', 'numeric', 'digits:8',
                 Rule::unique('perfil_persona', 'cedula')
-                    ->when($userId !== null, fn($q) => $q->ignore($userId)),
+                    ->when($userId !== null, fn($q) => $q->ignore($userId, 'usuario_id')),
             ],
             'nombre' => ['required', 'string', 'max:255'],
             'apellido' => ['required', 'string', 'max:255'],
