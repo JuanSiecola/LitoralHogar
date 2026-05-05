@@ -11,36 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { send } from '@/routes/verification';
 import PersonalProfileSection from './partials/PersonalProfileSection.vue';
 import InmobiliariaProfileSection from './partials/InmobiliariaProfileSection.vue';
-
-interface PerfilPersona {
-    nombre: string;
-    apellido: string;
-    cedula: string | null;
-    telefono: string;
-    foto_url: string | null;
-}
-
-interface InmobiliariaData {
-    razon_social: string;
-    rut: string;
-    direccion: string;
-    telefono: string;
-    logo_url: string | null;
-}
-
-interface Rol {
-    id: number;
-    nombre: string;
-}
-
-interface User {
-    id: number;
-    email: string;
-    email_verified_at: string | null;
-    perfil_persona?: PerfilPersona;
-    inmobiliaria?: InmobiliariaData;
-    rol_usuario?: Rol[];
-}
+import { User as UserType, InmobiliariaData, Rol } from '@/types/user';
 
 type Props = {
     mustVerifyEmail: boolean;
@@ -61,12 +32,13 @@ defineOptions({
 });
 
 const page = usePage();
-const user = computed(() => page.props.auth.user as User);
+const user = computed(() => page.props.auth.user as UserType);
 
-const isInmobiliaria = computed(() =>
-    user.value.rol_usuario?.some(
-        (r) => r.nombre.toLowerCase().includes('inmobiliaria'),
-    ) ?? false,
+const isInmobiliaria = computed(
+    () =>
+        user.value.rol_usuario?.some((r) =>
+            r.nombre.toLowerCase().includes('inmobiliaria'),
+        ) ?? false,
 );
 
 const rolNombre = computed(() => {
@@ -85,11 +57,19 @@ const displayName = computed(() => {
 const avatarInitials = computed(() => {
     if (isInmobiliaria.value) {
         const name = user.value.inmobiliaria?.razon_social ?? '';
-        return name.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+
+        return name
+            .split(' ')
+            .slice(0, 2)
+            .map((w) => w[0])
+            .join('')
+            .toUpperCase();
     }
+
     const p = user.value.perfil_persona;
     const n = p?.nombre?.[0] ?? '';
     const a = p?.apellido?.[0] ?? '';
+
     return `${n}${a}`.toUpperCase();
 });
 
@@ -121,13 +101,14 @@ const handleAvatarChange = (event: Event) => {
     <h1 class="sr-only">Editar perfil</h1>
 
     <div class="flex flex-col space-y-8">
-
         <Heading
             variant="small"
             title="Editar perfil"
-            :description="isInmobiliaria
-                ? 'Actualizá los datos de tu inmobiliaria'
-                : 'Actualizá tu información personal'"
+            :description="
+                isInmobiliaria
+                    ? 'Actualizá los datos de tu inmobiliaria'
+                    : 'Actualizá tu información personal'
+            "
         />
 
         <!-- Avatar -->
@@ -150,9 +131,9 @@ const handleAvatarChange = (event: Event) => {
                 <label
                     for="avatar-input"
                     :class="[
-                        'absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-primary text-white shadow-sm transition dark:border-neutral-800',
+                        'absolute right-0 bottom-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-primary text-white shadow-sm transition dark:border-neutral-800',
                         photoForm.processing
-                            ? 'cursor-wait opacity-60 pointer-events-none'
+                            ? 'pointer-events-none cursor-wait opacity-60'
                             : 'cursor-pointer hover:bg-primary/80',
                     ]"
                     title="Cambiar foto"
@@ -170,7 +151,9 @@ const handleAvatarChange = (event: Event) => {
             </div>
 
             <div>
-                <p class="text-sm font-semibold text-neutral-800 dark:text-neutral-100">
+                <p
+                    class="text-sm font-semibold text-neutral-800 dark:text-neutral-100"
+                >
                     {{ displayName }}
                 </p>
                 <div class="mt-0.5 flex items-center gap-1.5">
@@ -182,7 +165,9 @@ const handleAvatarChange = (event: Event) => {
                         {{ rolNombre }} · {{ user.email }}
                     </p>
                 </div>
-                <p class="mt-1 text-xs text-neutral-400">JPG, PNG o WEBP · máx. 2 MB</p>
+                <p class="mt-1 text-xs text-neutral-400">
+                    JPG, PNG o WEBP · máx. 2 MB
+                </p>
             </div>
         </div>
 
@@ -193,17 +178,27 @@ const handleAvatarChange = (event: Event) => {
             v-slot="{ errors, processing }"
         >
             <!-- Email (común a todos) -->
-            <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-card dark:border-neutral-700 dark:bg-neutral-800/50">
-                <div class="mb-5 border-b border-neutral-100 pb-4 dark:border-neutral-700">
-                    <h2 class="text-sm font-semibold text-neutral-700 dark:text-neutral-200">
+            <div
+                class="rounded-xl border border-neutral-200 bg-white p-6 shadow-card dark:border-neutral-700 dark:bg-neutral-800/50"
+            >
+                <div
+                    class="mb-5 border-b border-neutral-100 pb-4 dark:border-neutral-700"
+                >
+                    <h2
+                        class="text-sm font-semibold text-neutral-700 dark:text-neutral-200"
+                    >
                         Correo electrónico
                     </h2>
                 </div>
 
                 <div class="grid gap-form-gap">
                     <div class="grid gap-1.5">
-                        <label for="email" class="text-sm font-medium text-neutral-700 dark:text-neutral-200">
-                            Correo electrónico <span class="text-danger">*</span>
+                        <label
+                            for="email"
+                            class="text-sm font-medium text-neutral-700 dark:text-neutral-200"
+                        >
+                            Correo electrónico
+                            <span class="text-danger">*</span>
                         </label>
                         <input
                             id="email"
@@ -215,16 +210,16 @@ const handleAvatarChange = (event: Event) => {
                             required
                             :tabindex="0"
                             :class="[
-                                'h-11 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow,border-color] duration-150',
+                                'h-11 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow,border-color] duration-150 outline-none',
                                 'placeholder:text-neutral-400',
                                 errors.email
-                                    ? 'border-danger focus-visible:border-danger focus-visible:ring-2 focus-visible:ring-danger/20'
+                                    ? 'border-danger focus-visible:border-danger focus-visible:ring-danger/20 focus-visible:ring-2'
                                     : 'border-neutral-300 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 dark:border-neutral-600',
                             ]"
                         />
                         <p
                             v-if="errors.email"
-                            class="flex items-center gap-1 text-xs font-medium text-danger"
+                            class="text-danger flex items-center gap-1 text-xs font-medium"
                             role="alert"
                         >
                             {{ errors.email }}
@@ -232,20 +227,25 @@ const handleAvatarChange = (event: Event) => {
                     </div>
 
                     <!-- Verificación de email -->
-                    <div v-if="mustVerifyEmail && !user.email_verified_at" class="rounded-lg border border-warning/30 bg-warning/5 p-3">
-                        <p class="text-sm text-neutral-600 dark:text-neutral-300">
+                    <div
+                        v-if="mustVerifyEmail && !user.email_verified_at"
+                        class="border-warning/30 bg-warning/5 rounded-lg border p-3"
+                    >
+                        <p
+                            class="text-sm text-neutral-600 dark:text-neutral-300"
+                        >
                             Tu correo no está verificado.
                             <Link
                                 :href="send()"
                                 as="button"
-                                class="font-medium text-primary underline underline-offset-2 hover:text-primary-600"
+                                class="hover:text-primary-600 font-medium text-primary underline underline-offset-2"
                             >
                                 Reenviar email de verificación
                             </Link>
                         </p>
                         <p
                             v-if="status === 'verification-link-sent'"
-                            class="mt-1 text-xs font-medium text-success"
+                            class="text-success mt-1 text-xs font-medium"
                         >
                             ✓ Enlace enviado a tu correo.
                         </p>
@@ -274,14 +274,14 @@ const handleAvatarChange = (event: Event) => {
                     :disabled="processing"
                     :tabindex="11"
                     data-test="update-profile-button"
-                    class="bg-primary hover:bg-primary-600"
+                    class="hover:bg-primary-600 bg-primary"
                 >
                     <Spinner v-if="processing" />
                     Guardar cambios
                 </Button>
                 <span
                     v-if="status === 'profile-updated'"
-                    class="text-sm font-medium text-success"
+                    class="text-success text-sm font-medium"
                 >
                     ✓ Cambios guardados
                 </span>

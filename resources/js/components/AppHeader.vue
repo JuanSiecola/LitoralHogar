@@ -249,14 +249,14 @@ const rightNavItems: NavItem[] = [
                                     class="size-8 overflow-hidden rounded-full"
                                 >
                                     <AvatarImage
-                                        v-if="auth.user.avatar"
-                                        :src="auth.user.avatar"
-                                        :alt="auth.user.name"
+                                        v-if="auth.user.perfil_persona?.foto_url"
+                                        :src="auth.user.perfil_persona.foto_url"
+                                        :alt="auth.user.nombre"
                                     />
                                     <AvatarFallback
                                         class="rounded-lg bg-neutral-200 font-semibold text-black dark:bg-neutral-700 dark:text-white"
                                     >
-                                        {{ getInitials(auth.user?.name) }}
+                                        {{ getInitials(`${auth.user?.perfil_persona?.nombre ?? ''} ${auth.user?.perfil_persona?.apellido ?? ''}`.trim()) }}
                                     </AvatarFallback>
                                 </Avatar>
                             </Button>
