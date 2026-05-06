@@ -53,3 +53,7 @@ Este es un proyecto en laravel para la gestión de propiedades. Desarrollado par
    - Inmobiliaria:
      - Email: inmobiliaria1@litoralhogar.com
      - Password: password123
+   - Administrador:
+     - Email: admin@litoralhogar.com
+     - Password: password123  
+    
