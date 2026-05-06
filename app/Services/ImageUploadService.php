@@ -21,7 +21,7 @@ class ImageUploadService
         ]);
     }
 
-    public function upload(UploadedFile $file, string $folder = 'litoral-hogar'): string
+    public function upload(UploadedFile $file, string $folder = 'litoral-hogar'): array
     {
         $result = $this->cloudinary->uploadApi()->upload(
             $file->getRealPath(),
@@ -31,6 +31,9 @@ class ImageUploadService
             ]
         );
 
-        return $result['secure_url'];
+        return [
+            'secure_url' => $result['secure_url'],
+            'public_id'  => $result['public_id'],
+        ];
     }
 }

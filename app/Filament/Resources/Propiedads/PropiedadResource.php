@@ -19,6 +19,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Forms\Components\FileUpload;
 
 
 class PropiedadResource extends Resource
@@ -66,6 +67,11 @@ class PropiedadResource extends Resource
                 ])
                 ->required(),
 
+            FileUpload::make('imagenes_upload')
+                ->label('Imágenes')
+                ->image()
+                ->multiple()
+                ->columnSpanFull(),
         ]);
     }
 
