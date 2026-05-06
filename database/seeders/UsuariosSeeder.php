@@ -16,7 +16,6 @@ class UsuariosSeeder extends Seeder
         $rolInmobiliaria = Rol::where('nombre', 'inmobiliaria')->first();
         $rolAgente       = Rol::where('nombre', 'agente')->first();
         $rolCliente      = Rol::where('nombre', 'cliente')->first();
-
         // --- Inmobiliarias ---
         $inmobiliarias = [
             [
@@ -101,5 +100,28 @@ class UsuariosSeeder extends Seeder
                 array_merge($data['perfil'], ['usuario_id' => $user->id])
             );
         }
+
+         // --- Admin ---
+        $rolAdmin = Rol::where('nombre', 'admin')->first();
+            
+        $user = User::firstOrCreate(
+            ['email' => 'admin@litoralhogar.com'],
+            [
+                'password' => Hash::make('admin123'),
+                'email_verified_at' => now(),
+                'is_admin' => true,
+            ]
+        );
+       
+        PerfilPersona::firstOrCreate(
+            ['usuario_id' => $user->id],
+            [
+                'usuario_id' => $user->id,
+                'nombre'     => 'Administrador',
+                'apellido'   => 'Sistema',
+                'cedula'     => '00000001',
+                'telefono'   => '0990000000',
+            ]
+        );
     }
 }
