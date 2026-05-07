@@ -28,8 +28,15 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('Litoral Hogar')
+            ->brandLogo(asset('logo.svg'))->brandLogoHeight('6rem')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#306f81',
+                'secondary' => '#c6764c',
+                'success' => Color::Green,
+                'danger' => Color::Red,
+                'warning' => Color::Yellow,
+                'info' => Color::Blue,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
