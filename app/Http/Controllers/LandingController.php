@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Propiedad;
 use App\Models\Inmobiliaria;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LandingController extends Controller
 {
@@ -12,10 +14,10 @@ class LandingController extends Controller
     {
         // Propiedades destacadas: las 6 más recientes con estado Disponible
         $propiedadesDestacadas = Propiedad::with([
-                'detalle_propiedad',
-                'ubicacion',
-                'imagenes' => fn($q) => $q->where('es_principal', true)->limit(1),
-            ])
+            'detalle_propiedad',
+            'ubicacion',
+            'imagenes' => fn($q) => $q->where('es_principal', true)->limit(1),
+        ])
             ->where('estado_propiedad', 'Disponible')
             ->orderByDesc('id')
             ->limit(6)
@@ -33,9 +35,15 @@ class LandingController extends Controller
                 'departamento'     => $p->ubicacion?->departamento,
                 'imagen_url'       => $p->imagenes->first()?->url,
             ]);
+        $categorias = Propiedad::where('estado_propiedad', 'Disponible')
+            ->select('tipo_propiedad', 'tipo_operacion')
+            ->distinct()
+            ->orderBy('tipo_propiedad')
+            ->get();
 
         return Inertia::render('Landing', [
-            'propiedadesDestacadas' => $propiedadesDestacadas
+            'propiedadesDestacadas' => $propiedadesDestacadas,
+                'categorias'            => $categorias
         ]);
     }
 }
