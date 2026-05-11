@@ -30,7 +30,7 @@ class CreateNewUser implements CreatesNewUsers
             $rules['apellido'] = ['nullable'];
         }
 
-        $messages = $this->profileMessages();
+        $messages = array_merge($this->profileMessages(), $this->passwordMessages());
 
         if ($esInmobiliaria) {
             $rules    = array_merge($rules, $this->inmobiliariaRules());

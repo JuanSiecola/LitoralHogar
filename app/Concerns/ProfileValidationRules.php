@@ -10,7 +10,7 @@ trait ProfileValidationRules
     protected function profileRules(?int $userId = null): array
     {
         return [
-            'cedula' => ['nullable', 'numeric', 'digits:8',
+            'cedula' => ['nullable', 'numeric', 'digits_between:7,8',
                 Rule::unique('perfil_persona', 'cedula')
                     ->when($userId !== null, fn($q) => $q->ignore($userId, 'usuario_id')),
             ],
@@ -31,7 +31,7 @@ trait ProfileValidationRules
         return [
             'cedula.unique' => 'Esta cédula ya existe en el sistema.',
             'cedula.numeric' => 'La cédula solo admite números',
-            'cedula.digits' => 'La cédula debe tener exactamente 8 dígitos, sin puntos ni guiones.',
+            'cedula.digits_between' => 'La cédula debe tener entre 7 y 8 dígitos, sin puntos ni guiones.',
             'email.unique' => 'Este correo electrónico ya ha sido registrado.',
             'email.required' => 'El correo electrónico es obligatorio',
             'telefono.regex' => 'El teléfono debe comenzar con 09 y tener 9 dígitos (ej: 099123456).',

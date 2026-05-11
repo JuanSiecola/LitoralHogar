@@ -11,7 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { send } from '@/routes/verification';
 import PersonalProfileSection from './partials/PersonalProfileSection.vue';
 import InmobiliariaProfileSection from './partials/InmobiliariaProfileSection.vue';
-import { User as UserType, InmobiliariaData, Rol } from '@/types/user';
+import { User as UserType} from '@/types/user';
 
 type Props = {
     mustVerifyEmail: boolean;
@@ -131,7 +131,7 @@ const handleAvatarChange = (event: Event) => {
                 <label
                     for="avatar-input"
                     :class="[
-                        'absolute right-0 bottom-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-primary text-white shadow-sm transition dark:border-neutral-800',
+                        'absolute right-0 bottom-0 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-primary-foreground shadow-sm transition dark:border-neutral-800',
                         photoForm.processing
                             ? 'pointer-events-none cursor-wait opacity-60'
                             : 'cursor-pointer hover:bg-primary/80',
