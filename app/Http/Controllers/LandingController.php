@@ -35,7 +35,7 @@ class LandingController extends Controller
             ]);
 
         return Inertia::render('Landing', [
-            'propiedadesDestacadas' => $propiedadesDestacadas,
+            'propiedadesDestacadas' => $propiedadesDestacadas
         ]);
     }
 }
