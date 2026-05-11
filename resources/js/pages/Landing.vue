@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import PropertyCard from '@/components/PropertyCard.vue'
+import LandingNavbar from '@/components/LandingNavbar.vue'
 
 interface Propiedad {
   id: number
@@ -39,7 +40,7 @@ function buscar() {
 
 <template>
   <div class="min-h-screen bg-background">
-
+    <LandingNavbar />
     <!-- Hero -->
     <section class="relative bg-gradient-to-br from-primary/10 to-background py-20 px-4">
       <div class="max-w-4xl mx-auto text-center">
@@ -81,7 +82,7 @@ function buscar() {
       </div>
     </section>
     <!-- Propiedades destacadas -->
-    <section class="py-16 px-4 max-w-7xl mx-auto">
+        <section id="destacadas" class="py-16 px-4 max-w-7xl mx-auto">
         <h2 class="text-2xl font-bold text-foreground mb-2">Propiedades destacadas</h2>
             <p class="text-muted-foreground mb-8">Las últimas propiedades disponibles</p>
 
