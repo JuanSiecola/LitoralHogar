@@ -45,10 +45,10 @@ function buscar() {
     <section class="relative bg-gradient-to-br from-primary/10 to-background py-20 px-4">
       <div class="max-w-4xl mx-auto text-center">
         <h1 class="text-4xl md:text-5xl font-bold text-foreground">
-          Encontrá tu próximo hogar en Pysandú, Uruguay
+          Encontrá tu próximo hogar para comprar o alquilar en Uruguay
         </h1>
         <p class="mt-4 text-lg text-muted-foreground">
-          Miles de propiedades en venta y alquiler en Pysandú.
+          Miles de propiedades en venta y alquiler en todos los departamentos del país.
         </p>
 
         <!-- Buscador -->

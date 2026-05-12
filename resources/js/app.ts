@@ -15,7 +15,6 @@ createInertiaApp({
      resolve: (name) =>
         resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')).then((module) => {
             switch (true) {
-                case name === 'Welcome':
                 case name === 'Landing':
                     module.default.layout = null;
                     break;
