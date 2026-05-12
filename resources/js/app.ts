@@ -7,16 +7,20 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
+import PublicLayout from '@/layouts/PublicLayout.vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-     resolve: (name) =>
-        resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')).then((module) => {
+    resolve: (name) =>
+        resolvePageComponent(
+            `./pages/${name}.vue`,
+            import.meta.glob<DefineComponent>('./pages/**/*.vue'),
+        ).then((module) => {
             switch (true) {
                 case name === 'Landing':
-                    module.default.layout = null;
+                    module.default.layout = PublicLayout;
                     break;
                 case name.startsWith('auth/'):
                     module.default.layout = AuthLayout;
