@@ -4,8 +4,6 @@ import {
     Phone,
     Mail,
     MapPin,
-    Facebook,
-    Instagram,
     ExternalLink,
 } from 'lucide-vue-next';
 </script>
@@ -80,25 +78,6 @@ import {
                             </a>
                         </li>
                     </ul>
-
-                    <div class="mt-2 flex items-center gap-4">
-                        <a
-                            href="https://facebook.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="text-muted-foreground transition-colors hover:text-primary"
-                        >
-                            <Facebook class="h-5 w-5" />
-                        </a>
-                        <a
-                            href="https://instagram.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="text-muted-foreground transition-colors hover:text-primary"
-                        >
-                            <Instagram class="h-5 w-5" />
-                        </a>
-                    </div>
                 </div>
             </div>
 
