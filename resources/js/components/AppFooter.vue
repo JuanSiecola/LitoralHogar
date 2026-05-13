@@ -4,7 +4,6 @@ import {
     Phone,
     Mail,
     MapPin,
-    ExternalLink,
 } from 'lucide-vue-next';
 </script>
 

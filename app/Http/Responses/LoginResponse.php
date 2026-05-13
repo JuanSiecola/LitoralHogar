@@ -15,8 +15,8 @@ class LoginResponse implements LoginResponseContract
             ->toArray();
 
         if (in_array('inmobiliaria', $roles)) {
-            // TODO: cambiar a route('inmobiliaria.dashboard') cuando esté implementado
-            return redirect()->intended(route('dashboard'));
+            
+            return redirect()->intended(route('inmobiliaria.dashboard'));
         }
 
         // cliente y/o agente nos manda a landing page sape

@@ -95,51 +95,59 @@
 }
 
 :root {
+    /* Paleta exacta del logo Litoral Hogar */
+    --brand-teal:        hsl(197 52% 36%); /* #2c718d — teal principal (texto logo) */
+    --brand-teal-dark:   hsl(196 48% 31%); /* #296175 — teal oscuro (edificio) */
+    --brand-teal-muted:  hsl(177 18% 42%); /* #587e7c — teal apagado */
+    --brand-orange:      hsl(21  48% 52%); /* #bf7349 — terracota/naranja */
+    --brand-orange-light:hsl(28  68% 64%); /* #e19e63 — naranja claro */
+    --brand-olive:       hsl(72  16% 50%); /* #8b936a — oliva/sage */
+
     --background: hsl(0 0% 100%);
-    --foreground: hsl(195 30% 15%);
+    --foreground: hsl(197 48% 14%);
 
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(195 30% 15%);
+    --card-foreground: hsl(197 48% 14%);
 
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(195 30% 15%);
+    --popover-foreground: hsl(197 48% 14%);
 
-    --primary: hsl(193,46%,34%);
+    --primary: hsl(197 52% 36%);
     --primary-foreground: hsl(0 0% 98%);
 
-    --secondary: hsl(19,55%,55%);
+    --secondary: hsl(21 48% 52%);
     --secondary-foreground: hsl(0 0% 98%);
 
-    --muted: hsl(195 15% 95%);
-    --muted-foreground: hsl(195 10% 40%);
+    --muted: hsl(197 20% 95%);
+    --muted-foreground: hsl(197 15% 40%);
 
-    --accent: hsl(70,17%,49%);
+    --accent: hsl(72 16% 50%);
     --accent-foreground: hsl(0 0% 98%);
 
     --destructive: hsl(0 84.2% 60.2%);
     --destructive-foreground: hsl(0 0% 98%);
 
-    --border: hsl(195 15% 88%);
-    --input: hsl(195 15% 85%);
-    --ring: hsl(195 30% 24%);
+    --border: hsl(197 20% 88%);
+    --input: hsl(197 20% 85%);
+    --ring: hsl(197 52% 36%);
 
-    --chart-1: hsl(16 46% 53%);
-    --chart-2: hsl(195 30% 24%);
-    --chart-3: hsl(90 20% 45%);
-    --chart-4: hsl(199 51% 35%);
-    --chart-5: hsl(35 50% 55%);
+    --chart-1: hsl(21  48% 52%); /* terracota */
+    --chart-2: hsl(197 52% 36%); /* teal */
+    --chart-3: hsl(72  16% 50%); /* oliva */
+    --chart-4: hsl(28  68% 64%); /* naranja claro */
+    --chart-5: hsl(177 18% 42%); /* teal apagado */
 
     --radius: 0.5rem;
 
-    --sidebar-background: hsl(195 20% 97%);
-    --sidebar-foreground: hsl(195 30% 20%);
-    --sidebar-primary: hsl(195 30% 24%);
+    --sidebar-background: hsl(197 20% 97%);
+    --sidebar-foreground: hsl(197 30% 20%);
+    --sidebar-primary: hsl(197 52% 36%);
     --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(195 15% 93%);
-    --sidebar-accent-foreground: hsl(195 30% 20%);
-    --sidebar-border: hsl(195 15% 88%);
-    --sidebar-ring: hsl(199 51% 35%);
-    --sidebar: hsl(195 20% 97%);
+    --sidebar-accent: hsl(197 15% 93%);
+    --sidebar-accent-foreground: hsl(197 30% 20%);
+    --sidebar-border: hsl(197 20% 88%);
+    --sidebar-ring: hsl(197 52% 36%);
+    --sidebar: hsl(197 20% 97%);
 }
 
 .dark {
