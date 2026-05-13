@@ -16,6 +16,17 @@ export type User = {
         telefono: string;
         foto_url: string | null;
     };
+    inmobiliaria?: {
+        razon_social: string;
+        rut: string;
+        direccion: string;
+        telefono: string;
+        logo_url: string | null;
+    };
+    rol_usuario?: {
+        id: number;
+        nombre: string;
+    }[];
     [key: string]: unknown;
 };
 

@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import PropertyCard from '@/components/PropertyCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
+import { Head } from '@inertiajs/vue3';
 import {
     Home,
     Building2,
