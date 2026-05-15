@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Concerns;
+namespace App\Concerns\Profile;
 
 trait ProfilePhotoValidationRules
 {
     protected function profilePhotoRules(): array
     {
         return [
-            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], 
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 
