@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Concerns;
+namespace App\Concerns\Inmobiliaria;
 
 use Illuminate\Validation\Rule;
 

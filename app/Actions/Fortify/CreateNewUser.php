@@ -2,11 +2,11 @@
 
 namespace App\Actions\Fortify;
 
-use App\Concerns\PasswordValidationRules;
-use App\Concerns\ProfileValidationRules;
+use App\Concerns\Profile\ProfileValidationRules;
 use App\Models\Inmobiliaria;
 use App\Models\PerfilPersona;
-use App\Concerns\InmobiliariaValidationRules;
+use App\Concerns\Auth\PasswordValidationRules;
+use App\Concerns\Inmobiliaria\InmobiliariaValidationRules;
 use App\Models\User;
 use App\Models\Rol;
 use Illuminate\Support\Facades\Validator;

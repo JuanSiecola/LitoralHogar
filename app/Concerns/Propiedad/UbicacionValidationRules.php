@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Concerns;
+namespace App\Concerns\Propiedad;
 
 use Illuminate\Validation\Rule;
 

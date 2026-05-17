@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Concerns;
+namespace App\Concerns\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rules\Password;
