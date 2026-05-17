@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Propiedad;
 
 use App\Actions\Propiedad\PropiedadCrearAction;
-use App\Concerns\DetallePropiedadValidationRules;
-use App\Concerns\PropiedadValidationRules;
-use App\Concerns\UbicacionValidationRules;
+use App\Concerns\Propiedad\DetallePropiedadValidationRules;
+use App\Concerns\Propiedad\PropiedadValidationRules;
+use App\Concerns\Propiedad\UbicacionValidationRules;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,7 +20,13 @@ class PropiedadController extends Controller
      */
     public function index()
     {
-        //
+        $propiedades = Propiedad::where('usuario_id', auth()->id())
+        ->with(['ubicacion', 'detalle_propiedad', 'imagenes'])
+        ->get();
+
+        return Inertia::render('inmobiliaria/propiedades/Index', [
+            'propiedades' => $propiedades,
+        ]);
     }
 
     /**
