@@ -2,16 +2,17 @@
 
 namespace App\Actions\Fortify;
 
-use App\Concerns\PasswordValidationRules;
-use App\Concerns\ProfileValidationRules;
+use App\Concerns\Profile\ProfileValidationRules;
 use App\Models\Inmobiliaria;
 use App\Models\PerfilPersona;
-use App\Concerns\InmobiliariaValidationRules;
+use App\Concerns\Auth\PasswordValidationRules;
+use App\Concerns\Inmobiliaria\InmobiliariaValidationRules;
 use App\Models\User;
 use App\Models\Rol;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Illuminate\Support\Facades\DB;
+use App\Services\ImageUploadService;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -33,7 +34,7 @@ class CreateNewUser implements CreatesNewUsers
         $messages = array_merge($this->profileMessages(), $this->passwordMessages());
 
         if ($esInmobiliaria) {
-            $rules    = array_merge($rules, $this->inmobiliariaRules());
+            $rules = array_merge($rules, $this->inmobiliariaRules());
             $messages = array_merge($messages, $this->inmobiliariaMessages());
         }
 
@@ -41,33 +42,39 @@ class CreateNewUser implements CreatesNewUsers
 
         return DB::transaction(function () use ($input, $esInmobiliaria) {
             $user = User::create([
-                'email'    => $input['email'],
+                'email' => $input['email'],
                 'password' => $input['password'],
             ]);
 
             if ($esInmobiliaria) {
+                $logoUrl = null;
+                if (!empty($input['logo_url'])) {
+                    $uploader = new ImageUploadService();
+                    $result = $uploader->upload($input['logo_url'], 'litoral-hogar/logos');
+                    $logoUrl = $result['secure_url'];
+                }
                 Inmobiliaria::create([
-                    'usuario_id'   => $user->id,
+                    'usuario_id' => $user->id,
                     'razon_social' => $input['razon_social'],
-                    'rut'          => $input['rut'],
-                    'direccion'    => $input['direccion'],
-                    'telefono'     => $input['telefono'],
-                    'logo_url'     => null,
+                    'rut' => $input['rut'],
+                    'direccion' => $input['direccion'],
+                    'telefono' => $input['telefono'],
+                    'logo_url' => $logoUrl,
                 ]);
             } else {
                 PerfilPersona::create([
                     'usuario_id' => $user->id,
-                    'nombre'     => $input['nombre'],
-                    'apellido'   => $input['apellido'],
-                    'cedula'     => $input['cedula'] ?? null,
-                    'telefono'   => $input['telefono'],
+                    'nombre' => $input['nombre'],
+                    'apellido' => $input['apellido'],
+                    'cedula' => $input['cedula'] ?? null,
+                    'telefono' => $input['telefono'],
                 ]);
             }
 
-            $rolNombre = match($input['tipo']) {
+            $rolNombre = match ($input['tipo']) {
                 'inmobiliaria' => 'inmobiliaria',
-                'agente'       => 'agente',
-                'cliente'      => 'cliente',
+                'agente' => 'agente',
+                'cliente' => 'cliente',
             };
 
             $roles = [Rol::where('nombre', $rolNombre)->value('id')];

@@ -120,7 +120,7 @@ const clearFile = () => {
                 :id="`file-${name}`"
                 type="file"
                 :name="name"
-                :accept="accept"
+                accept="image/jpg,image/jpeg,image/png,image/webp"
                 :tabindex="tabindex"
                 class="hidden"
                 @change="handleFileSelect"

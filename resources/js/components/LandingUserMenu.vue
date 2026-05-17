@@ -11,7 +11,7 @@ import type { User } from '@/types';
 
 const props = defineProps<{ user: User }>();
 
-const { avatarUrl, displayName, initials } = useUserDisplay(props.user);
+const { avatarUrl, displayName, initials } = useUserDisplay(() => props.user);
 </script>
 
 <template>

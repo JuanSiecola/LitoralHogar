@@ -8,7 +8,6 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 import PublicLayout from '@/layouts/PublicLayout.vue';
-
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -27,6 +26,10 @@ createInertiaApp({
                     break;
                 case name.startsWith('settings/'):
                     module.default.layout = [AppLayout, SettingsLayout];
+                    break;
+                case name.startsWith('inmobiliaria/'):
+                case name.startsWith('agente/'):
+                    // cada página maneja su propio layout via PanelLayout
                     break;
                 default:
                     module.default.layout = AppLayout;

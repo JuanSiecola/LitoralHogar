@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Concerns;
+namespace App\Concerns\Inmobiliaria;
 
 use Illuminate\Validation\Rule;
 
@@ -16,6 +16,7 @@ trait InmobiliariaValidationRules
             ],
             'direccion'    => ['required', 'string', 'max:255'],
             'telefono'     => ['required', 'string', 'regex:/^09\d{7}$/'],
+            'logo_url'     => ['nullable', 'image', 'max:2048', 'mimes:jpg,jpeg,png,webp'], 
         ];
     }
 
@@ -29,6 +30,9 @@ trait InmobiliariaValidationRules
             'direccion.required'    => 'La dirección es obligatoria.',
             'telefono.required'     => 'El teléfono es obligatorio.',
             'telefono.regex'        => 'El teléfono debe comenzar con 09 y tener 9 dígitos (ej: 099123456).',
+            'logo_url.image'       => 'El archivo debe ser una imagen.',
+            'logo_url.max'         => 'El logo no debe superar los 2MB.',
+            'logo_url.mimes'       => 'Solo se aceptan JPG, PNG o WEBP.',
         ];
     }
 }

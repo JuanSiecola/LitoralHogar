@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\ImageUploadService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Concerns\ProfilePhotoValidationRules;
+use App\Concerns\Profile\ProfilePhotoValidationRules;
 
 class ProfilePhotoController extends Controller
 {
