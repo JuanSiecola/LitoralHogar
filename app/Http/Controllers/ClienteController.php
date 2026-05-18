@@ -15,8 +15,8 @@ class ClienteController extends Controller
         $user = Auth::user();
         return inertia('Cliente/Dashboard', [
             'totalFavoritos' => $user->favoritos()->count(),
-            /* 'totalConsultas' => $user->consultas()->count(), */
-            /* 'consultasRecientes' => $user->consultas()->latest()->take(3)->with('propiedad')->get(), */
+             'totalConsultas' => $user->consultas()->count(), 
+             'consultasRecientes' => $user->consultas()->latest()->take(3)->with('propiedad')->get(), 
         ]);
     }
 
