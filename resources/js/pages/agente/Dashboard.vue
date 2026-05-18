@@ -1,17 +1,25 @@
-<script setup>
-import PanelLayout from '@/layouts/PanelLayout.vue'
-import { useAgenteNav } from '@/composables/useAgenteNav'
-
-const navLinks = useAgenteNav()
-</script>
-
 <template>
-    <PanelLayout :navLinks="navLinks">
-        <h1 class="text-2xl font-semibold text-gray-900 mb-1">Dashboard</h1>
-        <p class="text-sm text-gray-500">Bienvenido a tu panel de agente.</p>
+  <AgenteLayout>
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard Agente</h1>
 
-        <div class="mt-8 rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center">
-            <p class="text-sm text-gray-400">📊 Stats de propiedades próximamente</p>
-        </div>
-    </PanelLayout>
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <div class="bg-white rounded-xl shadow p-6 text-center">
+        <p class="text-3xl font-bold text-green-600">{{ propsActivas }}</p>
+        <p class="text-gray-500 mt-1">Propiedades activas</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-6 text-center">
+        <p class="text-3xl font-bold text-blue-600">{{ totalVistas }}</p>
+        <p class="text-gray-500 mt-1">Total vistas</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-6 text-center">
+        <p class="text-3xl font-bold text-yellow-600">{{ consultasPendientes }}</p>
+        <p class="text-gray-500 mt-1">Consultas pendientes</p>
+      </div>
+    </div>
+  </AgenteLayout>
 </template>
+
+<script setup>
+import AgenteLayout from '@/layouts/AgenteLayout.vue'
+defineProps(['propsActivas', 'totalVistas', 'consultasPendientes'])
+</script>

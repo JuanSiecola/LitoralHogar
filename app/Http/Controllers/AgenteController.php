@@ -12,7 +12,7 @@ class AgenteController extends Controller
     public function dashboard()
     {
         $agente = auth()->user();
-        return inertia('Agente/Dashboard', [
+        return inertia('agente/Dashboard', [
             'propsActivas' => $agente->propiedades()->where('estado_propiedad', 'Disponible')->count(),
             'totalVistas'  => 0 ,  /* $agente->propiedades()->sum('calificacion'), */
             'consultasPendientes' => Consulta::whereIn(
@@ -29,7 +29,7 @@ class AgenteController extends Controller
             ->when(request('estado'), fn($q, $e) => $q->where('estado_propiedad', $e))
             ->paginate(15);
 
-        return inertia('Agente/Propiedades', compact('propiedades'));
+        return inertia('agente/Propiedades', compact('propiedades'));
     }
 
     // Listar consultas recibidas en propiedades del agente
@@ -40,7 +40,7 @@ class AgenteController extends Controller
             ->latest()
             ->paginate(15);
 
-        return inertia('Agente/ConsultasRecibidas', compact('consultas'));
+        return inertia('agente/ConsultasRecibidas', compact('consultas'));
     }
 
     // Endpoint para responder
