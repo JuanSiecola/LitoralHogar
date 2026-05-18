@@ -29,6 +29,7 @@ createInertiaApp({
                     break;
                 case name.startsWith('inmobiliaria/'):
                 case name.startsWith('agente/'):
+                case name.startsWith('Cliente/'):
                     // cada página maneja su propio layout via PanelLayout
                     break;
                 default:

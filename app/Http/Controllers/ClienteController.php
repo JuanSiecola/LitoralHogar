@@ -15,8 +15,8 @@ class ClienteController extends Controller
         $user = Auth::user();
         return inertia('Cliente/Dashboard', [
             'totalFavoritos' => $user->favoritos()->count(),
-            'totalConsultas' => $user->consultas()->count(),
-            'consultasRecientes' => $user->consultas()->latest()->take(3)->with('propiedad')->get(),
+            /* 'totalConsultas' => $user->consultas()->count(), */
+            /* 'consultasRecientes' => $user->consultas()->latest()->take(3)->with('propiedad')->get(), */
         ]);
     }
 
@@ -32,8 +32,13 @@ class ClienteController extends Controller
         return back();
     }
 
-    public function consultas()
+     public function consultas()
     {
-        return view('cliente.consultas');
-    }
+        $consultas = auth()->user()
+        ->consultas()
+        ->with('propiedad')
+        ->latest()
+        ->paginate(12);
+        return inertia('Cliente/Consultas', compact('consultas'));
+    } 
 }

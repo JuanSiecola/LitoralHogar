@@ -16,9 +16,19 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-    if (!Auth::check() || Auth::user()->rol !== $role) {
-        abort(403);
-    }
-    return $next($request);
+        if (!Auth::check()) {
+            abort(403);
+        }
+        $roles = Auth::user()
+            ->rol_usuario
+            ->pluck('nombre')
+            ->map(fn($r) => strtolower($r))
+            ->toArray();
+
+        if (!in_array(strtolower($role), $roles)) {
+            abort(403);
+        }
+
+        return $next($request);
     }
 }
