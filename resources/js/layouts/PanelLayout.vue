@@ -24,7 +24,7 @@ function logoutUser() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-muted flex">
+    <div class="h-screen bg-muted flex overflow-hidden">
 
         <div v-if="sidebarOpen" class="fixed inset-0 z-20 bg-black/40 lg:hidden" @click="sidebarOpen = false" />
 

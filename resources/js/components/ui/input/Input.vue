@@ -31,13 +31,22 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emits = defineEmits<{
-  (e: 'update:modelValue', payload: string | number): void;
+  (e: 'update:modelValue', payload: string | number | undefined): void;
 }>();
 
 const modelValue = useVModel(props, 'modelValue', emits, {
   passive: true,
   defaultValue: props.defaultValue,
 });
+
+function handleInput(event: Event) {
+  const target = event.target as HTMLInputElement;
+  if (props.type === 'number') {
+    modelValue.value = target.value === '' ? undefined as any : Number(target.value);
+  } else {
+    modelValue.value = target.value;
+  }
+}
 </script>
 
 <template>
@@ -56,7 +65,8 @@ const modelValue = useVModel(props, 'modelValue', emits, {
     </label>
 
     <input
-      v-model="modelValue"
+      :value="modelValue"
+      @input="handleInput"
       :id="props.id"
       :name="props.name"
       :type="props.type"
