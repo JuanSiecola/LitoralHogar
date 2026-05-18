@@ -10,6 +10,20 @@ use App\Models\Propiedad;
 
 class ClienteController extends Controller
 {
+    public function redirigirPropiedades()
+    {
+        $user = Auth::user()->loadMissing('rol_usuario');
+
+        $esCliente = $user->rol_usuario
+            ->contains(fn($rol) => strtolower($rol->nombre) === 'cliente');
+
+        if (!$esCliente) {
+            abort(403);
+        }
+
+        return redirect()->route('cliente.propiedades');
+    }
+
     public function dashboard()
     {
         $user = Auth::user();
@@ -40,5 +54,33 @@ class ClienteController extends Controller
         ->latest()
         ->paginate(12);
         return inertia('Cliente/Consultas', compact('consultas'));
+    } 
+
+    public function propiedades()
+    {
+        $propiedades = Propiedad::with([
+            'detalle_propiedad',
+            'ubicacion',
+            'imagenes' => fn($q) => $q->where('es_principal', true)->limit(1),
+        ])
+            ->where('estado_propiedad', 'Disponible')
+            ->orderByDesc('fecha_publicacion')
+            ->paginate(12)
+            ->withQueryString()
+            ->through(fn($propiedad) => [
+                'id' => $propiedad->id,
+                'titulo' => $propiedad->titulo,
+                'tipo_operacion' => $propiedad->tipo_operacion,
+                'tipo_propiedad' => $propiedad->tipo_propiedad,
+                'precio' => $propiedad->detalle_propiedad?->precio ?? 0,
+                'nro_habitaciones' => $propiedad->detalle_propiedad?->nro_habitaciones ?? 0,
+                'nro_banios' => $propiedad->detalle_propiedad?->nro_banios ?? 0,
+                'superficie_total' => $propiedad->detalle_propiedad?->superficie_total ?? 0,
+                'ciudad' => $propiedad->ubicacion?->ciudad ?? 'Sin ciudad',
+                'departamento' => $propiedad->ubicacion?->departamento ?? 'Sin departamento',
+                'imagen_url' => $propiedad->imagenes->first()?->url,
+            ]);
+
+        return inertia('Cliente/Propiedades', compact('propiedades'));
     } 
 }

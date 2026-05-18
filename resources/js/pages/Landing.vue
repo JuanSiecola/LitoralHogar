@@ -161,7 +161,7 @@ const submit = () => {
 
         <div class="mt-10 text-center">
             <a
-                href="/propiedades"
+                href="propiedades"
                 class="inline-block rounded-lg border border-primary px-8 py-3 font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
             >
                 Ver todas las propiedades
