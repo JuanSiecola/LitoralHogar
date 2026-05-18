@@ -29,4 +29,8 @@ Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->g
     Route::post('/consultas/{consulta}/responder', [AgenteController::class, 'responderConsulta'])->name('consultas.responder');
 });
 
+Route::post('/contact', [LandingController::class, 'sendContact'])->name('contact.send');
+
+
+
 require __DIR__.'/settings.php';
