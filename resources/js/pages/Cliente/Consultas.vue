@@ -1,4 +1,3 @@
-<!-- resources/js/Pages/Cliente/Consultas.vue -->
 <template>
   <ClienteLayout>
     <h1 class="text-2xl font-bold mb-6">Mis Consultas</h1>
@@ -32,7 +31,7 @@
 </template>
 
 <script setup>
-import ClienteLayout from '@/Layouts/ClienteLayout.vue'
+import ClienteLayout from '@/layouts/ClienteLayout.vue'
 defineProps(['consultas'])
 
 function estadoBadge(estado) {
