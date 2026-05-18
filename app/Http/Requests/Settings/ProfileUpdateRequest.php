@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Settings;
 
-use App\Concerns\InmobiliariaValidationRules;
-use App\Concerns\ProfileValidationRules;
+use App\Concerns\Inmobiliaria\InmobiliariaValidationRules;
+use App\Concerns\Profile\ProfileValidationRules;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

@@ -196,6 +196,9 @@ return [
     */
 
     'attributes' => [
+        'titulo' => 'título',
+        'tipo_propiedad' => 'tipo de propiedad',
+        'tipo_operacion' => 'tipo de operación',
         'email' => 'correo electrónico',
         'password' => 'contraseña'
     ],

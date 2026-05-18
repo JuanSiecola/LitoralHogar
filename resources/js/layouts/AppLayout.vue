@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/app/AppHeaderLayout.vue';
+import AppContent from '@/components/AppContent.vue';
+import AppHeader from '@/components/AppHeader.vue';
+import AppShell from '@/components/AppShell.vue';
+import { Toaster } from '@/components/ui/sonner';
 import type { BreadcrumbItem } from '@/types';
 
 const { breadcrumbs = [] } = defineProps<{
@@ -8,7 +11,11 @@ const { breadcrumbs = [] } = defineProps<{
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <slot />
-    </AppLayout>
+    <AppShell variant="header">
+        <AppHeader :breadcrumbs="breadcrumbs" />
+        <AppContent variant="header">
+            <slot />
+        </AppContent>
+        <Toaster />
+    </AppShell>
 </template>

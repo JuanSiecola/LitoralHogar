@@ -9,6 +9,7 @@ import TextLink from '@/components/TextLink.vue';
 import FileUploadInput from '@/components/FileUploadInput.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
@@ -62,6 +63,7 @@ function volver() {
 </script>
 
 <template>
+
     <Head title="Crear cuenta" />
 
     <!-- Paso 1: Selección de tipo -->
@@ -72,13 +74,8 @@ function volver() {
         </div>
 
         <div class="grid grid-cols-1 gap-3">
-            <button
-                v-for="opcion in opciones"
-                :key="opcion.valor"
-                type="button"
-                @click="elegirTipo(opcion.valor)"
-                class="flex items-center gap-4 rounded-lg border p-5 text-left transition-colors hover:border-primary hover:bg-muted"
-            >
+            <button v-for="opcion in opciones" :key="opcion.valor" type="button" @click="elegirTipo(opcion.valor)"
+                class="flex items-center gap-4 rounded-lg border p-5 text-left transition-colors hover:border-primary hover:bg-muted">
                 <component :is="opcion.icono" class="size-6 shrink-0 text-primary" />
                 <div>
                     <p class="font-semibold">{{ opcion.titulo }}</p>
@@ -94,14 +91,8 @@ function volver() {
     </div>
 
     <!-- Paso 2: Formulario según tipo -->
-    <Form
-        v-else
-        v-bind="store.form()"
-        :reset-on-success="['password', 'password_confirmation']"
-        v-slot="{ errors, processing }"
-        enctype="multipart/form-data"
-        class="flex flex-col gap-6"
-    >
+    <Form v-else v-bind="store.form()" :reset-on-success="['password', 'password_confirmation']"
+        v-slot="{ errors, processing }" enctype="multipart/form-data" class="flex flex-col gap-6">
         <input type="hidden" name="tipo" :value="tipo" />
 
         <div class="grid gap-6">
@@ -110,74 +101,40 @@ function volver() {
             <template v-if="tipo === 'inmobiliaria'">
                 <div class="grid gap-2">
                     <Label for="razon_social">Razón Social</Label>
-                    <Input
-                        id="razon_social"
-                        type="text"
-                        required
-                        autofocus
-                        name="razon_social"
-                        placeholder="Inmobiliaria XYZ S.A."
-                    />
+                    <Input id="razon_social" type="text" required autofocus name="razon_social"
+                        placeholder="Inmobiliaria XYZ S.A." />
                     <InputError :message="errors.razon_social" />
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div class="grid gap-2">
                         <Label for="rut">RUT</Label>
-                        <Input
-                            id="rut"
-                            type="text"
-                            required
-                            name="rut"
-                            placeholder="211234560010"
-                        />
+                        <Input id="rut" type="text" required name="rut" placeholder="211234560010" />
                         <InputError :message="errors.rut" />
                     </div>
                     <div class="grid gap-2">
                         <Label for="direccion">Dirección</Label>
-                        <Input
-                            id="direccion"
-                            type="text"
-                            required
-                            name="direccion"
-                            placeholder="Av. 18 de Julio 1234"
-                        />
+                        <Input id="direccion" type="text" required name="direccion"
+                            placeholder="Av. 18 de Julio 1234" />
                         <InputError :message="errors.direccion" />
                     </div>
                 </div>
 
-                <FileUpload
-                    label="Logo (archivo, max 2MB)"
-                    name="logo_url"
-                    :errors="errors.logo_url"
-                />
+                <FileUpload label="Logo (archivo, max 2MB)" name="logo_url" :errors="errors.logo_url" />
             </template>
 
             <!-- Nombre y Apellido (solo agente y cliente) -->
             <div v-if="tipo !== 'inmobiliaria'" class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div class="grid gap-2">
                     <Label for="nombre">Nombre</Label>
-                    <Input
-                        id="nombre"
-                        type="text"
-                        required
-                        autofocus
-                        autocomplete="given-name"
-                        name="nombre"
-                        placeholder="Juan"
-                    />
+                    <Input id="nombre" type="text" required autofocus autocomplete="given-name" name="nombre"
+                        placeholder="Juan" />
                     <InputError :message="errors.nombre" />
                 </div>
                 <div class="grid gap-2">
                     <Label for="apellido">Apellido</Label>
-                    <Input
-                        id="apellido"
-                        type="text"
-                        required
-                        autocomplete="family-name"
-                        name="apellido"
-                        placeholder="Pérez"
-                    />
+                    <Input id="apellido" type="text" required autocomplete="family-name" name="apellido"
+                        placeholder="Pérez" />
                     <InputError :message="errors.apellido" />
                 </div>
             </div>
@@ -186,41 +143,21 @@ function volver() {
             <div v-if="tipo !== 'inmobiliaria'" class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div class="grid gap-2">
                     <Label for="cedula">Cédula</Label>
-                    <Input
-                        id="cedula"
-                        type="text"
-                        required
-                        autocomplete="off"
-                        name="cedula"
-                        placeholder="12345678"
-                    />
+                    <Input id="cedula" type="text" required autocomplete="off" name="cedula" placeholder="12345678" />
                     <InputError :message="errors.cedula" />
                 </div>
                 <div class="grid gap-2">
                     <Label for="telefono">Teléfono</Label>
-                    <Input
-                        id="telefono"
-                        type="text"
-                        required
-                        autocomplete="tel"
-                        name="telefono"
-                        placeholder="092247856"
-                    />
+                    <Input id="telefono" type="text" required autocomplete="tel" name="telefono"
+                        placeholder="092247856" />
                     <InputError :message="errors.telefono" />
                 </div>
             </div>
 
-            <!-- Email (agente y cliente: ancho completo) -->
             <div v-if="tipo !== 'inmobiliaria'" class="grid gap-2">
                 <Label for="email">Correo electrónico</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    required
-                    autocomplete="email"
-                    name="email"
-                    placeholder="juanperez@gmail.com"
-                />
+                <Input id="email" type="email" required autocomplete="email" name="email"
+                    placeholder="juanperez@gmail.com" />
                 <InputError :message="errors.email" />
             </div>
 
@@ -228,85 +165,48 @@ function volver() {
             <div v-if="tipo === 'inmobiliaria'" class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div class="grid gap-2">
                     <Label for="email">Correo electrónico</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        required
-                        autocomplete="email"
-                        name="email"
-                        placeholder="juanperez@gmail.com"
-                    />
+                    <Input id="email" type="email" required autocomplete="email" name="email"
+                        placeholder="juanperez@gmail.com" />
                     <InputError :message="errors.email" />
                 </div>
                 <div class="grid gap-2">
                     <Label for="telefono">Teléfono</Label>
-                    <Input
-                        id="telefono"
-                        type="text"
-                        required
-                        autocomplete="tel"
-                        name="telefono"
-                        placeholder="092247856"
-                    />
+                    <Input id="telefono" type="text" required autocomplete="tel" name="telefono"
+                        placeholder="092247856" />
                     <InputError :message="errors.telefono" />
                 </div>
             </div>
 
             <!-- Checkbox agente (solo cliente) -->
             <div v-if="tipo === 'cliente'" class="flex items-center gap-2">
-                <input
-                    id="es_agente"
-                    type="checkbox"
-                    name="es_agente"
-                    value="1"
-                    class="h-4 w-4 rounded border-gray-300"
-                />
-                <Label for="es_agente" class="cursor-pointer font-normal">
+                <Label for="es_agente" class="flex items-center gap-2 cursor-pointer font-normal">
+                    <Checkbox id="es_agente" name="es_agente" value="1" />
                     También quiero ofrecer propiedades como agente
                 </Label>
             </div>
+
 
             <!-- Contraseña (todos) -->
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <Label for="password">Contraseña</Label>
-                    <PasswordInput
-                        id="password"
-                        required
-                        autocomplete="new-password"
-                        name="password"
-                        placeholder="Contraseña"
-                    />
+                    <PasswordInput id="password" required autocomplete="new-password" name="password"
+                        placeholder="Contraseña" />
                     <InputError :message="errors.password" />
                 </div>
                 <div class="grid gap-2">
                     <Label for="password_confirmation">Confirmar contraseña</Label>
-                    <PasswordInput
-                        id="password_confirmation"
-                        required
-                        autocomplete="new-password"
-                        name="password_confirmation"
-                        placeholder="Confirmar contraseña"
-                    />
+                    <PasswordInput id="password_confirmation" required autocomplete="new-password"
+                        name="password_confirmation" placeholder="Confirmar contraseña" />
                     <InputError :message="errors.password_confirmation" />
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    @click="volver"
-                >
+                <Button type="button" variant="outline" size="lg" @click="volver">
                     Volver
                 </Button>
-                <Button
-                    type="submit"
-                    size="lg"
-                    :disabled="processing"
-                    data-test="register-user-button"
-                >
+                <Button type="submit" size="lg" :disabled="processing" data-test="register-user-button">
                     <Spinner v-if="processing" />
                     Crear cuenta
                 </Button>

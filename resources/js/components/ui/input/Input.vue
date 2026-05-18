@@ -14,6 +14,9 @@ interface Props {
   required?: boolean;
   readonly?: boolean;
   disabled?: boolean;
+  min?: number | string;
+  max?: number | string;
+  step?: number | string;
   label?: string;
   error?: string;
   class?: HTMLAttributes['class'];
@@ -62,6 +65,9 @@ const modelValue = useVModel(props, 'modelValue', emits, {
       :required="props.required"
       :readonly="props.readonly"
       :disabled="props.disabled"
+      :min="props.min"
+      :max="props.max"
+      :step="props.step"
       :aria-invalid="!!props.error"
       :aria-describedby="props.error ? `${props.id}-error` : undefined"
       data-slot="input"
