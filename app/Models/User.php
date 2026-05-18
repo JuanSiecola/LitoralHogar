@@ -16,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
-
+use App\Models\Consulta;
 
 #[Fillable(['email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
@@ -63,7 +63,12 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     public function favoritos(): BelongsToMany
     {
-        return $this->belongsToMany(Propiedad::class, 'favoritos', 'usuario_id', 'propiedad_id');
+        return $this->belongsToMany(Propiedad::class, 'favorito', 'usuario_id', 'propiedad_id');
+    }
+
+    public function consultas()
+    {
+        return $this->hasMany(Consulta::class);
     }
 
     public function imagenes_propiedad(): HasMany
