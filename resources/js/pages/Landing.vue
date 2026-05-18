@@ -3,6 +3,8 @@ import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import PropertyCard from '@/components/PropertyCard.vue';
 import LandingNavbar from '@/components/LandingNavbar.vue';
+import { useForm } from '@inertiajs/vue3'
+import { toast } from 'vue-sonner'
 import {
     Home,
     Building2,
@@ -39,6 +41,7 @@ const busqueda = ref({
     tipo: '',
     ciudad: '',
 });
+
 const iconos: Record<string, Component> = {
     Casa: Home,
     Apartamento: Building2,
@@ -46,6 +49,7 @@ const iconos: Record<string, Component> = {
     Local: Store,
     Oficina: Briefcase,
 };
+
 function buscar() {
     router.get(
         '/propiedades',
@@ -57,6 +61,32 @@ function buscar() {
         { preserveState: false },
     );
 }
+
+const form = useForm({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+});
+
+const loading = ref(false);
+
+const submit = () => {
+    loading.value = true;
+
+    form.post('/contact', {
+        onSuccess: () => {
+            toast.success('¡Consulta enviada! Te contactaremos pronto.');
+            form.reset();
+        },
+        onError: () => {
+            toast.error('Hubo un error al enviar el formulario.');
+        },
+        onFinish: () => {
+            loading.value = false;
+        }
+    });
+};
 </script>
 
 <template>
@@ -214,6 +244,47 @@ function buscar() {
                         {{ cat.tipo_propiedad }}s en {{ cat.tipo_operacion }}
                     </span>
                 </a>
+            </div>
+        </section>
+        <!-- Sección Contacto -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-2xl mx-auto px-4">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-gray-900">¿Tenés alguna consulta?</h2>
+                    <p class="mt-3 text-gray-600">Completa el formulario y te responderemos a la brevedad.</p>
+                </div>
+
+                <form @submit.prevent="submit" class="space-y-6 bg-white p-8 rounded-2xl shadow">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+                        <input v-model="form.name" type="text" required
+                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input v-model="form.email" type="email" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono / WhatsApp</label>
+                            <input v-model="form.phone" type="tel" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mensaje</label>
+                        <textarea v-model="form.message" rows="5" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+
+                    <button type="submit" :disabled="loading"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-xl transition">
+                        {{ loading ? 'Enviando...' : 'Enviar consulta' }}
+                    </button>
+                </form>
             </div>
         </section>
     </div>

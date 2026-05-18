@@ -7,6 +7,9 @@ use App\Models\Inmobiliaria;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\ContactFormRequest;
+use App\Mail\ContactNotification;
+use Illuminate\Support\Facades\Mail;
 
 class LandingController extends Controller
 {
@@ -45,5 +48,15 @@ class LandingController extends Controller
             'propiedadesDestacadas' => $propiedadesDestacadas,
                 'categorias'            => $categorias
         ]);
+    }
+
+    public function sendContact(ContactFormRequest $request)
+    {
+        $data = $request->validated();
+
+        // Enviar email
+        Mail::to(config('mail.from.address'))->send(new ContactNotification($data));
+
+        return back()->with('success', '¡Consulta enviada correctamente! Te contactaremos pronto.');
     }
 }
