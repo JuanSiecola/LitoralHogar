@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import { Bed, ShowerHead, Square } from 'lucide-vue-next';
+
 interface Props {
     id: number;
     titulo: string;
@@ -12,9 +15,16 @@ interface Props {
     ciudad: string;
     departamento: string;
     imagen_url?: string | null;
+    selectable?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    selectable: false,
+});
+
+const emit = defineEmits<{
+    select: [propiedad: Omit<Props, 'selectable'>];
+}>();
 
 const precioFormateado = computed(() => {
     const num = new Intl.NumberFormat('es-UY').format(props.precio);
@@ -22,17 +32,33 @@ const precioFormateado = computed(() => {
         ? `USD ${num}/mes`
         : `USD ${num}`;
 });
-</script>
 
-<script lang="ts">
-import { computed } from 'vue';
-import { Link } from '@inertiajs/vue3';
+function seleccionar() {
+    if (!props.selectable) return;
+
+    emit('select', {
+        id: props.id,
+        titulo: props.titulo,
+        tipo_operacion: props.tipo_operacion,
+        tipo_propiedad: props.tipo_propiedad,
+        precio: props.precio,
+        nro_habitaciones: props.nro_habitaciones,
+        nro_banios: props.nro_banios,
+        superficie_total: props.superficie_total,
+        ciudad: props.ciudad,
+        departamento: props.departamento,
+        imagen_url: props.imagen_url,
+    });
+}
 </script>
 
 <template>
-    <Link
+    <component
+        :is="selectable ? 'button' : Link"
         :href="`/propiedades/${id}`"
-        class="group block overflow-hidden rounded-xl border border-border bg-card shadow-card transition-shadow duration-200 hover:shadow-md"
+        :type="selectable ? 'button' : undefined"
+        class="group block w-full overflow-hidden rounded-xl border border-border bg-card text-left shadow-card transition-shadow duration-200 hover:shadow-md"
+        @click="seleccionar"
     >
         <!-- Imagen -->
         <div class="relative aspect-4/3 overflow-hidden bg-muted">
@@ -105,5 +131,5 @@ import { Link } from '@inertiajs/vue3';
                 </span>
             </div>
         </div>
-    </Link>
+    </component>
 </template>
