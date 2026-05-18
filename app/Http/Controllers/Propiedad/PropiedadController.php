@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Propiedad;
+use App\Models\Amenidad;
 use App\Actions\Propiedad\PropiedadEditAction;
 
 class PropiedadController extends Controller
@@ -34,7 +35,9 @@ class PropiedadController extends Controller
      */
     public function create()
     {
-        return Inertia::render('inmobiliaria/propiedades/Create');
+        return Inertia::render('inmobiliaria/propiedades/Create', [
+            'amenidades' => Amenidad::all(['id', 'nombre']),
+        ]);
     }
 
     /**
@@ -46,10 +49,12 @@ class PropiedadController extends Controller
             $this->propiedadRules(),
             $this->ubicacionRules(),
             $this->detallePropiedadRules(),
+            $this->imagenesRules(),
         ), array_merge(
             $this->propiedadMessages(),
             $this->ubicacionMessages(),
             $this->detallePropiedadMessages(),
+            $this->imagenesMessages(),
         ));
 
         (new PropiedadCrearAction())->handle($validatedData, auth()->id());

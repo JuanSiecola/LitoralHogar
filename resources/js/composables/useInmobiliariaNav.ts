@@ -1,6 +1,7 @@
 import { Building2, LayoutDashboard, Plus, Settings } from 'lucide-vue-next'
 import inmobiliaria from '@/routes/inmobiliaria' 
 import type { Component } from 'vue'
+import profile from '@/routes/profile'
 
 export interface NavLink {
     label: string
@@ -13,6 +14,6 @@ export function useInmobiliariaNav(): NavLink[] {
         { label: 'Dashboard',       href: inmobiliaria.dashboard.url(),  icon: LayoutDashboard },
         { label: 'Mis Propiedades', href: inmobiliaria.propiedades.index.url(),  icon: Building2 },
         { label: 'Crear Propiedad', href: inmobiliaria.propiedades.create.url(),  icon: Plus },
-        //{ label: 'Mi Perfil',       href: inmobiliaria.dashboard.perfil.url(),  icon: Settings },
+        { label: 'Mi Perfil', href: profile.edit.url(), icon: Settings },
     ]
 }

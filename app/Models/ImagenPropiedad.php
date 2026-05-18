@@ -9,6 +9,8 @@ class ImagenPropiedad extends Model
 {
     protected $table = 'imagen_propiedad';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'url',
         'public_id',
