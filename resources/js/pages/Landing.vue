@@ -16,8 +16,6 @@ import {
 } from 'lucide-vue-next';
 import type { Component } from 'vue';
 
-defineOptions({ layout: PublicLayout });
-
 interface Propiedad {
     id: number;
     titulo: string;
@@ -37,6 +35,7 @@ const props = defineProps<{
     categorias: { tipo_propiedad: string; tipo_operacion: string }[];
 }>();
 
+// Estado del buscador
 const busqueda = ref({
     operacion: '',
     tipo: '',
@@ -285,5 +284,4 @@ const submit = () => {
                 </form>
             </div>
         </section>
-    </div>
 </template>
