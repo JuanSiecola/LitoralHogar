@@ -14,10 +14,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')->group(function () {
-    Route::get('/dashboard', [ClienteController::class, 'dashboard'])->name('dashboard');
-    Route::get('/favoritos', [ClienteController::class, 'favoritos'])->name('favoritos');
-    Route::get('/consultas', [ClienteController::class, 'consultas'])->name('consultas');
-    Route::delete('/favoritos/{propiedad}', [ClienteController::class, 'quitarFavorito'])->name('favoritos.quitar');
-});
+Route::post('/contact', [LandingController::class, 'sendContact'])->name('contact.send');
+
 require __DIR__.'/settings.php';
