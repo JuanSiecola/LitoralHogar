@@ -6,7 +6,6 @@ import InputError from '@/components/InputError.vue';
 import FileUpload from '@/components/FileUpload.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
-import FileUploadInput from '@/components/FileUploadInput.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';

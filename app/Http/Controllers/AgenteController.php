@@ -14,7 +14,10 @@ use App\Concerns\Propiedad\DetallePropiedadValidationRules;
 
 class AgenteController extends Controller
 {
-
+    use PropiedadValidationRules;      
+    use UbicacionValidationRules;      
+    use DetallePropiedadValidationRules;
+    
     public function dashboard()
     {
         $agente = auth()->user();
@@ -32,6 +35,7 @@ class AgenteController extends Controller
     {
         $propiedades = auth()->user()
             ->propiedades()
+            ->with('imagenes','detalle_propiedad', 'ubicacion')
             ->when(request('estado'), fn($q, $e) => $q->where('estado_propiedad', $e))
             ->paginate(15);
 

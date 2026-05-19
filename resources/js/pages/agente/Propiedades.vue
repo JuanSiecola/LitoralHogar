@@ -32,8 +32,8 @@
         
         <div class="p-4">
           <h3 class="font-semibold text-gray-800">{{ prop.titulo }}</h3>
-          <p class="text-blue-600 font-bold mt-1">${{ prop.precio.toLocaleString() }}</p>
-          <p class="text-sm text-gray-500">{{ prop.ubicacion }}</p>
+          <p class="text-blue-600 font-bold mt-1">${{ prop.detalle_propiedad?.precio?.toLocaleString() ?? 'Sin precio' }}</p>
+          <p class="text-sm text-gray-500">{{ prop.ubicacion?.direccion ?? '' }} {{ prop.ubicacion?.ciudad ?? '' }}</p>
           
           <span :class="prop.estado_propiedad === 'Disponible' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
                 class="text-xs px-2 py-1 rounded-full mt-2 inline-block">
