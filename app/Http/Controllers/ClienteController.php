@@ -76,7 +76,7 @@ class ClienteController extends Controller
                 'nro_habitaciones' => $propiedad->detalle_propiedad?->nro_habitaciones ?? 0,
                 'nro_banios' => $propiedad->detalle_propiedad?->nro_banios ?? 0,
                 'superficie_total' => $propiedad->detalle_propiedad?->superficie_total ?? 0,
-                'ciudad' => $propiedad->ubicacion?->ciudad ?? 'Sin ciudad',
+                'localidad' => $propiedad->ubicacion?->localidad ?? 'Sin localidad',
                 'departamento' => $propiedad->ubicacion?->departamento ?? 'Sin departamento',
                 'imagen_url' => $propiedad->imagenes->first()?->url,
             ]);

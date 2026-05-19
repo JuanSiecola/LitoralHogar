@@ -11,7 +11,7 @@ class Ubicacion extends Model
 
     public $timestamps = false;
 
-    protected $fillable = ['direccion', 'ciudad', 'departamento', 'longitud', 'latitud', 'propiedad_id'];
+    protected $fillable = ['direccion', 'localidad', 'departamento', 'longitud', 'latitud', 'propiedad_id'];
 
     public function propiedad(): BelongsTo
     {

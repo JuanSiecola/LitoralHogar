@@ -25,7 +25,7 @@ interface Propiedad {
     nro_habitaciones: number;
     nro_banios: number;
     superficie_total: number;
-    ciudad: string;
+    localidad: string;
     departamento: string;
     imagen_url?: string | null;
 }
@@ -39,7 +39,7 @@ const props = defineProps<{
 const busqueda = ref({
     operacion: '',
     tipo: '',
-    ciudad: '',
+    localidad: '',
 });
 
 const iconos: Record<string, Component> = {
@@ -56,7 +56,7 @@ function buscar() {
         {
             tipo_operacion: busqueda.value.operacion,
             tipo_propiedad: busqueda.value.tipo,
-            ciudad: busqueda.value.ciudad,
+            localidad: busqueda.value.localidad,
         },
         { preserveState: false },
     );
@@ -127,9 +127,9 @@ const submit = () => {
                     <option value="Oficina">Oficina</option>
                 </select>
                 <input
-                    v-model="busqueda.ciudad"
+                    v-model="busqueda.localidad"
                     type="text"
-                    placeholder="Ciudad (ej: Montevideo)"
+                    placeholder="Localidad (ej: Pocitos)"
                     class="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm"
                 />
                 <button
@@ -189,7 +189,7 @@ const submit = () => {
                     <h3 class="font-semibold text-foreground">1. Buscá</h3>
                     <p class="text-sm text-muted-foreground">
                         Usá los filtros para encontrar propiedades según tu
-                        presupuesto, tipo y ciudad.
+                        presupuesto, tipo y localidad.
                     </p>
                 </div>
                 <div class="flex flex-col items-center gap-3">

@@ -17,7 +17,7 @@ interface Propiedad {
     tipo_operacion: 'Venta' | 'Alquiler'
     tipo_propiedad: string
     estado_propiedad: string
-    ubicacion: { ciudad: string; departamento: string; direccion: string } | null
+    ubicacion: { localidad: string; departamento: string; direccion: string } | null
     detalle_propiedad: { precio: number; nro_habitaciones: number; nro_banios: number; nro_garage: number; superficie_total: number } | null
     imagenes: { url: string; es_principal: boolean }[]
 }
@@ -34,7 +34,7 @@ const filtroTipo    = ref('todos')
 const propiedadesFiltradas = computed(() => {
     return props.propiedades.filter(p => {
         const q = busqueda.value.toLowerCase()
-        const okBusqueda  = !q || p.titulo.toLowerCase().includes(q) || (p.ubicacion?.ciudad ?? '').toLowerCase().includes(q)
+        const okBusqueda  = !q || p.titulo.toLowerCase().includes(q) || (p.ubicacion?.localidad ?? '').toLowerCase().includes(q)
         const okEstado    = filtroEstado.value === 'todos' || p.estado_propiedad === filtroEstado.value
         const okOp        = filtroOp.value === 'todos'    || p.tipo_operacion === filtroOp.value
         const okTipo      = filtroTipo.value === 'todos'  || p.tipo_propiedad === filtroTipo.value
@@ -120,7 +120,7 @@ function confirmarEliminar() {
                     <input
                         v-model="busqueda"
                         type="text"
-                        placeholder="Buscar por título o ciudad..."
+                        placeholder="Buscar por título o localidad..."
                         class="w-full h-9 pl-9 pr-3 rounded-md border border-input bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring"
                     />
                 </div>
@@ -221,7 +221,7 @@ function confirmarEliminar() {
 
                             <!-- Ubicación -->
                             <td class="px-4 py-3 hidden md:table-cell text-neutral-500">
-                                {{ p.ubicacion?.ciudad ?? '—' }},
+                                {{ p.ubicacion?.localidad ?? '—' }},
                                 {{ p.ubicacion?.departamento ?? '' }}
                             </td>
 

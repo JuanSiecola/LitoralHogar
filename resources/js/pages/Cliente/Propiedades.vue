@@ -14,7 +14,7 @@ interface Propiedad {
     nro_habitaciones: number;
     nro_banios: number;
     superficie_total: number;
-    ciudad: string;
+    localidad: string;
     departamento: string;
     imagen_url?: string | null;
 }
