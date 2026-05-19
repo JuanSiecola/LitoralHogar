@@ -1,5 +1,5 @@
 <template>
-  <AgenteLayout>
+  <PanelLayout :nav-links="navLinks">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard Agente</h1>
 
     <div class="grid grid-cols-3 gap-4 mb-8">
@@ -16,10 +16,19 @@
         <p class="text-gray-500 mt-1">Consultas pendientes</p>
       </div>
     </div>
-  </AgenteLayout>
+  </PanelLayout>
 </template>
 
 <script setup>
-import AgenteLayout from '@/layouts/AgenteLayout.vue'
+
+import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next';
+import PanelLayout from '@/layouts/PanelLayout.vue';
+
 defineProps(['propsActivas', 'totalVistas', 'consultasPendientes'])
+
+const navLinks = [
+  { label: 'Dashboard',            href: '/agente/dashboard',   icon: LayoutDashboard },
+  { label: 'Mis Propiedades',      href: '/agente/propiedades', icon: Home },
+  { label: 'Consultas Recibidas',  href: '/agente/consultas',   icon: MessageSquare },
+]
 </script>
