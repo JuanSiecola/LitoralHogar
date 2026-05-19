@@ -12,7 +12,7 @@
         <div class="p-4">
           <h3 class="font-semibold text-gray-800">{{ prop.titulo }}</h3>
           <p class="text-blue-600 font-bold mt-1">${{ prop.precio.toLocaleString() }}</p>
-          <p class="text-sm text-gray-500">{{ prop.ciudad }}</p>
+          <p class="text-sm text-gray-500">{{ prop.localidad }}</p>
 
           <!-- Botón quitar -->
           <button @click="quitarFavorito(prop.id)"

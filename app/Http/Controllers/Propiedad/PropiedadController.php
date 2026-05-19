@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Propiedad;
 
 use App\Actions\Propiedad\PropiedadCrearAction;
+use App\Actions\Propiedad\PropiedadDeleteAction;
 use App\Concerns\Propiedad\DetallePropiedadValidationRules;
 use App\Concerns\Propiedad\PropiedadValidationRules;
 use App\Concerns\Propiedad\UbicacionValidationRules;
@@ -57,6 +58,8 @@ class PropiedadController extends Controller
             $this->imagenesMessages(),
         ));
 
+        \Log::info('amenidades recibidas:', ['data' => $validatedData['amenidades'] ?? 'NULL']);
+
         (new PropiedadCrearAction())->handle($validatedData, auth()->id());
 
         return redirect()->route('inmobiliaria.propiedades.index');
@@ -101,8 +104,10 @@ class PropiedadController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Propiedad $propiedad)
     {
-        //
+        (new PropiedadDeleteAction())->handle($propiedad);
+
+        return redirect()->route('inmobiliaria.propiedades.index');
     }
 }

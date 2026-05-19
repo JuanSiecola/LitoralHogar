@@ -34,7 +34,7 @@ class LandingController extends Controller
                 'nro_habitaciones' => $p->detalle_propiedad?->nro_habitaciones,
                 'nro_banios'       => $p->detalle_propiedad?->nro_banios,
                 'superficie_total' => $p->detalle_propiedad?->superficie_total,
-                'ciudad'           => $p->ubicacion?->ciudad,
+                'localidad'        => $p->ubicacion?->localidad,
                 'departamento'     => $p->ubicacion?->departamento,
                 'imagen_url'       => $p->imagenes->first()?->url,
             ]);
