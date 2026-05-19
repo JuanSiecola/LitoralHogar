@@ -9,7 +9,7 @@ interface Props {
     nro_habitaciones: number;
     nro_banios: number;
     superficie_total: number;
-    ciudad: string;
+    localidad: string;
     departamento: string;
     imagen_url?: string | null;
 }
@@ -81,7 +81,7 @@ import { Link } from '@inertiajs/vue3';
                 {{ titulo }}
             </h3>
             <p class="mt-1 text-xs text-muted-foreground">
-                {{ ciudad }}, {{ departamento }}
+                {{ localidad }}, {{ departamento }}
             </p>
 
             <!-- Datos clave -->

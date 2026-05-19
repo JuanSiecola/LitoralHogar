@@ -16,11 +16,13 @@ trait DetallePropiedadValidationRules
             'pisos' => ['required', 'integer', 'min:1'],
             'precio' => ['required', 'numeric', 'min:0'],
             'anio_construccion' => ['required', 'integer', 'min:1900', 'max:' . date('Y')],
-            'estado_construccion' => ['required', 'in:Nuevo,Usado,Reciclar'],
+            'estado_construccion' => ['required', 'in:Nuevo,Usado,Reciclado'],
             'deposito' => ['nullable', 'numeric', 'min:0'],
             'cant_meses_deposito' => ['nullable', 'integer', 'min:1'],
             'expensas' => ['nullable', 'numeric', 'min:0'],
             'acepta_mascotas' => ['nullable', 'boolean'],
+            'amenidades'   => ['nullable', 'array'],
+            'amenidades.*' => ['integer', 'exists:amenidad,id'],
         ];
     }
 
@@ -62,6 +64,9 @@ trait DetallePropiedadValidationRules
             'expensas.min' => 'Las expensas no pueden ser negativas.',
             'acepta_mascotas.required' => 'El campo acepta mascotas es obligatorio.',
             'acepta_mascotas.boolean' => 'El campo acepta mascotas debe ser verdadero o falso.',
+            'amenidades.array' => 'Las amenidades deben ser un array.',
+            'amenidades.*.integer' => 'Cada amenidad debe ser un número entero.',
+            'amenidades.*.exists' => 'La amenidad seleccionada no existe.',
         ];
     }
 }

@@ -34,7 +34,7 @@ class PropiedadEditAction
 
             $propiedad->ubicacion->update([
                 'direccion'    => $data['direccion'],
-                'ciudad'       => $data['ciudad'],
+                'localidad'    => $data['localidad'],
                 'departamento' => $data['departamento'],
                 'latitud'      => $data['latitud'] ?? null,
                 'longitud'     => $data['longitud'] ?? null,
