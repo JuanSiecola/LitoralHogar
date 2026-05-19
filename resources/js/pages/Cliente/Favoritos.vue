@@ -1,5 +1,5 @@
 <template>
-  <ClienteLayout>
+  <PanelLayout :nav-links="navlink">
     <h1 class="text-2xl font-bold mb-6">Mis Favoritos</h1>
 
     <div v-if="favoritos.data.length" class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -24,14 +24,21 @@
     </div>
 
     <p v-else class="text-gray-400">No tenés propiedades favoritas todavía.</p>
-  </ClienteLayout>
+  </PanelLayout>
 </template>
 
 <script setup>
 import { router } from '@inertiajs/vue3'
-import ClienteLayout from '@/layouts/ClienteLayout.vue'
+import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next';
+import PanelLayout from '@/layouts/PanelLayout.vue';
 
 defineProps(['favoritos'])
+
+const navlink = [
+  { label: 'Dashboard',             href: '/cliente/dashboard',   icon: LayoutDashboard },
+  { label: 'Mis Favoritos',         href: '/cliente/favoritos', icon: Home },
+  { label: 'Mis Consultas',         href: '/cliente/consultas',   icon: MessageSquare },
+]
 
 function quitarFavorito(propiedadId) {
   router.delete(route('cliente.favoritos.quitar', propiedadId))

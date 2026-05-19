@@ -1,5 +1,5 @@
 <template>
-  <ClienteLayout>
+  <PanelLayout :nav-links="navlink">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">
       ¡Bienvenido, {{ nombreUsuario }}!
     </h1>
@@ -28,17 +28,24 @@
       </div>
       <p v-else class="text-gray-400 text-sm">No tenés consultas aún.</p>
     </div>
-  </ClienteLayout>
+  </PanelLayout>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import ClienteLayout from '@/layouts/ClienteLayout.vue'
+import PanelLayout from '@/layouts/PanelLayout.vue'
+import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next';
 
 defineProps(['totalFavoritos', 'totalConsultas', 'consultasRecientes'])
 
 const page = usePage()
+
+const navlink = [
+  { label: 'Dashboard',             href: '/cliente/dashboard',   icon: LayoutDashboard },
+  { label: 'Mis Favoritos',         href: '/cliente/favoritos', icon: Home },
+  { label: 'Mis Consultas',         href: '/cliente/consultas',   icon: MessageSquare },
+]
 
 // Intenta mostrar nombre del perfil, si no el email
 const nombreUsuario = computed(() => {

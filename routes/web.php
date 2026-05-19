@@ -14,19 +14,9 @@ Route::get('/propiedades', [ClienteController::class, 'redirigirPropiedades'])
     ->middleware('auth')
     ->name('propiedades');
 
- 
 Route::middleware(['auth', 'verified'])->group(function () {
     /* Route::inertia('dashboard', 'Dashboard')->name('dashboard'); */
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-});
-
-
-Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')->group(function () {
-    Route::get('/dashboard', [ClienteController::class, 'dashboard'])->name('dashboard');
-    Route::get('/favoritos', [ClienteController::class, 'favoritos'])->name('favoritos');
-    Route::get('/consultas', [ClienteController::class, 'consultas'])->name('consultas');
-    Route::get('/propiedades', [ClienteController::class, 'propiedades'])->name('propiedades'); 
-    Route::delete('/favoritos/{propiedad}', [ClienteController::class, 'quitarFavorito'])->name('favoritos.quitar');
 });
 
 Route::middleware(['auth', 'verified', 'role:inmobiliaria'])->prefix('inmobiliaria')->name('inmobiliaria.')->group(function () {
@@ -43,7 +33,16 @@ Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')
 
 Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->group(function () {
     Route::get('/dashboard', [AgenteController::class, 'dashboard'])->name('dashboard');
+    
+    // Propiedades CRUD
     Route::get('/propiedades', [AgenteController::class, 'propiedades'])->name('propiedades');
+    Route::get('/propiedades/crear', [AgenteController::class, 'create'])->name('propiedades.create');
+    Route::post('/propiedades', [AgenteController::class, 'store'])->name('propiedades.store');
+    Route::get('/propiedades/{propiedad}/editar', [AgenteController::class, 'edit'])->name('propiedades.edit');
+    Route::put('/propiedades/{propiedad}', [AgenteController::class, 'update'])->name('propiedades.update');
+    Route::delete('/propiedades/{propiedad}', [AgenteController::class, 'destroy'])->name('propiedades.destroy');
+    
+    // Consultas
     Route::get('/consultas', [AgenteController::class, 'consultasRecibidas'])->name('consultas');
     Route::post('/consultas/{consulta}/responder', [AgenteController::class, 'responderConsulta'])->name('consultas.responder');
 });
@@ -52,4 +51,4 @@ Route::post('/contact', [LandingController::class, 'sendContact'])->name('contac
 
 
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

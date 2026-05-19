@@ -1,5 +1,5 @@
 <template>
-  <ClienteLayout>
+  <PanelLayout :nav-links="navlink">
     <h1 class="text-2xl font-bold mb-6">Mis Consultas</h1>
 
     <div class="space-y-4">
@@ -27,12 +27,21 @@
     </div>
 
     <p v-if="!consultas.data.length" class="text-gray-400">No realizaste consultas todavía.</p>
-  </ClienteLayout>
+  </PanelLayout>
 </template>
 
 <script setup>
-import ClienteLayout from '@/layouts/ClienteLayout.vue'
+import PanelLayout from '@/layouts/PanelLayout.vue';
 defineProps(['consultas'])
+import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next';
+
+
+const navlink = [
+  { label: 'Dashboard',             href: '/cliente/dashboard',   icon: LayoutDashboard },
+  { label: 'Mis Favoritos',         href: '/cliente/favoritos', icon: Home },
+  { label: 'Mis Consultas',         href: '/cliente/consultas',   icon: MessageSquare },
+]
+
 
 function estadoBadge(estado) {
   return estado === 'respondida'
