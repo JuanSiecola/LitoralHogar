@@ -84,6 +84,20 @@ function volver() {
             </button>
         </div>
 
+        <div class="flex items-center gap-3">
+            <div class="h-px flex-1 bg-border" />
+            <span class="text-xs text-muted-foreground">o</span>
+            <div class="h-px flex-1 bg-border" />
+        </div>
+
+        <a
+            href="/auth/google"
+            class="inline-flex w-full items-center justify-center gap-3 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+        >
+            <span class="text-base font-bold text-blue-600">G</span>
+            Registrarme como cliente con Google
+        </a>
+
         <div class="text-center text-sm text-muted-foreground">
             ¿Ya tenés una cuenta?
             <TextLink :href="login()" class="underline underline-offset-4">Iniciar sesión</TextLink>
