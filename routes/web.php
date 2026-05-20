@@ -8,8 +8,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Inmobiliaria\InmobiliariaController;
 use App\Http\Controllers\Propiedad\PropiedadController;
 use App\Http\Controllers\AgenteController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
+Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 Route::get('/propiedades', [ClienteController::class, 'redirigirPropiedades'])
     ->middleware('auth')
     ->name('propiedades');
