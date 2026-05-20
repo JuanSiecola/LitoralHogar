@@ -53,6 +53,7 @@ const { previews, onImagenesChange, eliminarImagen } = useImagenes(form)
 function submit() {
     form.post(store.url())
 }
+
 </script>
 
 <template>
@@ -269,32 +270,6 @@ function submit() {
                 <div class="flex items-center gap-3 pb-4 mb-5 border-b border-border">
                     <div
                         class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        <Sparkles class="w-4 h-4" />
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-semibold text-foreground">Amenidades</h2>
-                        <p class="text-sm text-muted-foreground mt-0.5">Seleccioná las comodidades disponibles.</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    <label v-for="amenidad in amenidades" :key="amenidad.id" :for="`amenidad-${amenidad.id}`"
-                        class="flex items-center gap-2.5 p-3 rounded-lg border border-neutral-200 cursor-pointer hover:bg-neutral-50 transition-colors"
-                        :class="{ 'border-primary bg-primary/5': form.amenidades.includes(amenidad.id) }">
-                        <Checkbox :id="`amenidad-${amenidad.id}`" :checked="form.amenidades.includes(amenidad.id)"
-                            @update:checked="(checked: boolean) => {
-                                if (checked) form.amenidades = [...form.amenidades, amenidad.id]
-                                else form.amenidades = form.amenidades.filter(id => id !== amenidad.id)
-                            }" />
-                        <span class="text-sm text-neutral-700 select-none">{{ amenidad.nombre }}</span>
-                    </label>
-                </div>
-                <FormMessage :message="form.errors.amenidades" />
-            </section>
-
-            <section class="bg-card rounded-xl border border-border p-6 mb-5 shadow-card">
-                <div class="flex items-center gap-3 pb-4 mb-5 border-b border-border">
-                    <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                         <ImageIcon class="w-4 h-4" />
                     </div>
                     <div>
@@ -328,7 +303,7 @@ function submit() {
                             @click="form.imagen_principal_index = index">
                             <img :src="preview" class="w-full aspect-4/3 object-cover" />
 
-                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
 
                             <!-- Badge portada -->
                             <span v-if="form.imagen_principal_index === index"
