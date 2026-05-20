@@ -58,8 +58,6 @@ class PropiedadController extends Controller
             $this->imagenesMessages(),
         ));
 
-        \Log::info('amenidades recibidas:', ['data' => $validatedData['amenidades'] ?? 'NULL']);
-
         (new PropiedadCrearAction())->handle($validatedData, auth()->id());
 
         return redirect()->route('inmobiliaria.propiedades.index');
