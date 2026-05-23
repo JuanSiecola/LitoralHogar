@@ -1,26 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Nueva consulta</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <h2>Nueva consulta desde el sitio web</h2>
-    
-    <p><strong>Nombre:</strong> {{ $data['name'] }}</p>
-    <p><strong>Email:</strong> {{ $data['email'] }}</p>
-    <p><strong>Teléfono/WhatsApp:</strong> {{ $data['phone'] }}</p>
-    
-    @if(isset($data['property_id']) && $data['property_id'])
-        <p><strong>Propiedad de interés:</strong> #{{ $data['property_id'] }}</p>
-    @endif
+<x-mail::message>
+# Nueva consulta recibida
 
-    <hr>
-    <p><strong>Mensaje:</strong></p>
-    <p>{{ nl2br($data['message']) }}</p>
+Alguien se contactó desde el sitio web. Aquí están sus datos:
 
-    <p style="margin-top: 30px; font-size: 0.9em; color: #666;">
-        Enviado desde LitoralHogar - {{ now()->format('d/m/Y H:i') }}
-    </p>
-</body>
-</html>
+<x-mail::panel>
+**Nombre:** {{ $data['name'] }}
+**Email:** {{ $data['email'] }}
+**Teléfono:** {{ $data['phone'] }}
+</x-mail::panel>
+
+@if(!empty($data['property_id']))
+<x-mail::panel>
+ **Propiedad consultada:** #{{ $data['property_id'] }}
+</x-mail::panel>
+@endif
+
+**Mensaje:**
+
+{{ $data['message'] }}
+
+<x-mail::button :url="'mailto:' . $data['email']" color="primary">
+Responder a {{ $data['name'] }}
+</x-mail::button>
+
+_Enviado desde LitoralHogar — {{ now()->setTimezone('America/Montevideo')->format('d/m/Y H:i') }} hs_
+
+</x-mail::message>
