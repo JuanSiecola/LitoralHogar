@@ -1,142 +1,266 @@
-<template>
-  <PanelLayout :nav-links="navLinks">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">Mis Propiedades</h1>
-      <Link href="/agente/propiedades/crear"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-        + Nueva Propiedad
-      </Link>
-    </div>
+<script setup lang="ts">
+import { Head, Link } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import PropertyCard from '@/components/PropertyCard.vue';
+import PublicLayout from '@/layouts/PublicLayout.vue';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Bed, Home, MapPin, ShowerHead, Square } from 'lucide-vue-next';
 
-    <!-- Filtros por estado -->
-    <div class="mb-4 flex gap-2">
-      <button
-        v-for="filtro in filtros" :key="filtro.label"
-        @click="aplicarFiltro(filtro.valor)"
-        :class="estadoActivo === filtro.valor
-          ? 'bg-blue-600 text-white'
-          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
-        class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors">
-        {{ filtro.label }}
-      </button>
-    </div>
+defineOptions({ layout: PublicLayout });
 
-    <!-- Grid de propiedades -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div v-for="prop in propiedades.data" :key="prop.id"
-           class="bg-white rounded-xl shadow overflow-hidden flex flex-col">
-        <img :src="prop.imagenes?.[0]?.url ?? '/placeholder.jpg'"
-             class="w-full h-48 object-cover" :alt="prop.titulo" />
-
-        <div class="p-4 flex flex-col flex-1">
-          <h3 class="font-semibold text-gray-800">{{ prop.titulo }}</h3>
-          <p class="text-blue-600 font-bold mt-1">
-            ${{ prop.detalle_propiedad?.precio?.toLocaleString() ?? 'Sin precio' }}
-          </p>
-          <p class="text-sm text-gray-500 mt-0.5">
-            {{ [prop.ubicacion?.direccion, prop.ubicacion?.ciudad].filter(Boolean).join(', ') }}
-          </p>
-
-          <span :class="prop.estado_propiedad === 'Disponible'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700'"
-                class="text-xs px-2 py-1 rounded-full mt-2 inline-block w-fit">
-            {{ prop.estado_propiedad }}
-          </span>
-
-          <div class="flex gap-2 mt-auto pt-3">
-            <Link :href="`/agente/propiedades/${prop.id}/editar`"
-                  class="flex-1 text-center text-sm text-blue-600 border border-blue-300 rounded py-1.5 hover:bg-blue-50 transition-colors">
-              Editar
-            </Link>
-            <button @click="confirmarEliminar(prop)"
-                    class="flex-1 text-sm text-red-600 border border-red-300 rounded py-1.5 hover:bg-red-50 transition-colors">
-              Eliminar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <p v-if="!propiedades.data.length" class="text-gray-400 mt-6">No tenés propiedades aún.</p>
-
-    <!-- Paginación -->
-    <div v-if="propiedades.last_page > 1" class="mt-6 flex justify-center gap-2">
-      <Link
-        v-for="link in propiedades.links" :key="link.label"
-        :href="link.url ?? '#'"
-        v-html="link.label"
-        :class="[
-          'px-3 py-1.5 rounded text-sm border transition-colors',
-          link.active
-            ? 'bg-blue-600 text-white border-blue-600'
-            : link.url
-              ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              : 'bg-white text-gray-300 border-gray-200 cursor-not-allowed pointer-events-none'
-        ]"
-      />
-    </div>
-
-    <!-- Modal confirmación eliminar -->
-    <div v-if="propAEliminar" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
-        <h3 class="text-lg font-semibold text-gray-800 mb-2">¿Eliminar propiedad?</h3>
-        <p class="text-sm text-gray-500 mb-6">
-          Estás por eliminar <strong>{{ propAEliminar.titulo }}</strong>. Esta acción no se puede deshacer.
-        </p>
-        <div class="flex gap-3">
-          <button @click="propAEliminar = null"
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-            Cancelar
-          </button>
-          <button @click="eliminar"
-                  class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">
-            Eliminar
-          </button>
-        </div>
-      </div>
-    </div>
-  </PanelLayout>
-</template>
-
-<script setup>
-import { ref } from 'vue'
-import { Link, router } from '@inertiajs/vue3'
-import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next'
-import PanelLayout from '@/layouts/PanelLayout.vue'
-
-defineProps(['propiedades'])
-
-const estadoActivo = ref(null)
-const propAEliminar = ref(null)
-
-const filtros = [
-  { label: 'Todas',       valor: null },
-  { label: 'Disponibles', valor: 'Disponible' },
-  { label: 'Vendidas',    valor: 'Vendida' },
-]
-
-const navLinks = [
-  { label: 'Dashboard',           href: '/agente/dashboard',   icon: LayoutDashboard },
-  { label: 'Mis Propiedades',     href: '/agente/propiedades', icon: Home },
-  { label: 'Consultas Recibidas', href: '/agente/consultas',   icon: MessageSquare },
-]
-
-function aplicarFiltro(estado) {
-  estadoActivo.value = estado
-  router.get('/agente/propiedades', estado ? { estado } : {}, {
-    preserveState: true,
-    replace: true,
-  })
+interface Propiedad {
+    id: number;
+    titulo: string;
+    tipo_operacion: 'Venta' | 'Alquiler';
+    tipo_propiedad: string;
+    precio: number;
+    nro_habitaciones: number;
+    nro_banios: number;
+    superficie_total: number;
+    localidad: string;
+    departamento: string;
+    imagen_url?: string | null;
 }
 
-function confirmarEliminar(prop) {
-  propAEliminar.value = prop
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
 }
 
-function eliminar() {
-  router.delete(`/agente/propiedades/${propAEliminar.value.id}`, {
-    onSuccess: () => { propAEliminar.value = null },
-  })
+interface PaginatedPropiedades {
+    data: Propiedad[];
+    links: PaginationLink[];
+    from: number | null;
+    to: number | null;
+    total: number;
+}
+
+defineProps<{
+    propiedades: PaginatedPropiedades;
+}>();
+
+const propiedadSeleccionada = ref<Propiedad | null>(null);
+
+const precioSeleccionado = computed(() => {
+    if (!propiedadSeleccionada.value) return '';
+
+    const num = new Intl.NumberFormat('es-UY').format(
+        propiedadSeleccionada.value.precio,
+    );
+
+    return propiedadSeleccionada.value.tipo_operacion === 'Alquiler'
+        ? `USD ${num}/mes`
+        : `USD ${num}`;
+});
+
+function paginationLabel(label: string) {
+    return label
+        .replace('&laquo; Previous', 'Anterior')
+        .replace('Next &raquo;', 'Siguiente');
+}
+
+function cerrarDetalle(open: boolean) {
+    if (!open) {
+        propiedadSeleccionada.value = null;
+    }
 }
 </script>
+
+<template>
+    <Head title="Propiedades"/>
+
+    <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-foreground">Propiedades</h1>
+                <p class="mt-2 text-muted-foreground">
+                    Explora las propiedades disponibles para comprar o alquilar.
+                </p>
+            </div>
+
+            <p v-if="propiedades.total > 0" class="text-sm text-muted-foreground">
+                Mostrando {{ propiedades.from }}-{{ propiedades.to }} de
+                {{ propiedades.total }}
+            </p>
+        </div>
+
+        <div
+            v-if="propiedades.data.length"
+            class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        >
+            <PropertyCard
+                v-for="propiedad in propiedades.data"
+                :key="propiedad.id"
+                v-bind="propiedad"
+                selectable
+                @select="propiedadSeleccionada = $event"
+            />
+        </div>
+
+        <div
+            v-else
+            class="rounded-lg border border-border bg-card px-6 py-12 text-center"
+        >
+            <h2 class="text-lg font-semibold text-foreground">
+                No hay propiedades disponibles
+            </h2>
+        </div>
+
+        <nav
+            v-if="propiedades.links.length > 3"
+            class="mt-10 flex flex-wrap justify-center gap-2"
+            aria-label="Paginacion de propiedades"
+        >
+            <component
+                :is="link.url ? Link : 'span'"
+                v-for="link in propiedades.links"
+                :key="`${link.label}-${link.url}`"
+                :href="link.url || undefined"
+                class="min-w-10 rounded-md border px-3 py-2 text-center text-sm font-medium transition-colors"
+                :class="[
+                    link.active
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background text-foreground hover:border-primary hover:text-primary',
+                    !link.url && 'cursor-not-allowed opacity-50 hover:border-border hover:text-foreground',
+                ]"
+            >
+                {{ paginationLabel(link.label) }}
+            </component>
+        </nav>
+
+        <Dialog
+            :open="!!propiedadSeleccionada"
+            @update:open="cerrarDetalle"
+        >
+            <DialogContent class="max-h-[90vh] overflow-y-auto p-0 sm:max-w-5xl">
+                <div
+                    v-if="propiedadSeleccionada"
+                    class="grid min-h-[520px] grid-cols-1 md:grid-cols-[1.15fr_0.85fr]"
+                >
+                    <div class="bg-muted">
+                        <img
+                            v-if="propiedadSeleccionada.imagen_url"
+                            :src="propiedadSeleccionada.imagen_url"
+                            :alt="propiedadSeleccionada.titulo"
+                            class="h-full min-h-80 w-full object-cover"
+                        />
+                        <div
+                            v-else
+                            class="flex h-full min-h-80 w-full items-center justify-center text-muted-foreground"
+                        >
+                            <Home class="h-20 w-20" />
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col p-6 md:p-8">
+                        <DialogHeader class="space-y-3 text-left">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span
+                                    class="rounded-full px-3 py-1 text-xs font-semibold text-primary-foreground"
+                                    :class="
+                                        propiedadSeleccionada.tipo_operacion === 'Venta'
+                                            ? 'bg-primary'
+                                            : 'bg-secondary'
+                                    "
+                                >
+                                    {{ propiedadSeleccionada.tipo_operacion }}
+                                </span>
+                                <span
+                                    class="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground"
+                                >
+                                    {{ propiedadSeleccionada.tipo_propiedad }}
+                                </span>
+                            </div>
+
+                            <DialogTitle class="pr-8 text-2xl font-bold leading-tight text-foreground">
+                                {{ propiedadSeleccionada.titulo }}
+                            </DialogTitle>
+
+                            <p class="text-3xl font-bold text-primary">
+                                {{ precioSeleccionado }}
+                            </p>
+                        </DialogHeader>
+
+                        <div class="mt-6 flex items-start gap-2 text-sm text-muted-foreground">
+                            <MapPin class="mt-0.5 h-4 w-4 shrink-0" />
+                            <span>
+                                {{ propiedadSeleccionada.localidad }},
+                                {{ propiedadSeleccionada.departamento }}
+                            </span>
+                        </div>
+
+                        <div class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                            <div class="rounded-lg border border-border p-4">
+                                <Bed class="mb-3 h-5 w-5 text-primary" />
+                                <p class="text-2xl font-semibold text-foreground">
+                                    {{ propiedadSeleccionada.nro_habitaciones }}
+                                </p>
+                                <p class="text-xs text-muted-foreground">
+                                    Habitaciones
+                                </p>
+                            </div>
+
+                            <div class="rounded-lg border border-border p-4">
+                                <ShowerHead class="mb-3 h-5 w-5 text-secondary" />
+                                <p class="text-2xl font-semibold text-foreground">
+                                    {{ propiedadSeleccionada.nro_banios }}
+                                </p>
+                                <p class="text-xs text-muted-foreground">
+                                    Baños
+                                </p>
+                            </div>
+
+                            <div class="rounded-lg border border-border p-4">
+                                <Square class="mb-3 h-5 w-5 text-accent" />
+                                <p class="text-2xl font-semibold text-foreground">
+                                    {{ propiedadSeleccionada.superficie_total }}
+                                </p>
+                                <p class="text-xs text-muted-foreground">
+                                    m² totales
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 border-t border-border pt-6">
+                            <h3 class="text-sm font-semibold text-foreground">
+                                Información de la propiedad
+                            </h3>
+                            <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                                <div>
+                                    <dt class="text-muted-foreground">Tipo</dt>
+                                    <dd class="font-medium text-foreground">
+                                        {{ propiedadSeleccionada.tipo_propiedad }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-muted-foreground">Operación</dt>
+                                    <dd class="font-medium text-foreground">
+                                        {{ propiedadSeleccionada.tipo_operacion }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-muted-foreground">Localidad</dt>
+                                    <dd class="font-medium text-foreground">
+                                        {{ propiedadSeleccionada.localidad }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-muted-foreground">Departamento</dt>
+                                    <dd class="font-medium text-foreground">
+                                        {{ propiedadSeleccionada.departamento }}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    </section>
+</template>
