@@ -24,13 +24,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'verified', 'role:inmobiliaria'])->prefix('inmobiliaria')->name('inmobiliaria.')->group(function () {
     Route::get('/dashboard', [InmobiliariaController::class, 'dashboard'])->name('dashboard');
-    Route::resource('propiedades', PropiedadController::class);
+    Route::get('/propiedades', [PropiedadController::class, 'index'])->name('propiedades');
+    Route::get('/propiedades/create', [PropiedadController::class, 'create'])->name('propiedades.create');
+    Route::post('/propiedades', [PropiedadController::class, 'store'])->name('propiedades.store');
+    Route::get('/propiedades/{propiedad}/edit', [PropiedadController::class, 'edit'])->name('propiedades.edit');
+    Route::patch('/propiedades/{propiedad}', [PropiedadController::class, 'update'])->name('propiedades.update');
+    Route::delete('/propiedades/{propiedad}', [PropiedadController::class, 'destroy'])->name('propiedades.destroy');
 });
 
 Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')->group(function () {
     Route::get('/dashboard', [ClienteController::class, 'dashboard'])->name('dashboard');
     Route::get('/favoritos', [ClienteController::class, 'favoritos'])->name('favoritos');
     Route::get('/consultas', [ClienteController::class, 'consultas'])->name('consultas');
+    Route::get('/propiedades', [ClienteController::class, 'propiedades'])->name('propiedades');
     Route::delete('/favoritos/{propiedad}', [ClienteController::class, 'quitarFavorito'])->name('favoritos.quitar');
 });
 
@@ -42,7 +48,7 @@ Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->g
     Route::get('/propiedades/crear', [AgenteController::class, 'create'])->name('propiedades.create');
     Route::post('/propiedades', [AgenteController::class, 'store'])->name('propiedades.store');
     Route::get('/propiedades/{propiedad}/editar', [AgenteController::class, 'edit'])->name('propiedades.edit');
-    Route::put('/propiedades/{propiedad}', [AgenteController::class, 'update'])->name('propiedades.update');
+    Route::patch('/propiedades/{propiedad}', [AgenteController::class, 'update'])->name('propiedades.update');
     Route::delete('/propiedades/{propiedad}', [AgenteController::class, 'destroy'])->name('propiedades.destroy');
     
     // Consultas

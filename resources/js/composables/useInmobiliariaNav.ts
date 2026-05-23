@@ -12,7 +12,7 @@ export interface NavLink {
 export function useInmobiliariaNav(): NavLink[] {
     return [
         { label: 'Dashboard',       href: inmobiliaria.dashboard.url(),  icon: LayoutDashboard },
-        { label: 'Mis Propiedades', href: inmobiliaria.propiedades.index.url(),  icon: Building2 },
+        { label: 'Mis Propiedades', href: inmobiliaria.propiedades.url(),  icon: Building2 },
         { label: 'Crear Propiedad', href: inmobiliaria.propiedades.create.url(),  icon: Plus },
         { label: 'Mi Perfil', href: profile.edit.url(), icon: Settings },
     ]

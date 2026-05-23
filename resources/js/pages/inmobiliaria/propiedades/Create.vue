@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import PanelLayout from '@/layouts/PanelLayout.vue'
 import { useInmobiliariaNav } from '@/composables/useInmobiliariaNav'
@@ -9,8 +8,9 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { FormMessage } from '@/components/ui/form'
-import { FileText, Home, MapPin, ImageIcon, Sparkles, PawPrint, DollarSign, X } from 'lucide-vue-next'
+import { Home, MapPin, ImageIcon, PawPrint, DollarSign, X } from 'lucide-vue-next'
 import InputError from '@/components/InputError.vue'
+import FormSection from '@/components/FormSection.vue'
 
 interface Amenidad {
     id: number
@@ -66,25 +66,13 @@ function submit() {
 
         <form @submit.prevent="submit">
 
-            <section class="bg-card rounded-xl border border-border p-6 mb-5 shadow-card">
-                <div class="flex items-center gap-3 pb-4 mb-5 border-b border-border">
-                    <div
-                        class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        <Home class="w-4 h-4" />
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-semibold text-foreground">Datos principales</h2>
-                        <p class="text-sm text-muted-foreground">Completa los datos principales de la propiedad.</p>
-                    </div>
-                </div>
-
+            <FormSection :icon="Home" title="Datos principales" description="Completa los datos principales de la propiedad.">
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-col gap-1.5">
                         <Input id="titulo" type="text" name="titulo" label="Titulo" required v-model="form.titulo"
                             placeholder="Ej: Hermoso apartamento en la Blanqueada" />
                         <InputError :message="form.errors.titulo" />
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="flex flex-col gap-1.5">
                             <Label for="tipo_propiedad">Tipo de Propiedad</Label>
@@ -133,20 +121,9 @@ function submit() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </FormSection>
 
-            <section class="bg-card rounded-xl border border-border p-6 mb-5 shadow-card">
-                <div class="flex items-center gap-3 pb-4 mb-5 border-b border-border">
-                    <div
-                        class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        <MapPin class="w-4 h-4" />
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-semibold text-foreground">Ubicación</h2>
-                        <p class="text-sm text-muted-foreground mt-0.5">Dirección y coordenadas</p>
-                    </div>
-                </div>
-
+            <FormSection :icon="MapPin" title="Ubicación" description="Dirección y coordenadas">
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-col gap-1.5">
                         <Input id="direccion" type="text" label="Dirección" required placeholder="Ej: Av. Italia 1234"
@@ -179,19 +156,9 @@ function submit() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </FormSection>
 
-            <section class="bg-card rounded-xl border border-border p-6 mb-5 shadow-card">
-                <div class="flex items-center gap-3 pb-4 mb-5 border-b border-border">
-                    <div
-                        class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        <DollarSign class="w-4 h-4" />
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-semibold text-foreground">Detalles de la propiedad</h2>
-                        <p class="text-sm text-muted-foreground">Características físicas y precio.</p>
-                    </div>
-                </div>
+           <FormSection :icon="DollarSign" title="Detalles de la propiedad" description="Características físicas y precio">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <Input id="nro_habitaciones" label="Habitaciones" type="number" required :min="0" :max="20"
                         v-model="form.nro_habitaciones" />
@@ -264,20 +231,9 @@ function submit() {
                 <p v-else class="mt-5 text-xs text-neutral-400 italic">
                     Las condiciones de alquiler aparecen cuando seleccionás "Alquiler" en la pestaña Datos.
                 </p>
-            </section>
+            </FormSection>
 
-            <section class="bg-card rounded-xl border border-border p-6 mb-5 shadow-card">
-                <div class="flex items-center gap-3 pb-4 mb-5 border-b border-border">
-                    <div
-                        class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        <ImageIcon class="w-4 h-4" />
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-semibold text-foreground">Imágenes</h2>
-                        <p class="text-sm text-muted-foreground mt-0.5">Fotos de la propiedad</p>
-                    </div>
-                </div>
-
+            <FormSection :icon="ImageIcon" title="Imágenes" description="Fotos de la propiedad">
                 <label
                     class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-neutral-300 rounded-xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors group">
                     <ImageIcon class="w-8 h-8 text-neutral-300 group-hover:text-primary transition-colors mb-2" />
@@ -322,7 +278,7 @@ function submit() {
                 </div>
 
                 <FormMessage :message="form.errors.imagenes" />
-            </section>
+            </FormSection>
 
             <button type="submit" :disabled="form.processing"
                 class="h-11 px-8 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">

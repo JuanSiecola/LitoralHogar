@@ -60,7 +60,7 @@ class PropiedadController extends Controller
 
         (new PropiedadCrearAction())->handle($validatedData, auth()->id());
 
-        return redirect()->route('inmobiliaria.propiedades.index');
+        return redirect()->route('inmobiliaria.propiedades');
     }
 
     /**
@@ -76,7 +76,15 @@ class PropiedadController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $propiedad = Propiedad::where('id', $id)
+            ->where('usuario_id', auth()->id())
+            ->with(['ubicacion', 'detalle_propiedad', 'imagenes', 'amenidades'])
+            ->firstOrFail();
+
+        return Inertia::render('inmobiliaria/propiedades/Edit', [
+            'propiedad' => $propiedad,
+            'amenidades' => Amenidad::all(['id', 'nombre']),
+        ]);
     }
 
     /**
@@ -96,7 +104,7 @@ class PropiedadController extends Controller
 
         (new PropiedadEditAction())->handle($propiedad, $validatedData);
 
-        return redirect()->route('inmobiliaria.propiedades.index');
+        return redirect()->route('inmobiliaria.propiedades');
     }
 
     /**
@@ -106,6 +114,6 @@ class PropiedadController extends Controller
     {
         (new PropiedadDeleteAction())->handle($propiedad);
 
-        return redirect()->route('inmobiliaria.propiedades.index');
+        return redirect()->route('inmobiliaria.propiedades');
     }
 }

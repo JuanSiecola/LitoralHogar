@@ -60,8 +60,6 @@ class PropiedadCrearAction
                 'longitud' => $data['longitud'] ?? null,
             ]);
 
-            \Log::info('amenidades en action:', ['data' => $data['amenidades'] ?? 'NULL']);
-
             $propiedad->amenidades()->sync($data['amenidades'] ?? []);
 
             return $propiedad;

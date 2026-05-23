@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator} from '@/components/ui/dropdown-menu'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
-import { create, edit, update, destroy } from '@/routes/inmobiliaria/propiedades'
 import { Plus, Search, Pencil, Trash2, EllipsisVertical, PauseCircle, PlayCircle } from 'lucide-vue-next'
+import { create, edit, update, destroy } from '@/routes/inmobiliaria/propiedades'
 
 interface Propiedad {
     id: number
@@ -78,6 +78,7 @@ function confirmarEliminar() {
     router.delete(destroy.url(propiedadAEliminar.value))
     propiedadAEliminar.value = null
 }
+
 </script>
 
 <template>
