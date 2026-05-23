@@ -35,7 +35,6 @@ const precioFormateado = computed(() => {
 
 function seleccionar() {
     if (!props.selectable) return;
-
     emit('select', {
         id: props.id,
         titulo: props.titulo,
@@ -45,7 +44,7 @@ function seleccionar() {
         nro_habitaciones: props.nro_habitaciones,
         nro_banios: props.nro_banios,
         superficie_total: props.superficie_total,
-        ciudad: props.ciudad,
+        localidad: props.localidad,
         departamento: props.departamento,
         imagen_url: props.imagen_url,
     });
@@ -72,29 +71,15 @@ function seleccionar() {
                 v-else
                 class="flex h-full w-full items-center justify-center text-muted-foreground"
             >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-12 w-12"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="1.5"
-                        d="M3 9.75L12 3l9 6.75V21H3V9.75z"
-                    />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9.75L12 3l9 6.75V21H3V9.75z" />
                 </svg>
             </div>
-            <!-- Badge operación -->
+
+            <!-- Badge operación — usa paleta de la marca -->
             <span
-                class="absolute top-3 left-3 rounded-full px-2.5 py-1 text-xs font-semibold"
-                :class="
-                    tipo_operacion === 'Venta'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-emerald-600 text-white'
-                "
+                class="absolute top-3 left-3 rounded-full px-2.5 py-1 text-xs font-semibold text-primary-foreground"
+                :class="tipo_operacion === 'Venta' ? 'bg-primary' : 'bg-secondary'"
             >
                 {{ tipo_operacion }}
             </span>
@@ -111,22 +96,17 @@ function seleccionar() {
             </p>
 
             <!-- Datos clave -->
-            <div
-                class="mt-3 flex items-center gap-4 border-t border-border pt-3 text-sm text-muted-foreground"
-            >
-                <span
-                    v-if="nro_habitaciones > 0"
-                    class="flex items-center gap-1"
-                >
-                    <Bed class="h-8 w-8 text-red-800" />
+            <div class="mt-3 flex items-center gap-4 border-t border-border pt-3 text-sm text-muted-foreground">
+                <span v-if="nro_habitaciones > 0" class="flex items-center gap-1">
+                    <Bed class="h-4 w-4 text-primary" />
                     {{ nro_habitaciones }} hab.
                 </span>
                 <span v-if="nro_banios > 0" class="flex items-center gap-1">
-                    <ShowerHead class="h-8 w-8 text-sky-700" />
+                    <ShowerHead class="h-4 w-4 text-secondary" />
                     {{ nro_banios }} baños
                 </span>
                 <span class="flex items-center gap-1">
-                    <Square class="h-8 w-8 text-green-700" />
+                    <Square class="h-4 w-4 text-accent" />
                     {{ superficie_total }} m²
                 </span>
             </div>
