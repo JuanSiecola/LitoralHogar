@@ -96,10 +96,12 @@ class PropiedadController extends Controller
             $this->propiedadRules(),
             $this->ubicacionRules($propiedad->ubicacion->id),
             $this->detallePropiedadRules(),
+            $this->imagenesRules(),
         ), array_merge(
             $this->propiedadMessages(),
             $this->ubicacionMessages(),
             $this->detallePropiedadMessages(),
+            $this->imagenesMessages(),
         ));
 
         (new PropiedadEditAction())->handle($propiedad, $validatedData);
