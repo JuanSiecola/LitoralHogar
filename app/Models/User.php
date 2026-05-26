@@ -18,7 +18,7 @@ use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use App\Models\Consulta;
 
-#[Fillable(['email', 'password'])]
+#[Fillable(['email', 'password', 'google_id', 'email_verified_at'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser, HasName
 {

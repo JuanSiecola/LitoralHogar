@@ -1,58 +1,60 @@
 <template>
-  <PanelLayout :nav-links="navlink">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">
-      ¡Bienvenido, {{ nombreUsuario }}!
-    </h1>
+    <PanelLayout :nav-links="navlink">
+        <h1 class="mb-6 text-2xl font-bold text-foreground">
+            ¡Bienvenido, {{ nombreUsuario }}!
+        </h1>
 
-    <!-- Cards resumen -->
-    <div class="grid grid-cols-2 gap-4 mb-8">
-      <div class="bg-white rounded-xl shadow p-6 text-center">
-        <p class="text-3xl font-bold text-blue-600">{{ totalFavoritos }}</p>
-        <p class="text-gray-500 mt-1">Propiedades favoritas</p>
-      </div>
-      <div class="bg-white rounded-xl shadow p-6 text-center">
-        <p class="text-3xl font-bold text-green-600">{{ totalConsultas }}</p>
-        <p class="text-gray-500 mt-1">Consultas realizadas</p>
-      </div>
-    </div>
-
-    <!-- Consultas recientes -->
-    <div class="bg-white rounded-xl shadow p-6">
-      <h2 class="text-lg font-semibold mb-4">Consultas recientes</h2>
-      <div v-if="consultasRecientes && consultasRecientes.length">
-        <div v-for="consulta in consultasRecientes" :key="consulta.id"
-             class="border-b py-3 last:border-0">
-          <p class="font-medium">{{ consulta.propiedad?.titulo ?? 'Propiedad sin título' }}</p>
-          <p class="text-sm text-gray-400">{{ consulta.created_at }}</p>
+        <!-- Cards resumen -->
+        <div class="mb-8 grid grid-cols-2 gap-4">
+            <div class="rounded-xl border border-border bg-card p-6 text-center shadow-card">
+                <p class="text-3xl font-bold text-primary">{{ totalFavoritos }}</p>
+                <p class="mt-1 text-sm text-muted-foreground">Propiedades favoritas</p>
+            </div>
+            <div class="rounded-xl border border-border bg-card p-6 text-center shadow-card">
+                <p class="text-3xl font-bold text-secondary">{{ totalConsultas }}</p>
+                <p class="mt-1 text-sm text-muted-foreground">Consultas realizadas</p>
+            </div>
         </div>
-      </div>
-      <p v-else class="text-gray-400 text-sm">No tenés consultas aún.</p>
-    </div>
-  </PanelLayout>
+
+        <!-- Consultas recientes -->
+        <div class="rounded-xl border border-border bg-card p-6 shadow-card">
+            <h2 class="mb-4 text-lg font-semibold text-foreground">Consultas recientes</h2>
+            <div v-if="consultasRecientes && consultasRecientes.length">
+                <div
+                    v-for="consulta in consultasRecientes"
+                    :key="consulta.id"
+                    class="border-b border-border py-3 last:border-0"
+                >
+                    <p class="font-medium text-foreground">{{ consulta.propiedad?.titulo ?? 'Propiedad sin título' }}</p>
+                    <p class="text-sm text-muted-foreground">{{ consulta.created_at }}</p>
+                </div>
+            </div>
+            <p v-else class="text-sm text-muted-foreground">No tenés consultas aún.</p>
+        </div>
+    </PanelLayout>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import PanelLayout from '@/layouts/PanelLayout.vue'
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import PanelLayout from '@/layouts/PanelLayout.vue';
 import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next';
 
-defineProps(['totalFavoritos', 'totalConsultas', 'consultasRecientes'])
+defineProps(['totalFavoritos', 'totalConsultas', 'consultasRecientes']);
 
-const page = usePage()
+const page = usePage();
 
 const navlink = [
-  { label: 'Dashboard',             href: '/cliente/dashboard',   icon: LayoutDashboard },
-  { label: 'Mis Favoritos',         href: '/cliente/favoritos', icon: Home },
-  { label: 'Mis Consultas',         href: '/cliente/consultas',   icon: MessageSquare },
-]
+    { label: 'Dashboard',     href: '/cliente/dashboard', icon: LayoutDashboard },
+    { label: 'Mis Favoritos', href: '/cliente/favoritos', icon: Home },
+    { label: 'Mis Consultas', href: '/cliente/consultas', icon: MessageSquare },
+];
 
-// Intenta mostrar nombre del perfil, si no el email
 const nombreUsuario = computed(() => {
-  const user = page.props.auth?.user
-  if (!user) return ''
-  return user.perfil_persona?.nombre
-    ? `${user.perfil_persona.nombre} ${user.perfil_persona.apellido ?? ''}`
-    : user.email
-})
+    const user = page.props.auth?.user;
+    if (!user) return '';
+    return user.perfil_persona?.nombre
+        ? `${user.perfil_persona.nombre} ${user.perfil_persona.apellido ?? ''}`
+        : user.email;
+});
 </script>

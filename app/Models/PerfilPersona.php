@@ -10,7 +10,7 @@ class PerfilPersona extends Model
 {
     protected $table = 'perfil_persona';
 
-    protected $fillable = ['usuario_id', 'nombre', 'apellido', 'cedula', 'telefono', 'foto_url'];
+    protected $fillable = ['usuario_id', 'nombre', 'apellido', 'cedula', 'telefono', 'foto_url', 'foto_public_id'];
 
     public $timestamps = false;
 

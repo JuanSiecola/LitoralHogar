@@ -34,6 +34,20 @@ defineProps<{
         {{ status }}
     </div>
 
+    <a
+        href="/auth/google"
+        class="mb-6 inline-flex w-full items-center justify-center gap-3 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+    >
+        <span class="text-base font-bold text-blue-600">G</span>
+        Iniciar sesión con Google
+    </a>
+
+    <div class="mb-6 flex items-center gap-3">
+        <div class="h-px flex-1 bg-border" />
+        <span class="text-xs text-muted-foreground">o con email</span>
+        <div class="h-px flex-1 bg-border" />
+    </div>
+
     <Form v-bind="store.form()" :reset-on-success="['password']" v-slot="{ errors, processing }"
         class="flex flex-col gap-6">
         <div class="grid gap-6">

@@ -60,8 +60,6 @@ class PropiedadCrearAction
                 'longitud' => $data['longitud'] ?? null,
             ]);
 
-            \Log::info('validatedData amenidades:', ['data' => $validatedData['amenidades'] ?? 'NULL']);
-
             $propiedad->amenidades()->sync($data['amenidades'] ?? []);
 
             return $propiedad;

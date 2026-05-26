@@ -48,10 +48,12 @@ class CreateNewUser implements CreatesNewUsers
 
             if ($esInmobiliaria) {
                 $logoUrl = null;
+                $logoPublicId = null;
                 if (!empty($input['logo_url'])) {
                     $uploader = new ImageUploadService();
                     $result = $uploader->upload($input['logo_url'], 'litoral-hogar/logos');
                     $logoUrl = $result['secure_url'];
+                    $logoPublicId = $result['public_id'];
                 }
                 Inmobiliaria::create([
                     'usuario_id' => $user->id,
@@ -60,6 +62,7 @@ class CreateNewUser implements CreatesNewUsers
                     'direccion' => $input['direccion'],
                     'telefono' => $input['telefono'],
                     'logo_url' => $logoUrl,
+                    'logo_public_id' => $logoPublicId,
                 ]);
             } else {
                 PerfilPersona::create([

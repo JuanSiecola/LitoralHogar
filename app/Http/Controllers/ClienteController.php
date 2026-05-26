@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Consulta;
 use App\Models\Favorito;
 use App\Models\Propiedad;
-
+use Inertia\Response;
+use Inertia\Inertia;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 class ClienteController extends Controller
 {
     public function redirigirPropiedades()
@@ -29,8 +31,8 @@ class ClienteController extends Controller
         $user = Auth::user();
         return inertia('Cliente/Dashboard', [
             'totalFavoritos' => $user->favoritos()->count(),
-             'totalConsultas' => $user->consultas()->count(), 
-             'consultasRecientes' => $user->consultas()->latest()->take(3)->with('propiedad')->get(), 
+            'totalConsultas' => $user->consultas()->count(),
+            'consultasRecientes' => $user->consultas()->latest()->take(3)->with('propiedad')->get(),
         ]);
     }
 
@@ -46,15 +48,15 @@ class ClienteController extends Controller
         return back();
     }
 
-     public function consultas()
+    public function consultas()
     {
         $consultas = auth()->user()
-        ->consultas()
-        ->with('propiedad')
-        ->latest()
-        ->paginate(12);
+            ->consultas()
+            ->with('propiedad')
+            ->latest()
+            ->paginate(12);
         return inertia('Cliente/Consultas', compact('consultas'));
-    } 
+    }
 
     public function propiedades()
     {
@@ -82,5 +84,13 @@ class ClienteController extends Controller
             ]);
 
         return inertia('Cliente/Propiedades', compact('propiedades'));
-    } 
+    }
+    public function perfil(Request $request): Response
+    {
+        return Inertia::render('Cliente/Perfil', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => $request->session()->get('status'),
+        ]);
+    }
+
 }
