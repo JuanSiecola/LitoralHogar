@@ -9,7 +9,10 @@ interface Props {
     nro_habitaciones: number;
     nro_banios: number;
     superficie_total: number;
-    localidad: string;
+    localidad: {
+        type: [String, null],
+        default: null
+    }
     departamento: string;
     imagen_url?: string | null;
 }
