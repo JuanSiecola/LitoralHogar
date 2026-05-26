@@ -11,19 +11,23 @@ use App\Actions\Propiedad\PropiedadEditAction;
 use App\Concerns\Propiedad\PropiedadValidationRules;
 use App\Concerns\Propiedad\UbicacionValidationRules;
 use App\Concerns\Propiedad\DetallePropiedadValidationRules;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Inertia\Inertia;
+use Inertia\Response;
+
 
 class AgenteController extends Controller
 {
-    use PropiedadValidationRules;      
-    use UbicacionValidationRules;      
+    use PropiedadValidationRules;
+    use UbicacionValidationRules;
     use DetallePropiedadValidationRules;
-    
+
     public function dashboard()
     {
         $agente = auth()->user();
         return inertia('agente/Dashboard', [
             'propsActivas' => $agente->propiedades()->where('estado_propiedad', 'Disponible')->count(),
-            'totalVistas'  => 0, /* $agente->propiedades()->sum('calificacion'), */
+            'totalVistas' => 0, /* $agente->propiedades()->sum('calificacion'), */
             'consultasPendientes' => Consulta::whereIn(
                 'propiedad_id',
                 $agente->propiedades()->pluck('id')
@@ -35,7 +39,7 @@ class AgenteController extends Controller
     {
         $propiedades = auth()->user()
             ->propiedades()
-            ->with('imagenes','detalle_propiedad', 'ubicacion')
+            ->with('imagenes', 'detalle_propiedad', 'ubicacion')
             ->when(request('estado'), fn($q, $e) => $q->where('estado_propiedad', $e))
             ->paginate(15);
 
@@ -160,6 +164,13 @@ class AgenteController extends Controller
         return redirect()->route('agente.propiedades')->with('success', 'Propiedad eliminada exitosamente.');
     }
 
+    public function perfil(Request $request): Response
+    {
+        return Inertia::render('agente/Perfil', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => $request->session()->get('status'),
+        ]);
+    }
 
 
 }

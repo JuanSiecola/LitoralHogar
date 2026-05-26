@@ -30,7 +30,8 @@ Route::middleware(['auth', 'verified', 'role:inmobiliaria'])->prefix('inmobiliar
     Route::get('/propiedades/{propiedad}/edit', [PropiedadController::class, 'edit'])->name('propiedades.edit');
     Route::patch('/propiedades/{propiedad}', [PropiedadController::class, 'update'])->name('propiedades.update');
     Route::delete('/propiedades/{propiedad}', [PropiedadController::class, 'destroy'])->name('propiedades.destroy');
-});
+    Route::get('/perfil', [InmobiliariaController::class, 'perfil'])->name('perfil');
+    });
 
 Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')->group(function () {
     Route::get('/dashboard', [ClienteController::class, 'dashboard'])->name('dashboard');
@@ -38,6 +39,7 @@ Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')
     Route::get('/consultas', [ClienteController::class, 'consultas'])->name('consultas');
     Route::get('/propiedades', [ClienteController::class, 'propiedades'])->name('propiedades');
     Route::delete('/favoritos/{propiedad}', [ClienteController::class, 'quitarFavorito'])->name('favoritos.quitar');
+    Route::get('/perfil', [ClienteController::class, 'perfil'])->name('perfil');
 });
 
 Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->group(function () {
@@ -54,6 +56,7 @@ Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->g
     // Consultas
     Route::get('/consultas', [AgenteController::class, 'consultasRecibidas'])->name('consultas');
     Route::post('/consultas/{consulta}/responder', [AgenteController::class, 'responderConsulta'])->name('consultas.responder');
+    Route::get('/perfil', [AgenteController::class, 'perfil'])->name('perfil');
 });
 
 Route::post('/contact', [LandingController::class, 'sendContact'])->name('contact.send');
