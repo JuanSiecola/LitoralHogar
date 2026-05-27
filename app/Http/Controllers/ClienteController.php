@@ -78,6 +78,8 @@ class ClienteController extends Controller
                 'superficie_total' => $propiedad->detalle_propiedad?->superficie_total ?? 0,
                 'ciudad' => $propiedad->ubicacion?->ciudad ?? 'Sin ciudad',
                 'departamento' => $propiedad->ubicacion?->departamento ?? 'Sin departamento',
+                'latitud' => $propiedad->ubicacion?->latitud,
+                'longitud' => $propiedad->ubicacion?->longitud,
                 'imagen_url' => $propiedad->imagenes->first()?->url,
             ]);
 
