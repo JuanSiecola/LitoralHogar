@@ -39,6 +39,7 @@ createInertiaApp({
             return module;
         }),
     setup({ el, App, props, plugin }) {
+        if (typeof window === 'undefined') return;
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .mount(el);

@@ -36,4 +36,10 @@ class ImageUploadService
             'public_id'  => $result['public_id'],
         ];
     }
+
+    public function delete(string $publicId): void
+    {
+        $this->cloudinary->uploadApi()->destroy($publicId);
+    }
+
 }

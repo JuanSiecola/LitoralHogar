@@ -19,15 +19,27 @@ class ProfilePhotoController extends Controller
         $user = $request->user();
         $user->loadMissing(['rol_usuario', 'perfil_persona', 'inmobiliaria']);
 
-        $url = $uploader->upload($request->file('photo'), 'litoral-hogar/profiles');
+        $result = $uploader->upload($request->file('photo'), 'litoral-hogar/profiles');
 
         $isInmobiliaria = $user->rol_usuario
             ->contains(fn($r) => str_contains(strtolower($r->nombre), 'inmobiliaria'));
 
         if ($isInmobiliaria) {
-            $user->inmobiliaria()->updateOrCreate([], ['logo_url' => $url]);
+            $old = $user->inmobiliaria?->logo_public_id;
+            if ($old) $uploader->delete($old);
+
+            $user->inmobiliaria()->updateOrCreate([], [
+                'logo_url'       => $result['secure_url'],
+                'logo_public_id' => $result['public_id'],
+            ]);
         } else {
-            $user->perfil_persona()->updateOrCreate([], ['foto_url' => $url]);
+            $old = $user->perfil_persona?->foto_public_id;
+            if ($old) $uploader->delete($old);
+
+            $user->perfil_persona()->updateOrCreate([], [
+                'foto_url'       => $result['secure_url'],
+                'foto_public_id' => $result['public_id'],
+            ]);
         }
 
         return back();

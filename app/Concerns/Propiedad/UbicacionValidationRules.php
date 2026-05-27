@@ -10,7 +10,7 @@ trait UbicacionValidationRules
     {
         return [
             'direccion'    => ['required', 'string', 'max:255'],
-            'ciudad'       => ['required', 'string', 'max:100'],
+            'localidad'    => ['required', 'string', 'max:100'],
             'departamento' => ['required', 'string', 'max:100'],
             'latitud'      => ['nullable', 'numeric'],
             'longitud'     => ['nullable', 'numeric'],
@@ -21,7 +21,7 @@ trait UbicacionValidationRules
     {
         return [
             'direccion.required' => 'La dirección es obligatoria.',
-            'ciudad.required' => 'La ciudad es obligatoria.',
+            'localidad.required' => 'La localidad es obligatoria.',
             'departamento.required' => 'El departamento es obligatorio.',
             'latitud.numeric' => 'La latitud debe ser un número.',
             'longitud.numeric' => 'La longitud debe ser un número.',

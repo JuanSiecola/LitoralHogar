@@ -14,7 +14,7 @@ const user = computed(() => page.props.auth.user)
 const { displayName, initials: displayInitial, avatarUrl } = useUserDisplay(() => page.props.auth.user)
 
 function isActive(href: string): boolean {
-    if (href === '#') return false
+    if (typeof window  === 'undefined') return false
     return window.location.pathname === href
 }
 

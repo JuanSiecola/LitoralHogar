@@ -103,7 +103,7 @@
     --brand-orange-light:hsl(28  68% 64%); /* #e19e63 — naranja claro */
     --brand-olive:       hsl(72  16% 50%); /* #8b936a — oliva/sage */
 
-    --background: hsl(0 0% 100%);
+    --background: hsl(197 30% 92%);
     --foreground: hsl(197 48% 14%);
 
     --card: hsl(0 0% 100%);
@@ -118,7 +118,7 @@
     --secondary: hsl(21 48% 52%);
     --secondary-foreground: hsl(0 0% 98%);
 
-    --muted: hsl(197 20% 95%);
+    --muted: hsl(197 25% 87%);
     --muted-foreground: hsl(197 15% 40%);
 
     --accent: hsl(72 16% 50%);

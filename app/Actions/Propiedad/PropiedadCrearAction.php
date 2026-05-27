@@ -54,7 +54,7 @@ class PropiedadCrearAction
 
             $propiedad->ubicacion()->create([
                 'direccion' => $data['direccion'],
-                'ciudad' => $data['ciudad'],
+                'localidad' => $data['localidad'],
                 'departamento' => $data['departamento'],
                 'latitud' => $data['latitud'] ?? null,
                 'longitud' => $data['longitud'] ?? null,

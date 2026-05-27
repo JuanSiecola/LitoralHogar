@@ -6,10 +6,9 @@ import { useInmobiliariaNav } from '@/composables/useInmobiliariaNav'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import {DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator} from '@/components/ui/dropdown-menu'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
-import { create, edit, update, destroy } from '@/routes/inmobiliaria/propiedades'
 import { Plus, Search, Pencil, Trash2, EllipsisVertical, PauseCircle, PlayCircle } from 'lucide-vue-next'
+import { create, edit, update, destroy } from '@/routes/inmobiliaria/propiedades'
 
 interface Propiedad {
     id: number
@@ -17,7 +16,7 @@ interface Propiedad {
     tipo_operacion: 'Venta' | 'Alquiler'
     tipo_propiedad: string
     estado_propiedad: string
-    ubicacion: { ciudad: string; departamento: string; direccion: string } | null
+    ubicacion: { localidad: string; departamento: string; direccion: string } | null
     detalle_propiedad: { precio: number; nro_habitaciones: number; nro_banios: number; nro_garage: number; superficie_total: number } | null
     imagenes: { url: string; es_principal: boolean }[]
 }
@@ -26,18 +25,18 @@ const props = defineProps<{ propiedades: Propiedad[] }>()
 
 const navLinks = useInmobiliariaNav()
 
-const busqueda      = ref('')
-const filtroEstado  = ref('todos')
-const filtroOp      = ref('todos')
-const filtroTipo    = ref('todos')
+const busqueda = ref('')
+const filtroEstado = ref('todos')
+const filtroOp = ref('todos')
+const filtroTipo = ref('todos')
 
 const propiedadesFiltradas = computed(() => {
     return props.propiedades.filter(p => {
         const q = busqueda.value.toLowerCase()
-        const okBusqueda  = !q || p.titulo.toLowerCase().includes(q) || (p.ubicacion?.ciudad ?? '').toLowerCase().includes(q)
-        const okEstado    = filtroEstado.value === 'todos' || p.estado_propiedad === filtroEstado.value
-        const okOp        = filtroOp.value === 'todos'    || p.tipo_operacion === filtroOp.value
-        const okTipo      = filtroTipo.value === 'todos'  || p.tipo_propiedad === filtroTipo.value
+        const okBusqueda = !q || p.titulo.toLowerCase().includes(q) || (p.ubicacion?.localidad ?? '').toLowerCase().includes(q)
+        const okEstado = filtroEstado.value === 'todos' || p.estado_propiedad === filtroEstado.value
+        const okOp = filtroOp.value === 'todos' || p.tipo_operacion === filtroOp.value
+        const okTipo = filtroTipo.value === 'todos' || p.tipo_propiedad === filtroTipo.value
         return okBusqueda && okEstado && okOp && okTipo
     })
 })
@@ -54,10 +53,10 @@ function formatPrecio(precio: number, op: string): string {
 function estadoClass(estado: string): string {
     const map: Record<string, string> = {
         Disponible: 'bg-green-100 text-green-700 border-green-200',
-        Reservada:  'bg-yellow-100 text-yellow-700 border-yellow-200',
-        Vendida:    'bg-blue-100 text-blue-700 border-blue-200',
-        Alquilada:  'bg-purple-100 text-purple-700 border-purple-200',
-        Pausada:    'bg-neutral-100 text-neutral-500 border-neutral-200',
+        Reservada: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+        Vendida: 'bg-blue-100 text-blue-700 border-blue-200',
+        Alquilada: 'bg-purple-100 text-purple-700 border-purple-200',
+        Pausada: 'bg-neutral-100 text-neutral-500 border-neutral-200',
     }
     return map[estado] ?? 'bg-neutral-100 text-neutral-500 border-neutral-200'
 }
@@ -78,6 +77,7 @@ function confirmarEliminar() {
     router.delete(destroy.url(propiedadAEliminar.value))
     propiedadAEliminar.value = null
 }
+
 </script>
 
 <template>
@@ -99,7 +99,6 @@ function confirmarEliminar() {
             </Button>
         </div>
 
-        <!-- Estado vacío total -->
         <div v-if="propiedades.length === 0"
             class="rounded-xl border border-dashed border-gray-300 bg-white p-16 text-center">
             <p class="text-sm text-gray-400 mb-4">Todavía no publicaste ninguna propiedad.</p>
@@ -112,17 +111,12 @@ function confirmarEliminar() {
         </div>
 
         <template v-else>
-            <!-- Barra de filtros -->
             <div class="flex flex-wrap gap-3 mb-5">
-                <!-- Búsqueda -->
                 <div class="relative flex-1 min-w-48">
-                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
-                    <input
-                        v-model="busqueda"
-                        type="text"
-                        placeholder="Buscar por título o ciudad..."
-                        class="w-full h-9 pl-9 pr-3 rounded-md border border-input bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring"
-                    />
+                    <Search
+                        class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                    <input v-model="busqueda" type="text" placeholder="Buscar por título o localidad..."
+                        class="w-full h-9 pl-9 pr-3 rounded-md border border-input bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring" />
                 </div>
 
                 <Select v-model="filtroEstado">
@@ -169,7 +163,8 @@ function confirmarEliminar() {
             <div class="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-neutral-200 bg-neutral-50 text-xs font-semibold text-neutral-500 uppercase tracking-wide">
+                        <tr
+                            class="border-b border-neutral-200 bg-neutral-50 text-xs font-semibold text-neutral-500 uppercase tracking-wide">
                             <th class="px-4 py-3 text-left">Propiedad</th>
                             <th class="px-4 py-3 text-left hidden sm:table-cell">Operación</th>
                             <th class="px-4 py-3 text-left hidden md:table-cell">Ubicación</th>
@@ -179,22 +174,15 @@ function confirmarEliminar() {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-100">
-                        <tr
-                            v-for="p in propiedadesFiltradas"
-                            :key="p.id"
-                            class="hover:bg-neutral-50 transition-colors"
-                        >
+                        <tr v-for="p in propiedadesFiltradas" :key="p.id" class="hover:bg-neutral-50 transition-colors">
                             <!-- Propiedad: imagen + título + tipo -->
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
                                     <div class="w-14 h-10 rounded-md overflow-hidden bg-neutral-100 shrink-0">
-                                        <img
-                                            v-if="imagenPrincipal(p.imagenes)"
-                                            :src="imagenPrincipal(p.imagenes)!"
-                                            :alt="p.titulo"
-                                            class="w-full h-full object-cover"
-                                        />
-                                        <div v-else class="w-full h-full flex items-center justify-center text-neutral-300">
+                                        <img v-if="imagenPrincipal(p.imagenes)" :src="imagenPrincipal(p.imagenes)!"
+                                            :alt="p.titulo" class="w-full h-full object-cover" />
+                                        <div v-else
+                                            class="w-full h-full flex items-center justify-center text-neutral-300">
                                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                                     d="M3 9.75L12 3l9 6.75V21H3V9.75z" />
@@ -208,81 +196,68 @@ function confirmarEliminar() {
                                 </div>
                             </td>
 
-                            <!-- Operación -->
                             <td class="px-4 py-3 hidden sm:table-cell">
-                                <Badge
-                                    :class="p.tipo_operacion === 'Venta'
-                                        ? 'bg-blue-600 text-white border-transparent'
-                                        : 'bg-emerald-600 text-white border-transparent'"
-                                >
+                                <Badge :class="p.tipo_operacion === 'Venta'
+                                    ? 'bg-blue-600 text-white border-transparent'
+                                    : 'bg-emerald-600 text-white border-transparent'">
                                     {{ p.tipo_operacion }}
                                 </Badge>
                             </td>
 
-                            <!-- Ubicación -->
                             <td class="px-4 py-3 hidden md:table-cell text-neutral-500">
-                                {{ p.ubicacion?.ciudad ?? '—' }},
+                                {{ p.ubicacion?.localidad ?? '—' }},
                                 {{ p.ubicacion?.departamento ?? '' }}
                             </td>
 
-                            <!-- Precio -->
                             <td class="px-4 py-3 hidden lg:table-cell font-medium text-neutral-700">
-                                {{ p.detalle_propiedad ? formatPrecio(p.detalle_propiedad.precio, p.tipo_operacion) : '—' }}
+                                {{ p.detalle_propiedad ? formatPrecio(p.detalle_propiedad.precio, p.tipo_operacion) :
+                                '—' }}
                             </td>
 
-                            <!-- Estado -->
                             <td class="px-4 py-3">
                                 <Badge :class="estadoClass(p.estado_propiedad)">
                                     {{ p.estado_propiedad }}
                                 </Badge>
                             </td>
 
-                            <!-- Acciones -->
-                            <td class="px-4 py-3 text-right">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger as-child>
-                                        <Button variant="ghost" size="icon" class="w-8 h-8">
-                                            <EllipsisVertical class="w-4 h-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" class="w-44">
-                                        <DropdownMenuItem as-child>
-                                            <Link :href="edit.url(p.id)" class="flex items-center gap-2 cursor-pointer">
-                                                <Pencil class="w-3.5 h-3.5" />
-                                                Editar
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            class="flex items-center gap-2 cursor-pointer"
-                                            @click="toggleEstado(p)"
-                                        >
-                                            <PauseCircle v-if="p.estado_propiedad !== 'Pausada'" class="w-3.5 h-3.5" />
-                                            <PlayCircle v-else class="w-3.5 h-3.5" />
-                                            {{ p.estado_propiedad === 'Pausada' ? 'Activar' : 'Pausar' }}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem
-                                            class="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
-                                            @click="eliminar(p.id)"
-                                        >
-                                            <Trash2 class="w-3.5 h-3.5" />
-                                            Eliminar
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center justify-end gap-1">
+
+                                    <Link :href="edit.url(p.id)"
+                                        class="w-8 h-8 flex items-center justify-center rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                        title="Editar">
+                                        <Pencil class="w-4 h-4" />
+                                    </Link>
+
+                                    <button type="button"
+                                        class="w-8 h-8 flex items-center justify-center rounded-md transition-colors"
+                                        :class="p.estado_propiedad === 'Pausada'
+                                            ? 'text-amber-500 hover:text-amber-700 hover:bg-amber-50'
+                                            : 'text-neutral-400 hover:text-amber-600 hover:bg-amber-50'"
+                                        :title="p.estado_propiedad === 'Pausada' ? 'Activar' : 'Pausar'"
+                                        @click="toggleEstado(p)">
+                                        <PlayCircle v-if="p.estado_propiedad === 'Pausada'" class="w-4 h-4" />
+                                        <PauseCircle v-else class="w-4 h-4" />
+                                    </button>
+
+                                    <button type="button"
+                                        class="w-8 h-8 flex items-center justify-center rounded-md text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                        title="Eliminar" @click="eliminar(p.id)">
+                                        <Trash2 class="w-4 h-4" />
+                                    </button>
+
+                                </div>
                             </td>
+
                         </tr>
                     </tbody>
                 </table>
 
-                <!-- Sin resultados tras filtrar -->
-                <div v-if="propiedadesFiltradas.length === 0"
-                    class="py-16 text-center text-sm text-neutral-400">
+                <div v-if="propiedadesFiltradas.length === 0" class="py-16 text-center text-sm text-neutral-400">
                     No hay propiedades que coincidan con los filtros.
                 </div>
             </div>
 
-            <!-- Contador de resultados -->
             <p v-if="propiedadesFiltradas.length !== propiedades.length"
                 class="mt-3 text-xs text-neutral-400 text-right">
                 Mostrando {{ propiedadesFiltradas.length }} de {{ propiedades.length }} propiedades
@@ -295,10 +270,11 @@ function confirmarEliminar() {
                 <DialogHeader>
                     <DialogTitle>Eliminar propiedad</DialogTitle>
                     <DialogDescription>
-                        Esta acción es permanente y no se puede deshacer. ¿Estás seguro que querés eliminar esta propiedad?
+                        Esta acción es permanente y no se puede deshacer. ¿Estás seguro que querés eliminar esta
+                        propiedad?
                     </DialogDescription>
                 </DialogHeader>
-                <DialogFooter class="gap-2 sm:gap-0">
+                <DialogFooter class="gap-4 sm:gap-2">
                     <DialogClose as-child>
                         <Button variant="outline">Cancelar</Button>
                     </DialogClose>

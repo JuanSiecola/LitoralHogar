@@ -9,7 +9,7 @@ class Inmobiliaria extends Model
 {
     protected $table = 'inmobiliaria';
 
-    protected $fillable = ['usuario_id', 'razon_social', 'rut', 'direccion', 'telefono', 'logo_url'];
+    protected $fillable = ['usuario_id', 'razon_social', 'rut', 'direccion', 'telefono', 'logo_url', 'logo_public_id'];
 
     public $timestamps = false;
 

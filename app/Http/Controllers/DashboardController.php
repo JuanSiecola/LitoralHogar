@@ -18,7 +18,7 @@ class DashboardController extends Controller
             return redirect()->route('cliente.dashboard');
         }
 
-        return inertia('dashboard');
+        return Inertia('dashboard');
 
     }
 

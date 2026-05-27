@@ -55,7 +55,7 @@ function handleInput(event: Event) {
       v-if="props.label"
       :for="props.id"
       :class="cn(
-        'text-sm font-medium leading-none',
+        'text-base font-medium leading-none',
         props.disabled ? 'cursor-not-allowed text-neutral-400' : 'text-neutral-700 dark:text-neutral-200',
         props.error && 'text-danger',
       )"
