@@ -1,4 +1,4 @@
-<?php
+  <?php
 
 namespace App\Http\Controllers;
 
@@ -80,10 +80,16 @@ class ClienteController extends Controller
                 'superficie_total' => $propiedad->detalle_propiedad?->superficie_total ?? 0,
                 'localidad' => $propiedad->ubicacion?->localidad ?? 'Sin localidad',
                 'departamento' => $propiedad->ubicacion?->departamento ?? 'Sin departamento',
+                'latitud' => $propiedad->ubicacion?->latitud,
+                'longitud' => $propiedad->ubicacion?->longitud,
                 'imagen_url' => $propiedad->imagenes->first()?->url,
             ]);
 
         return inertia('Cliente/Propiedades', compact('propiedades'));
+feature/proiedades-cliente
+    } 
+}
+=======
     }
     public function perfil(Request $request): Response
     {
@@ -94,3 +100,4 @@ class ClienteController extends Controller
     }
 
 }
+ main

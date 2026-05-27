@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import PropertyCard from '@/components/PropertyCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import {
@@ -10,6 +10,11 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Bed, Home, MapPin, ShowerHead, Square } from 'lucide-vue-next';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 defineOptions({ layout: PublicLayout });
 
@@ -24,6 +29,8 @@ interface Propiedad {
     superficie_total: number;
     localidad: string;
     departamento: string;
+    latitud?: number | string | null;
+    longitud?: number | string | null;
     imagen_url?: string | null;
 }
 
@@ -46,6 +53,15 @@ defineProps<{
 }>();
 
 const propiedadSeleccionada = ref<Propiedad | null>(null);
+const mapaDetalle = ref<HTMLDivElement | null>(null);
+let leafletMap: L.Map | null = null;
+let leafletMarker: L.Marker | null = null;
+
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: markerIcon2x,
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow,
+});
 
 const precioSeleccionado = computed(() => {
     if (!propiedadSeleccionada.value) return '';
@@ -59,6 +75,20 @@ const precioSeleccionado = computed(() => {
         : `USD ${num}`;
 });
 
+const coordenadasSeleccionadas = computed<[number, number] | null>(() => {
+    const propiedad = propiedadSeleccionada.value;
+    if (!propiedad) return null;
+
+    const latitud = Number(propiedad.latitud);
+    const longitud = Number(propiedad.longitud);
+
+    if (!Number.isFinite(latitud) || !Number.isFinite(longitud)) {
+        return null;
+    }
+
+    return [latitud, longitud];
+});
+
 function paginationLabel(label: string) {
     return label
         .replace('&laquo; Previous', 'Anterior')
@@ -70,6 +100,49 @@ function cerrarDetalle(open: boolean) {
         propiedadSeleccionada.value = null;
     }
 }
+
+function destruirMapa() {
+    if (!leafletMap) return;
+
+    leafletMap.remove();
+    leafletMap = null;
+    leafletMarker = null;
+}
+
+async function actualizarMapa() {
+    await nextTick();
+
+    const coordenadas = coordenadasSeleccionadas.value;
+    if (!mapaDetalle.value || !coordenadas) {
+        destruirMapa();
+        return;
+    }
+
+    if (!leafletMap) {
+        leafletMap = L.map(mapaDetalle.value).setView(coordenadas, 15);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }).addTo(leafletMap);
+    } else {
+        leafletMap.setView(coordenadas, 15);
+    }
+
+    if (leafletMarker) {
+        leafletMarker.setLatLng(coordenadas);
+    } else {
+        leafletMarker = L.marker(coordenadas).addTo(leafletMap);
+    }
+
+    leafletMarker.bindPopup(propiedadSeleccionada.value?.titulo ?? 'Propiedad');
+    leafletMap.invalidateSize();
+    window.setTimeout(() => leafletMap?.invalidateSize(), 250);
+}
+
+watch(propiedadSeleccionada, actualizarMapa);
+
+onBeforeUnmount(destruirMapa);
 </script>
 
 <template>
@@ -257,6 +330,24 @@ function cerrarDetalle(open: boolean) {
                                     </dd>
                                 </div>
                             </dl>
+                        </div>
+
+                        <div class="mt-8 border-t border-border pt-6">
+                            <h3 class="text-sm font-semibold text-foreground">
+                                Ubicacion
+                            </h3>
+                            <div
+                                v-if="coordenadasSeleccionadas"
+                                ref="mapaDetalle"
+                                class="mt-4 h-72 w-full overflow-hidden rounded-lg border border-border"
+                                aria-label="Mapa de ubicacion de la propiedad"
+                            />
+                            <p
+                                v-else
+                                class="mt-4 rounded-lg border border-border bg-muted p-4 text-sm text-muted-foreground"
+                            >
+                                Esta propiedad no tiene coordenadas cargadas.
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -14,6 +14,8 @@ interface Props {
     superficie_total: number;
     localidad: string;
     departamento: string;
+    latitud?: number | string | null;
+    longitud?: number | string | null;
     imagen_url?: string | null;
     selectable?: boolean;
 }
@@ -46,6 +48,8 @@ function seleccionar() {
         superficie_total: props.superficie_total,
         localidad: props.localidad,
         departamento: props.departamento,
+        latitud: props.latitud,
+        longitud: props.longitud,
         imagen_url: props.imagen_url,
     });
 }
