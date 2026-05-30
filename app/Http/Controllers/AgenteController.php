@@ -14,6 +14,7 @@ use App\Concerns\Propiedad\DetallePropiedadValidationRules;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Auth;
 
 
 class AgenteController extends Controller
@@ -23,27 +24,49 @@ class AgenteController extends Controller
     use DetallePropiedadValidationRules;
 
     public function dashboard()
-    {
-        $agente = auth()->user();
-        return inertia('agente/Dashboard', [
-            'propsActivas' => $agente->propiedades()->where('estado_propiedad', 'Disponible')->count(),
-            'totalVistas' => 0, /* $agente->propiedades()->sum('calificacion'), */
-            'consultasPendientes' => Consulta::whereIn(
-                'propiedad_id',
-                $agente->propiedades()->pluck('id')
-            )->where('estado', 'pendiente')->count(),
-        ]);
-    }
+{
+    $agente = Auth::user();
 
+    $propsActivas = $agente->propiedades()
+        ->where('estado_propiedad', 'Disponible')
+        ->count();
+
+
+    $consultasPendientes = \App\Models\Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $agente->id))
+        ->where('estado', 'pendiente')
+        ->count();
+
+    $ultimasConsultas = \App\Models\Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $agente->id))
+        ->with(['user:id,email', 'propiedad:id,titulo'])
+        ->latest()
+        ->take(5)
+        ->get();
+    $ultimasConsultas = \App\Models\Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $agente->id))
+        ->with(['user.perfilPersona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
+        ->latest()
+        ->take(5)
+        ->get();
+
+    return Inertia::render('agente/Dashboard', [
+        'agente'              => [
+                'id'     => $agente->id,
+                'nombre' => $agente->perfilPersona?->nombre,
+            ],
+        'propsActivas'        => $propsActivas,
+        'consultasPendientes' => $consultasPendientes,
+        'ultimasConsultas'    => $ultimasConsultas,
+    ]);
+}
     public function propiedades()
     {
-        $propiedades = auth()->user()
-            ->propiedades()
-            ->with('imagenes', 'detalle_propiedad', 'ubicacion')
-            ->when(request('estado'), fn($q, $e) => $q->where('estado_propiedad', $e))
-            ->paginate(15);
+        $propiedades = Auth::user()
+        ->propiedades()
+        ->with(['ubicacion', 'detalle_propiedad', 'imagenes'])
+        ->get();
 
-        return inertia('agente/Propiedades', compact('propiedades'));
+        return Inertia::render('agente/Propiedades/Index', [
+            'propiedades' => $propiedades,
+        ]);
     }
 
     // Listar consultas recibidas en propiedades del agente
@@ -138,7 +161,12 @@ class AgenteController extends Controller
     {
         // Verificar que la propiedad pertenece al agente autenticado
         $this->authorize('update', $propiedad);
-
+        
+        if ($request->has('estado_propiedad') && count($request->all()) === 1) {
+           $propiedad->update(['estado_propiedad' => $request->estado_propiedad]);
+            return back();
+        }
+        
         $validatedData = $request->validate(array_merge(
             $this->propiedadRules(),
             $this->ubicacionRules($propiedad->ubicacion->id),

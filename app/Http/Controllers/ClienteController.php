@@ -1,4 +1,4 @@
-  <?php
+<?php
 
 namespace App\Http\Controllers;
 
@@ -86,11 +86,8 @@ class ClienteController extends Controller
             ]);
 
         return inertia('Cliente/Propiedades', compact('propiedades'));
-feature/proiedades-cliente
+
     } 
-}
-=======
-    }
     public function perfil(Request $request): Response
     {
         return Inertia::render('Cliente/Perfil', [
@@ -100,4 +97,4 @@ feature/proiedades-cliente
     }
 
 }
- main
+
