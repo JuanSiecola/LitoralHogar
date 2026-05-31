@@ -37,11 +37,6 @@ class AgenteController extends Controller
         ->count();
 
     $ultimasConsultas = \App\Models\Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $agente->id))
-        ->with(['user:id,email', 'propiedad:id,titulo'])
-        ->latest()
-        ->take(5)
-        ->get();
-    $ultimasConsultas = \App\Models\Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $agente->id))
         ->with(['user.perfilPersona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
         ->latest()
         ->take(5)
@@ -95,8 +90,7 @@ class AgenteController extends Controller
 
     public function create()
     {
-        return inertia('agente/PropiedadForm', [
-            'propiedad' => null,
+        return inertia('agente/Propiedades/Create', [
             'amenidades' => Amenidad::all('id', 'nombre'),
         ]);
     }
@@ -124,34 +118,49 @@ class AgenteController extends Controller
     public function edit(Propiedad $propiedad)
     {
         // Verificar que la propiedad pertenece al agente autenticado
-        $this->authorize('update', $propiedad);
+        abort_if($propiedad->usuario_id !== auth()->id(), 403);
+ 
+        $propiedad->load(['ubicacion', 'detalle_propiedad', 'imagenes', 'amenidades']);
 
-        return inertia('agente/PropiedadForm', [
+        return inertia('agente/Propiedades/Edit', [
             'propiedad' => [
-                'id' => $propiedad->id,
-                'titulo' => $propiedad->titulo,
-                'tipo_propiedad' => $propiedad->tipo_propiedad,
-                'tipo_operacion' => $propiedad->tipo_operacion,
+                'id'               => $propiedad->id,
+                'titulo'           => $propiedad->titulo,
+                'tipo_propiedad'   => $propiedad->tipo_propiedad,
+                'tipo_operacion'   => $propiedad->tipo_operacion,
                 'estado_propiedad' => $propiedad->estado_propiedad,
-                'direccion' => $propiedad->ubicacion->direccion,
-                'ciudad' => $propiedad->ubicacion->ciudad,
-                'departamento' => $propiedad->ubicacion->departamento,
-                'latitud' => $propiedad->ubicacion->latitud,
-                'longitud' => $propiedad->ubicacion->longitud,
-                'nro_habitaciones' => $propiedad->detalle_propiedad->nro_habitaciones,
-                'nro_banios' => $propiedad->detalle_propiedad->nro_banios,
-                'nro_garage' => $propiedad->detalle_propiedad->nro_garage,
-                'superficie_total' => $propiedad->detalle_propiedad->superficie_total,
-                'pisos' => $propiedad->detalle_propiedad->pisos,
-                'precio' => $propiedad->detalle_propiedad->precio,
-                'anio_construccion' => $propiedad->detalle_propiedad->anio_construccion,
-                'estado_construccion' => $propiedad->detalle_propiedad->estado_construccion,
-                'deposito' => $propiedad->detalle_propiedad->deposito,
-                'cant_meses_deposito' => $propiedad->detalle_propiedad->cant_meses_deposito,
-                'expensas' => $propiedad->detalle_propiedad->expensas,
-                'acepta_mascotas' => $propiedad->detalle_propiedad->acepta_mascotas,
-                'imagenes' => $propiedad->imagenes,
-                'amenidades' => $propiedad->amenidades->pluck('id')->toArray(),
+                'ubicacion' => [
+                    'direccion'    => $propiedad->ubicacion->direccion,
+                    'localidad'    => $propiedad->ubicacion->localidad,
+                    'departamento' => $propiedad->ubicacion->departamento,
+                    'latitud'      => $propiedad->ubicacion->latitud,
+                    'longitud'     => $propiedad->ubicacion->longitud,
+                ],
+                'detalle_propiedad' => [
+                    'nro_habitaciones'    => $propiedad->detalle_propiedad->nro_habitaciones,
+                    'nro_banios'          => $propiedad->detalle_propiedad->nro_banios,
+                    'nro_garage'          => $propiedad->detalle_propiedad->nro_garage,
+                    'superficie_total'    => $propiedad->detalle_propiedad->superficie_total,
+                    'pisos'               => $propiedad->detalle_propiedad->pisos,
+                    'precio'              => $propiedad->detalle_propiedad->precio,
+                    'anio_construccion'   => $propiedad->detalle_propiedad->anio_construccion,
+                    'estado_construccion' => $propiedad->detalle_propiedad->estado_construccion,
+                    'deposito'            => $propiedad->detalle_propiedad->deposito,
+                    'cant_meses_deposito' => $propiedad->detalle_propiedad->cant_meses_deposito,
+                    'expensas'            => $propiedad->detalle_propiedad->expensas,
+                    'acepta_mascotas'     => $propiedad->detalle_propiedad->acepta_mascotas,
+                ],
+                // objetos con id y nombre, NO solo IDs
+                'amenidades' => $propiedad->amenidades->map(fn($a) => [
+                    'id'     => $a->id,
+                    'nombre' => $a->nombre,
+                ]),
+                'imagenes' => $propiedad->imagenes->map(fn($i) => [
+                    'id'           => $i->id,
+                    'url'          => $i->url,
+                    'es_principal' => $i->es_principal,
+                    'orden'        => $i->orden ?? 0,
+                ]),
             ],
             'amenidades' => Amenidad::all(['id', 'nombre']),
         ]);
@@ -160,8 +169,8 @@ class AgenteController extends Controller
     public function update(Request $request, Propiedad $propiedad)
     {
         // Verificar que la propiedad pertenece al agente autenticado
-        $this->authorize('update', $propiedad);
-        
+        abort_if($propiedad->usuario_id !== auth()->id(), 403);
+ 
         if ($request->has('estado_propiedad') && count($request->all()) === 1) {
            $propiedad->update(['estado_propiedad' => $request->estado_propiedad]);
             return back();
@@ -185,8 +194,7 @@ class AgenteController extends Controller
     public function destroy(Propiedad $propiedad)
     {
         // Verificar que la propiedad pertenece al agente autenticado
-        $this->authorize('delete', $propiedad);
-
+        abort_if($propiedad->usuario_id !== auth()->id(), 403);
         $propiedad->delete();
 
         return redirect()->route('agente.propiedades')->with('success', 'Propiedad eliminada exitosamente.');

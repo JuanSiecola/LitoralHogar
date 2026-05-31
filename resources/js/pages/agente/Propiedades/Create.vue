@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import PanelLayout from '@/layouts/PanelLayout.vue'
-import PropiedadForm from '@/components/PropiedadForm.vue'
+import PropiedadForm from './PropiedadForm.vue'  // ruta relativa
 import { Home, MessageSquare, LayoutDashboard } from 'lucide-vue-next'
 
 interface Amenidad {
