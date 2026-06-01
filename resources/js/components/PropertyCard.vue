@@ -12,7 +12,10 @@ interface Props {
     nro_habitaciones: number;
     nro_banios: number;
     superficie_total: number;
-    localidad: string;
+    localidad: {
+        type: [String, null],
+        default: null
+    }
     departamento: string;
     latitud?: number | string | null;
     longitud?: number | string | null;

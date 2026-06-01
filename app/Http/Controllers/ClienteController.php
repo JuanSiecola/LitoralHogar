@@ -88,7 +88,7 @@ class ClienteController extends Controller
 
         return inertia('Cliente/Propiedades', compact('propiedades'));
 
-    }
+    } 
     public function perfil(Request $request): Response
     {
         return Inertia::render('Cliente/Perfil', [
