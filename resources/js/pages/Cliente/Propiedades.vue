@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import PropertyCard from '@/components/PropertyCard.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 import {
@@ -9,7 +9,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Bed, Home, MapPin, ShowerHead, Square } from 'lucide-vue-next';
+import {
+    Bed,
+    Home,
+    MapPin,
+    ShowerHead,
+    Square,
+} from 'lucide-vue-next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -48,9 +54,36 @@ interface PaginatedPropiedades {
     total: number;
 }
 
-defineProps<{
+interface PropiedadFilters {
+    tipo_operacion?: string;
+    tipo_propiedad?: string;
+    localidad?: string;
+    departamento?: string;
+    nro_habitaciones?: string | number;
+    nro_banios?: string | number;
+    precio_min?: string | number;
+    precio_max?: string | number;
+    superficie_min?: string | number;
+}
+
+const props = defineProps<{
     propiedades: PaginatedPropiedades;
+    filters: PropiedadFilters;
 }>();
+
+const precioMaximoTope = '1000000';
+
+const filtros = reactive({
+    tipo_operacion: props.filters.tipo_operacion ?? '',
+    tipo_propiedad: props.filters.tipo_propiedad ?? '',
+    localidad: props.filters.localidad ?? '',
+    departamento: props.filters.departamento ?? '',
+    nro_habitaciones: props.filters.nro_habitaciones?.toString() ?? '',
+    nro_banios: props.filters.nro_banios?.toString() ?? '',
+    precio_min: props.filters.precio_min?.toString() ?? '',
+    precio_max: props.filters.precio_max?.toString() ?? precioMaximoTope,
+    superficie_min: props.filters.superficie_min?.toString() ?? '',
+});
 
 const propiedadSeleccionada = ref<Propiedad | null>(null);
 const mapaDetalle = ref<HTMLDivElement | null>(null);
@@ -90,10 +123,56 @@ const coordenadasSeleccionadas = computed<[number, number] | null>(() => {
     return [latitud, longitud];
 });
 
+const hayFiltrosActivos = computed(() =>
+    Object.entries(filtros).some(([key, value]) => {
+        if (key === 'precio_max') return value !== precioMaximoTope;
+
+        return value !== '';
+    }),
+);
+
+const precioMaximoFormateado = computed(() => {
+    const valor = Number(filtros.precio_max);
+    const precio = new Intl.NumberFormat('es-UY').format(valor);
+
+    return valor >= Number(precioMaximoTope) ? `USD ${precio}+` : `USD ${precio}`;
+});
+
+function filtrosLimpios() {
+    return Object.fromEntries(
+        Object.entries(filtros).filter(([key, value]) => {
+            if (key === 'precio_max') return value !== precioMaximoTope;
+
+            return value !== '';
+        }),
+    );
+}
+
 function paginationLabel(label: string) {
     return label
         .replace('&laquo; Previous', 'Anterior')
         .replace('Next &raquo;', 'Siguiente');
+}
+
+function buscarPropiedades() {
+    router.get('/cliente/propiedades', filtrosLimpios(), {
+        preserveScroll: true,
+        preserveState: true,
+        replace: true,
+    });
+}
+
+function limpiarFiltros() {
+    Object.keys(filtros).forEach((key) => {
+        filtros[key as keyof typeof filtros] =
+            key === 'precio_max' ? precioMaximoTope : '';
+    });
+
+    router.get('/cliente/propiedades', {}, {
+        preserveScroll: true,
+        preserveState: true,
+        replace: true,
+    });
 }
 
 function cerrarDetalle(open: boolean) {
@@ -164,10 +243,140 @@ onBeforeUnmount(destruirMapa);
             </p>
         </div>
 
-        <div
-            v-if="propiedades.data.length"
-            class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+            <aside>
+                <form
+                    class="sticky top-6 rounded-xl border border-border bg-card p-5 shadow-sm"
+                    @submit.prevent="buscarPropiedades"
+                >
+                    <div class="mb-5 border-b border-border pb-4">
+                        <h2 class="text-lg font-semibold text-foreground">Filtros</h2>
+                        <p class="mt-1 text-sm text-muted-foreground">Ajusta tu busqueda</p>
+                    </div>
+
+            <div class="space-y-4">
+                <select
+                    v-model="filtros.tipo_operacion"
+                    class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+                >
+                    <option value="">Operación</option>
+                    <option value="Venta">Venta</option>
+                    <option value="Alquiler">Alquiler</option>
+                </select>
+
+                <select
+                    v-model="filtros.tipo_propiedad"
+                    class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+                >
+                    <option value="">Tipo</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Apartamento">Apartamento</option>
+                    <option value="Local">Local</option>
+                    <option value="Terreno">Terreno</option>
+                    <option value="Oficina">Oficina</option>
+                </select>
+
+                <input
+                    v-model="filtros.localidad"
+                    type="text"
+                    placeholder="Localidad"
+                    class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                />
+
+                <input
+                    v-model="filtros.departamento"
+                    type="text"
+                    placeholder="Departamento"
+                    class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                />
+
+                <input
+                    v-model="filtros.precio_min"
+                    type="number"
+                    min="0"
+                    placeholder="Precio mínimo"
+                    class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                />
+
+                <div class="rounded-lg border border-border bg-background p-3">
+                    <div class="mb-3 flex items-center justify-between gap-3">
+                        <label for="precio-max" class="text-sm font-medium text-foreground">
+                            Precio maximo
+                        </label>
+                        <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                            {{ precioMaximoFormateado }}
+                        </span>
+                    </div>
+                    <input
+                        id="precio-max"
+                        v-model="filtros.precio_max"
+                        type="range"
+                        min="0"
+                        :max="precioMaximoTope"
+                        step="10000"
+                        class="w-full cursor-pointer accent-primary"
+                    />
+                    <div class="mt-2 flex justify-between text-xs text-muted-foreground">
+                        <span>USD 0</span>
+                        <span>USD 1.000.000</span>
+                    </div>
+                </div>
+
+                <select
+                    v-model="filtros.nro_habitaciones"
+                    class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+                >
+                    <option value="">Habitaciones</option>
+                    <option value="1">1+ habitaciones</option>
+                    <option value="2">2+ habitaciones</option>
+                    <option value="3">3+ habitaciones</option>
+                    <option value="4">4+ habitaciones</option>
+                </select>
+
+                <select
+                    v-model="filtros.nro_banios"
+                    class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+                >
+                    <option value="">Baños</option>
+                    <option value="1">1+ baños</option>
+                    <option value="2">2+ baños</option>
+                    <option value="3">3+ baños</option>
+                    <option value="4">4+ baños</option>
+                </select>
+
+                <input
+                    v-model="filtros.superficie_min"
+                    type="number"
+                    min="0"
+                    placeholder="M² mínimos"
+                    class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                />
+
+                <div class="flex gap-2">
+                    <button
+                        type="submit"
+                        class="flex-1 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                    >
+                        Buscar
+                    </button>
+                    <button
+                        v-if="hayFiltrosActivos"
+                        type="button"
+                        class="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+                        @click="limpiarFiltros"
+                    >
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+                </form>
+            </aside>
+
+            <div>
+                <div
+                    v-if="propiedades.data.length"
+                    class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
+                >
             <PropertyCard
                 v-for="propiedad in propiedades.data"
                 :key="propiedad.id"
@@ -207,6 +416,8 @@ onBeforeUnmount(destruirMapa);
                 {{ paginationLabel(link.label) }}
             </component>
         </nav>
+            </div>
+        </div>
 
         <Dialog
             :open="!!propiedadSeleccionada"
