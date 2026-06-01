@@ -13,6 +13,11 @@ interface Amenidad {
     nombre: string
 }
 
+interface Departamento {
+    id: number
+    nombre: string
+}
+
 interface ImagenExistente {
     id: number
     url: string
@@ -28,8 +33,8 @@ interface Propiedad {
     estado_propiedad: string
     ubicacion: {
         direccion: string
-        localidad: string
-        departamento: string
+        departamento_id: number
+        localidad_id: number
         latitud: number | null
         longitud: number | null
     }
@@ -54,6 +59,7 @@ interface Propiedad {
 const props = defineProps<{
     propiedad: Propiedad
     amenidades: Amenidad[]
+    departamentos: Departamento[]
 }>()
 
 const navLinks = useInmobiliariaNav()
@@ -64,13 +70,13 @@ const form = useForm({
     tipo_propiedad: props.propiedad.tipo_propiedad,
     tipo_operacion: props.propiedad.tipo_operacion,
     estado_propiedad: props.propiedad.estado_propiedad,
-
-    direccion: props.propiedad.ubicacion.direccion,
-    localidad: props.propiedad.ubicacion.localidad,
-    departamento: props.propiedad.ubicacion.departamento,
-    latitud: props.propiedad.ubicacion.latitud ?? undefined,
-    longitud: props.propiedad.ubicacion.longitud ?? undefined,
-
+    ubicacion: {
+        direccion: props.propiedad.ubicacion.direccion,
+        departamento_id: props.propiedad.ubicacion.departamento_id as number | null,
+        localidad_id: props.propiedad.ubicacion.localidad_id as number | null,
+        latitud: props.propiedad.ubicacion.latitud,
+        longitud: props.propiedad.ubicacion.longitud,
+    },
     nro_habitaciones: props.propiedad.detalle_propiedad.nro_habitaciones,
     nro_banios: props.propiedad.detalle_propiedad.nro_banios,
     nro_garage: props.propiedad.detalle_propiedad.nro_garage,
@@ -83,9 +89,7 @@ const form = useForm({
     cant_meses_deposito: props.propiedad.detalle_propiedad.cant_meses_deposito ?? undefined,
     expensas: props.propiedad.detalle_propiedad.expensas ?? undefined,
     acepta_mascotas: props.propiedad.detalle_propiedad.acepta_mascotas,
-
     amenidades: props.propiedad.amenidades.map(a => a.id),
-
     imagenes: [] as File[],
     imagen_principal_index: 0,
     imagenes_a_eliminar: [] as number[],
@@ -104,13 +108,18 @@ function submit() {
                 <ChevronLeft class="w-4 h-4" />
                 Volver a propiedades
             </Link>
-
             <h1 class="text-2xl font-semibold text-gray-900">Editar Propiedad</h1>
             <p class="text-sm text-gray-500 mt-1">Modificá los datos de la propiedad.</p>
         </div>
 
-
-        <PropiedadForm :form="form" :amenidades="amenidades" :imagenes-previas="propiedad.imagenes"
-            :cancel-href="propiedades.url()" submit-label="Guardar cambios" @submit="submit" />
+        <PropiedadForm
+            :form="form"
+            :amenidades="amenidades"
+            :departamentos="departamentos"
+            :imagenes-previas="propiedad.imagenes"
+            :cancel-href="propiedades.url()"
+            submit-label="Guardar cambios"
+            @submit="submit"
+        />
     </PanelLayout>
 </template>

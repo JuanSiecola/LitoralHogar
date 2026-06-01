@@ -16,7 +16,11 @@ interface Propiedad {
     tipo_operacion: 'Venta' | 'Alquiler'
     tipo_propiedad: string
     estado_propiedad: string
-    ubicacion: { localidad: string; departamento: string; direccion: string } | null
+    ubicacion: {
+        direccion: string
+        departamento: { id: number; nombre: string } | null
+        localidad: { id: number; nombre: string } | null
+    } | null
     detalle_propiedad: { precio: number; nro_habitaciones: number; nro_banios: number; nro_garage: number; superficie_total: number } | null
     imagenes: { url: string; es_principal: boolean }[]
 }
@@ -33,7 +37,7 @@ const filtroTipo = ref('todos')
 const propiedadesFiltradas = computed(() => {
     return props.propiedades.filter(p => {
         const q = busqueda.value.toLowerCase()
-        const okBusqueda = !q || p.titulo.toLowerCase().includes(q) || (p.ubicacion?.localidad ?? '').toLowerCase().includes(q)
+        const okBusqueda = !q || p.titulo.toLowerCase().includes(q) || (p.ubicacion?.localidad?.nombre ?? '').toLowerCase().includes(q)
         const okEstado = filtroEstado.value === 'todos' || p.estado_propiedad === filtroEstado.value
         const okOp = filtroOp.value === 'todos' || p.tipo_operacion === filtroOp.value
         const okTipo = filtroTipo.value === 'todos' || p.tipo_propiedad === filtroTipo.value
@@ -83,7 +87,6 @@ function confirmarEliminar() {
 <template>
     <PanelLayout :navLinks="navLinks">
 
-        <!-- Encabezado -->
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h1 class="text-2xl font-semibold text-gray-900">Mis Propiedades</h1>
@@ -159,7 +162,6 @@ function confirmarEliminar() {
                 </Select>
             </div>
 
-            <!-- Tabla -->
             <div class="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
                 <table class="w-full text-sm">
                     <thead>
@@ -175,7 +177,6 @@ function confirmarEliminar() {
                     </thead>
                     <tbody class="divide-y divide-neutral-100">
                         <tr v-for="p in propiedadesFiltradas" :key="p.id" class="hover:bg-neutral-50 transition-colors">
-                            <!-- Propiedad: imagen + título + tipo -->
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
                                     <div class="w-14 h-10 rounded-md overflow-hidden bg-neutral-100 shrink-0">
@@ -205,13 +206,13 @@ function confirmarEliminar() {
                             </td>
 
                             <td class="px-4 py-3 hidden md:table-cell text-neutral-500">
-                                {{ p.ubicacion?.localidad ?? '—' }},
-                                {{ p.ubicacion?.departamento ?? '' }}
+                                {{ p.ubicacion?.localidad?.nombre ?? '—' }}<span v-if="p.ubicacion?.departamento">, {{
+                                    p.ubicacion.departamento.nombre }}</span>
                             </td>
 
                             <td class="px-4 py-3 hidden lg:table-cell font-medium text-neutral-700">
                                 {{ p.detalle_propiedad ? formatPrecio(p.detalle_propiedad.precio, p.tipo_operacion) :
-                                '—' }}
+                                    '—' }}
                             </td>
 
                             <td class="px-4 py-3">
@@ -264,7 +265,6 @@ function confirmarEliminar() {
             </p>
         </template>
 
-        <!-- Dialog confirmar eliminación -->
         <Dialog :open="propiedadAEliminar !== null" @update:open="(v) => { if (!v) propiedadAEliminar = null }">
             <DialogContent :show-close-button="false" class="max-w-md">
                 <DialogHeader>

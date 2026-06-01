@@ -9,6 +9,8 @@ use App\Http\Controllers\Inmobiliaria\InmobiliariaController;
 use App\Http\Controllers\Propiedad\PropiedadController;
 use App\Http\Controllers\AgenteController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\LocalidadController;
+use App\Http\Controllers\GeocodeController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
@@ -61,6 +63,8 @@ Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->g
 
 Route::post('/contact', [LandingController::class, 'sendContact'])->name('contact.send');
 
+Route::get('/departamentos/{departamento}/localidades', [LocalidadController::class, 'porDepartamento'])->name('departamentos.localidades.index');
 
 
+Route::get('/geocode', [GeocodeController::class, 'buscar'])->name('geocode');
 require __DIR__ . '/settings.php';

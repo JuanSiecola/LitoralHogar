@@ -10,7 +10,15 @@ interface Amenidad {
     nombre: string
 }
 
-defineProps<{ amenidades: Amenidad[] }>()
+interface Departamento {
+    id: number
+    nombre: string
+}
+
+const props = defineProps<{
+    amenidades: Amenidad[]
+    departamentos: Departamento[]
+}>()
 
 const navLinks = useInmobiliariaNav()
 
@@ -19,11 +27,13 @@ const form = useForm({
     tipo_propiedad: '',
     tipo_operacion: '',
     estado_propiedad: 'Disponible',
-    direccion: '',
-    localidad: '',
-    departamento: '',
-    latitud: undefined as number | undefined,
-    longitud: undefined as number | undefined,
+    ubicacion: {
+        direccion: '',
+        departamento_id: null as number | null,
+        localidad_id: null as number | null,
+        latitud: null as number | null,
+        longitud: null as number | null,
+    },
     nro_habitaciones: 0,
     nro_banios: 0,
     nro_garage: 0,
@@ -57,6 +67,7 @@ function submit() {
         <PropiedadForm
             :form="form"
             :amenidades="amenidades"
+            :departamentos="departamentos"
             submit-label="Publicar propiedad"
             @submit="submit"
         />
