@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Propiedad;
-use App\Models\Inmobiliaria;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Requests\ContactFormRequest;
 use App\Mail\ContactNotification;
 use Illuminate\Support\Facades\Mail;
@@ -18,7 +15,8 @@ class LandingController extends Controller
         // Propiedades destacadas: las 6 más recientes con estado Disponible
         $propiedadesDestacadas = Propiedad::with([
             'detalle_propiedad',
-            'ubicacion',
+            'ubicacion.departamento:id,nombre',
+            'ubicacion.localidad:id,nombre',
             'imagenes' => fn($q) => $q->where('es_principal', true)->limit(1),
         ])
             ->where('estado_propiedad', 'Disponible')
@@ -34,8 +32,8 @@ class LandingController extends Controller
                 'nro_habitaciones' => $p->detalle_propiedad?->nro_habitaciones,
                 'nro_banios'       => $p->detalle_propiedad?->nro_banios,
                 'superficie_total' => $p->detalle_propiedad?->superficie_total,
-                'localidad'        => $p->ubicacion?->localidad,
-                'departamento'     => $p->ubicacion?->departamento,
+                'localidad'        => $p->ubicacion?->localidad?->nombre,
+                'departamento'     => $p->ubicacion?->departamento?->nombre,
                 'imagen_url'       => $p->imagenes->first()?->url,
             ]);
         $categorias = Propiedad::where('estado_propiedad', 'Disponible')

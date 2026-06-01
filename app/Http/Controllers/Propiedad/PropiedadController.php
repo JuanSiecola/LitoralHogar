@@ -13,6 +13,7 @@ use Inertia\Inertia;
 use App\Models\Propiedad;
 use App\Models\Amenidad;
 use App\Actions\Propiedad\PropiedadEditAction;
+use App\Models\Departamento;
 
 class PropiedadController extends Controller
 {
@@ -23,8 +24,12 @@ class PropiedadController extends Controller
     public function index()
     {
         $propiedades = Propiedad::where('usuario_id', auth()->id())
-        ->with(['ubicacion', 'detalle_propiedad', 'imagenes'])
-        ->get();
+            ->with([
+                'ubicacion.departamento:id,nombre',
+                'ubicacion.localidad:id,nombre',
+                'detalle_propiedad',
+                'imagenes',
+            ])->get();
 
         return Inertia::render('inmobiliaria/propiedades/Index', [
             'propiedades' => $propiedades,
@@ -38,6 +43,7 @@ class PropiedadController extends Controller
     {
         return Inertia::render('inmobiliaria/propiedades/Create', [
             'amenidades' => Amenidad::all(['id', 'nombre']),
+            'departamentos' => Departamento::orderBy('nombre')->get(['id', 'nombre']),
         ]);
     }
 
@@ -84,6 +90,7 @@ class PropiedadController extends Controller
         return Inertia::render('inmobiliaria/propiedades/Edit', [
             'propiedad' => $propiedad,
             'amenidades' => Amenidad::all(['id', 'nombre']),
+            'departamentos' => Departamento::orderBy('nombre')->get(['id', 'nombre']),
         ]);
     }
 

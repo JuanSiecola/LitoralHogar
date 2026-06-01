@@ -20,14 +20,10 @@
 </template>
 
 <script setup>
-import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next';
 import PanelLayout from '@/layouts/PanelLayout.vue';
+import { useAgenteNav } from '@/composables/useAgenteNav';
 
 defineProps(['propsActivas', 'totalVistas', 'consultasPendientes']);
 
-const navLinks = [
-    { label: 'Dashboard',           href: '/agente/dashboard',   icon: LayoutDashboard },
-    { label: 'Mis Propiedades',     href: '/agente/propiedades', icon: Home },
-    { label: 'Consultas Recibidas', href: '/agente/consultas',   icon: MessageSquare },
-];
+const navLinks = useAgenteNav();
 </script>

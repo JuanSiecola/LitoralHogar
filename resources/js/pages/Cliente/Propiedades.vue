@@ -57,6 +57,7 @@ const mapaDetalle = ref<HTMLDivElement | null>(null);
 let leafletMap: L.Map | null = null;
 let leafletMarker: L.Marker | null = null;
 
+delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
     iconUrl: markerIcon,
@@ -263,7 +264,7 @@ onBeforeUnmount(destruirMapa);
                         <div class="mt-6 flex items-start gap-2 text-sm text-muted-foreground">
                             <MapPin class="mt-0.5 h-4 w-4 shrink-0" />
                             <span>
-                                {{ propiedadSeleccionada.ciudad }},
+                                {{ propiedadSeleccionada.localidad }},
                                 {{ propiedadSeleccionada.departamento }}
                             </span>
                         </div>
@@ -320,7 +321,7 @@ onBeforeUnmount(destruirMapa);
                                 <div>
                                     <dt class="text-muted-foreground">Ciudad</dt>
                                     <dd class="font-medium text-foreground">
-                                        {{ propiedadSeleccionada.ciudad }}
+                                        {{ propiedadSeleccionada.localidad }}
                                     </dd>
                                 </div>
                                 <div>

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services;
 
 use Cloudinary\Cloudinary;
@@ -8,6 +7,19 @@ use Illuminate\Http\UploadedFile;
 class ImageUploadService
 {
     private Cloudinary $cloudinary;
+
+    private const PROFILES = [
+        // Logos y avatares: cuadrado, recortado, liviano
+        'avatar' => [
+            'width' => 400, 'height' => 400, 'crop' => 'fill',
+            'gravity' => 'face', 'quality' => 'auto', 'fetch_format' => 'auto',
+        ],
+        // Propiedades: alta resolución, sin recortar, calidad alta
+        'propiedad' => [
+            'width' => 1600, 'crop' => 'limit',
+            'quality' => 'auto:good', 'fetch_format' => 'auto',
+        ],
+    ];
 
     public function __construct()
     {
@@ -21,13 +33,16 @@ class ImageUploadService
         ]);
     }
 
-    public function upload(UploadedFile $file, string $folder = 'litoral-hogar'): array
-    {
+    public function upload(
+        UploadedFile $file,
+        string $folder = 'litoral-hogar',
+        string $profile = 'avatar'
+    ): array {
         $result = $this->cloudinary->uploadApi()->upload(
             $file->getRealPath(),
             [
                 'folder'         => $folder,
-                'transformation' => ['width' => 400, 'height' => 400, 'crop' => 'fill'],
+                'transformation' => self::PROFILES[$profile] ?? self::PROFILES['avatar'],
             ]
         );
 
@@ -41,5 +56,4 @@ class ImageUploadService
     {
         $this->cloudinary->uploadApi()->destroy($publicId);
     }
-
 }
