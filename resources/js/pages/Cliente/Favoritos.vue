@@ -29,16 +29,12 @@
 
 <script setup>
 import { router } from '@inertiajs/vue3'
-import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next';
 import PanelLayout from '@/layouts/PanelLayout.vue';
+import { useClienteNav } from '@/composables/useClienteNav';
 
 defineProps(['favoritos'])
 
-const navlink = [
-  { label: 'Dashboard',             href: '/cliente/dashboard',   icon: LayoutDashboard },
-  { label: 'Mis Favoritos',         href: '/cliente/favoritos', icon: Home },
-  { label: 'Mis Consultas',         href: '/cliente/consultas',   icon: MessageSquare },
-]
+const navlink = useClienteNav()
 
 function quitarFavorito(propiedadId) {
   router.delete(route('cliente.favoritos.quitar', propiedadId))

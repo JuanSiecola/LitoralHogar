@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder
             RolSeeder::class,
             AmenidadSeeder::class,
             UsuariosSeeder::class,
-            PropiedadesSeeder::class,
+            DepartamentoSeeder::class,
+            LocalidadSeeder::class,
         ]);
     }
 }

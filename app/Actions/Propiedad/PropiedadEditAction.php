@@ -36,11 +36,11 @@ class PropiedadEditAction
             ]);
 
             $propiedad->ubicacion->update([
-                'direccion' => $data['direccion'],
-                'localidad' => $data['localidad'],
-                'departamento' => $data['departamento'],
-                'latitud' => $data['latitud'] ?? null,
-                'longitud' => $data['longitud'] ?? null,
+                'direccion'        => $data['ubicacion']['direccion'],
+                'departamento_id'  => $data['ubicacion']['departamento_id'],
+                'localidad_id'     => $data['ubicacion']['localidad_id'],
+                'latitud'          => $data['ubicacion']['latitud'] ?? null,
+                'longitud'         => $data['ubicacion']['longitud'] ?? null,
             ]);
 
             $propiedad->amenidades()->sync($data['amenidades'] ?? []);
@@ -60,11 +60,10 @@ class PropiedadEditAction
             if (!empty($data['imagenes'])) {
                 $imagenPrincipalIndex = (int) ($data['imagen_principal_index'] ?? 0);
                 $ordenActual = $propiedad->imagenes()->max('orden') ?? -1;
-
                 $propiedad->imagenes()->update(['es_principal' => false]);
 
                 foreach ($data['imagenes'] as $indice => $archivo) {
-                    $resultado = $uploader->upload($archivo, 'litoral-hogar/propiedades');
+                    $resultado = $uploader->upload($archivo, 'litoral-hogar/propiedades', 'propiedad');
                     $propiedad->imagenes()->create([
                         'url' => $resultado['secure_url'],
                         'public_id' => $resultado['public_id'],

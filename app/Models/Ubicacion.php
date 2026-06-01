@@ -11,10 +11,25 @@ class Ubicacion extends Model
 
     public $timestamps = false;
 
-    protected $fillable = ['direccion', 'localidad', 'departamento', 'longitud', 'latitud', 'propiedad_id'];
+    protected $fillable = ['direccion', 'departamento_id', 'localidad_id', 'longitud', 'latitud', 'propiedad_id'];
+
+    protected $casts = [
+        'latitud' => 'decimal:8',
+        'longitud' => 'decimal:8',
+    ];
 
     public function propiedad(): BelongsTo
     {
         return $this->belongsTo(Propiedad::class, 'propiedad_id');
+    }
+
+     public function departamento(): BelongsTo
+    {
+        return $this->belongsTo(Departamento::class);
+    }
+
+    public function localidad(): BelongsTo
+    {
+        return $this->belongsTo(Localidad::class);
     }
 }

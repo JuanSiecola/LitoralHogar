@@ -1,5 +1,6 @@
-import { Building2, LayoutDashboard, Plus, Settings } from 'lucide-vue-next'
+import { Building2, LayoutDashboard, MessageSquare, Settings } from 'lucide-vue-next'
 import type { Component } from 'vue'
+import agente from '@/routes/agente'
 
 export interface NavLink {
     label: string
@@ -9,9 +10,9 @@ export interface NavLink {
 
 export function useAgenteNav(): NavLink[] {
     return [
-        { label: 'Dashboard',       href: '#', icon: LayoutDashboard },
-        { label: 'Mis Propiedades', href: '#', icon: Building2 },
-        { label: 'Publicar',        href: '#', icon: Plus },
-        { label: 'Mi Perfil',       href: '#', icon: Settings },
+        { label: 'Dashboard',       href: agente.dashboard.url(),           icon: LayoutDashboard },
+        { label: 'Mis Propiedades', href: agente.propiedades.url(),  icon: Building2 },
+        { label: 'Consultas',       href: agente.consultas.url(),  icon: MessageSquare },
+        { label: 'Mi Perfil',       href: agente.perfil.url(),              icon: Settings },
     ]
 }

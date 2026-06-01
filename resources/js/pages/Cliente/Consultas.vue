@@ -32,15 +32,11 @@
 
 <script setup>
 import PanelLayout from '@/layouts/PanelLayout.vue';
+import { useClienteNav } from '@/composables/useClienteNav';
+
 defineProps(['consultas'])
-import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next';
 
-
-const navlink = [
-  { label: 'Dashboard',             href: '/cliente/dashboard',   icon: LayoutDashboard },
-  { label: 'Mis Favoritos',         href: '/cliente/favoritos', icon: Home },
-  { label: 'Mis Consultas',         href: '/cliente/consultas',   icon: MessageSquare },
-]
+const navlink = useClienteNav()
 
 
 function estadoBadge(estado) {

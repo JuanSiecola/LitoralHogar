@@ -13,7 +13,7 @@ class PropiedadCrearAction
         $uploader = new ImageUploadService();
         $imagenesSubidas = [];
         foreach ($data['imagenes'] ?? [] as $archivo) {
-            $imagenesSubidas[] = $uploader->upload($archivo, 'litoral-hogar/propiedades');
+            $imagenesSubidas[] = $uploader->upload($archivo, 'litoral-hogar/propiedades', 'propiedad');
         }
 
         $imagenPrincipalIndex = (int) ($data['imagen_principal_index'] ?? 0);
@@ -53,11 +53,11 @@ class PropiedadCrearAction
             }
 
             $propiedad->ubicacion()->create([
-                'direccion' => $data['direccion'],
-                'localidad' => $data['localidad'],
-                'departamento' => $data['departamento'],
-                'latitud' => $data['latitud'] ?? null,
-                'longitud' => $data['longitud'] ?? null,
+                'direccion' => $data['ubicacion']['direccion'],
+                'departamento_id' => $data['ubicacion']['departamento_id'],
+                'localidad_id' => $data['ubicacion']['localidad_id'],
+                'latitud' => $data['ubicacion']['latitud'] ?? null,
+                'longitud' => $data['ubicacion']['longitud'] ?? null,
             ]);
 
             $propiedad->amenidades()->sync($data['amenidades'] ?? []);

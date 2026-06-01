@@ -38,17 +38,13 @@
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import PanelLayout from '@/layouts/PanelLayout.vue';
-import { LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next';
+import { useClienteNav } from '@/composables/useClienteNav';
 
 defineProps(['totalFavoritos', 'totalConsultas', 'consultasRecientes']);
 
 const page = usePage();
 
-const navlink = [
-    { label: 'Dashboard',     href: '/cliente/dashboard', icon: LayoutDashboard },
-    { label: 'Mis Favoritos', href: '/cliente/favoritos', icon: Home },
-    { label: 'Mis Consultas', href: '/cliente/consultas', icon: MessageSquare },
-];
+const navlink = useClienteNav();
 
 const nombreUsuario = computed(() => {
     const user = page.props.auth?.user;

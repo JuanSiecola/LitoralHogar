@@ -90,6 +90,7 @@ const mapaDetalle = ref<HTMLDivElement | null>(null);
 let leafletMap: L.Map | null = null;
 let leafletMarker: L.Marker | null = null;
 
+delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
     iconUrl: markerIcon,

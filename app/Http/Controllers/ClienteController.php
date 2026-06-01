@@ -63,24 +63,12 @@ class ClienteController extends Controller
 
     public function propiedades(Request $request)
     {
-        $filters = $request->only([
-            'tipo_operacion',
-            'tipo_propiedad',
-            'localidad',
-            'departamento',
-            'nro_habitaciones',
-            'nro_banios',
-            'precio_min',
-            'precio_max',
-            'superficie_min',
-        ]);
-
-        $propiedades = Propiedad::query()
-            ->with([
-                'detalle_propiedad',
-                'ubicacion',
-                'imagenes' => fn($q) => $q->where('es_principal', true)->limit(1),
-            ])
+        $propiedades = Propiedad::with([
+            'detalle_propiedad',
+            'ubicacion.departamento:id,nombre',
+            'ubicacion.localidad:id,nombre',
+            'imagenes' => fn($q) => $q->where('es_principal', true)->limit(1),
+        ])
             ->where('estado_propiedad', 'Disponible')
             ->when($request->filled('tipo_operacion'), fn($query) => $query
                 ->where('tipo_operacion', (string) $request->input('tipo_operacion')))
@@ -124,8 +112,8 @@ class ClienteController extends Controller
                 'nro_habitaciones' => $propiedad->detalle_propiedad?->nro_habitaciones ?? 0,
                 'nro_banios' => $propiedad->detalle_propiedad?->nro_banios ?? 0,
                 'superficie_total' => $propiedad->detalle_propiedad?->superficie_total ?? 0,
-                'localidad' => $propiedad->ubicacion?->localidad ?? 'Sin localidad',
-                'departamento' => $propiedad->ubicacion?->departamento ?? 'Sin departamento',
+                'localidad' => $propiedad->ubicacion?->localidad?->nombre ?? 'Sin localidad',
+                'departamento' => $propiedad->ubicacion?->departamento?->nombre ?? 'Sin departamento',
                 'latitud' => $propiedad->ubicacion?->latitud,
                 'longitud' => $propiedad->ubicacion?->longitud,
                 'imagen_url' => $propiedad->imagenes->first()?->url,
@@ -145,3 +133,4 @@ class ClienteController extends Controller
         ]);
     }
 }
+
