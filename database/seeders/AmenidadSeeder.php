@@ -25,6 +25,9 @@ class AmenidadSeeder extends Seeder
             'Calefacción central',
             'Gimnasio',
             'Sala de juegos infantiles',
+            'Wifi',
+            'Cocina equipada',
+            'Amoblado',
         ];
 
         foreach ($amenidades as $nombre) {

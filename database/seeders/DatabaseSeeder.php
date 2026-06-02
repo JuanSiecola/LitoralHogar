@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UsuariosSeeder::class,
             DepartamentoSeeder::class,
             LocalidadSeeder::class,
+            PropiedadesSeeder::class,
         ]);
     }
 }

@@ -121,7 +121,17 @@ class ClienteController extends Controller
 
         return inertia('Cliente/Propiedades', [
             'propiedades' => $propiedades,
-            'filters' => $filters,
+            'filters' => $request->only([
+                'tipo_operacion',
+                'tipo_propiedad',
+                'localidad',
+                'departamento',
+                'nro_habitaciones',
+                'nro_banios',
+                'precio_min',
+                'precio_max',
+                'superficie_min',
+            ]),
         ]);
     }
 

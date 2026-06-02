@@ -33,6 +33,8 @@ Route::middleware(['auth', 'verified', 'role:inmobiliaria'])->prefix('inmobiliar
     Route::patch('/propiedades/{propiedad}', [PropiedadController::class, 'update'])->name('propiedades.update');
     Route::delete('/propiedades/{propiedad}', [PropiedadController::class, 'destroy'])->name('propiedades.destroy');
     Route::get('/perfil', [InmobiliariaController::class, 'perfil'])->name('perfil');
+    Route::get('/consultas', [InmobiliariaController::class, 'consultasRecibidas'])->name('consultas');
+    Route::post('/consultas/{consulta}/responder', [InmobiliariaController::class, 'responderConsulta'])->name('consultas.responder');
     });
 
 Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')->group(function () {
