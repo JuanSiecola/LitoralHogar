@@ -185,6 +185,7 @@ class PropiedadesSeeder extends Seeder
                 $ids = Amenidad::whereIn('nombre', $data['amenidades'])->pluck('id');
                 $propiedad->amenidades()->attach($ids);
             }
+
         }
     }
 }
