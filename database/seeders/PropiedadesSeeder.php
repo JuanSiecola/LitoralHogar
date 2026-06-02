@@ -8,6 +8,8 @@ use App\Models\Propiedad;
 use App\Models\DetallePropiedad;
 use App\Models\Ubicacion;
 use App\Models\Amenidad;
+use App\Models\Departamento;
+use App\Models\Localidad;
 
 class PropiedadesSeeder extends Seeder
 {
@@ -19,6 +21,11 @@ class PropiedadesSeeder extends Seeder
             $this->command->warn('No se encontraron agentes. Ejecutá UsuariosSeeder primero.');
             return;
         }
+
+        $depto = fn(string $nombre) => Departamento::where('nombre', $nombre)->value('id');
+        $loc   = fn(string $nombre, int $deptoId) => Localidad::where('nombre', $nombre)
+            ->where('departamento_id', $deptoId)
+            ->value('id');
 
         $propiedades = [
             // ---- Agente 0 ----
@@ -102,13 +109,31 @@ class PropiedadesSeeder extends Seeder
             $propiedad = Propiedad::create(array_merge($data['propiedad'], ['usuario_id' => $agente->id]));
 
             DetallePropiedad::create(array_merge($data['detalle'], ['propiedad_id' => $propiedad->id]));
-
-            Ubicacion::create(array_merge($data['ubicacion'], ['propiedad_id' => $propiedad->id]));
+            
+            $deptoId = $depto($data['ubicacion']['departamento']);
+            $locId   = $loc($data['ubicacion']['localidad'], $deptoId);
+ 
+            if (!$deptoId) {
+                $this->command->warn("Departamento no encontrado: {$data['ubicacion']['departamento']}");
+            }
+            if (!$locId) {
+                $this->command->warn("Localidad no encontrada: {$data['ubicacion']['localidad']} ({$data['ubicacion']['departamento']})");
+            }
+             
+            Ubicacion::create([
+                'direccion'       => $data['ubicacion']['direccion'],
+                'localidad_id'    => $locId,
+                'departamento_id' => $deptoId,
+                'latitud'         => $data['ubicacion']['latitud'],
+                'longitud'        => $data['ubicacion']['longitud'],
+                'propiedad_id'    => $propiedad->id,
+            ]);
 
             if (!empty($data['amenidades'])) {
                 $ids = Amenidad::whereIn('nombre', $data['amenidades'])->pluck('id');
                 $propiedad->amenidades()->attach($ids);
             }
+
         }
     }
 }
