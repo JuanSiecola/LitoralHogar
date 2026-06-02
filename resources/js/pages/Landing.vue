@@ -98,42 +98,8 @@ const submit = () => {
             <p class="mt-4 text-lg text-muted-foreground">
                 Miles de propiedades en venta y alquiler en todos los departamentos del país.
             </p>
-
-            <!-- Buscador -->
-            <div class="mt-8 flex flex-col gap-3 rounded-2xl bg-card p-4 shadow-card md:flex-row">
-                <select
-                    v-model="busqueda.operacion"
-                    class="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-                >
-                    <option value="">Operación</option>
-                    <option value="Venta">Venta</option>
-                    <option value="Alquiler">Alquiler</option>
-                </select>
-                <select
-                    v-model="busqueda.tipo"
-                    class="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-                >
-                    <option value="">Tipo</option>
-                    <option value="Casa">Casa</option>
-                    <option value="Apartamento">Apartamento</option>
-                    <option value="Local">Local</option>
-                    <option value="Terreno">Terreno</option>
-                    <option value="Oficina">Oficina</option>
-                </select>
-                <input
-                    v-model="busqueda.localidad"
-                    type="text"
-                    placeholder="Localidad (ej: Pocitos)"
-                    class="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-                />
-                <button
-                    @click="buscar"
-                    class="rounded-lg bg-primary px-6 py-2 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                >
-                    Buscar
-                </button>
-            </div>
         </div>
+
     </section>
 
     <!-- Propiedades destacadas -->
