@@ -23,13 +23,17 @@ class Ubicacion extends Model
         return $this->belongsTo(Propiedad::class, 'propiedad_id');
     }
 
-     public function departamento(): BelongsTo
+    public function departamento(): BelongsTo
     {
-        return $this->belongsTo(Departamento::class);
+        return $this->belongsTo(Departamento::class)->withDefault([
+            'nombre' => 'Sin departamento',
+        ]);
     }
 
     public function localidad(): BelongsTo
     {
-        return $this->belongsTo(Localidad::class);
+        return $this->belongsTo(Localidad::class)->withDefault([
+            'nombre' => 'Sin localidad',
+        ]);
     }
 }

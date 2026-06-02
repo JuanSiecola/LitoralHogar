@@ -119,7 +119,7 @@ class ClienteController extends Controller
                 'imagen_url' => $propiedad->imagenes->first()?->url,
             ]);
 
-        return inertia('Cliente/Propiedades', [
+       return inertia('Cliente/Propiedades', [
             'propiedades' => $propiedades,
             'filters' => $request->only([
                 'tipo_operacion',
