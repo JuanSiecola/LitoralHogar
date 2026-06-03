@@ -37,7 +37,7 @@ class AgenteController extends Controller
         ->count();
 
     $ultimasConsultas = \App\Models\Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $agente->id))
-        ->with(['user.perfilPersona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
+        ->with(['user.perfil_persona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
         ->latest()
         ->take(5)
         ->get();

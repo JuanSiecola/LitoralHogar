@@ -55,13 +55,13 @@
                 >
                     <!-- Avatar inicial -->
                     <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
-                        {{ consulta.user?.nombre?.charAt(0)?.toUpperCase() ?? '?' }}
+                        {{ consulta.user?.perfil_persona?.nombre?.charAt(0)?.toUpperCase() ?? '?' }}
                     </div>
 
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center justify-between gap-2">
                             <p class="truncate text-sm font-medium text-foreground">
-                                {{ consulta.user?.nombre }}
+                                {{ consulta.user?.perfil_persona?.nombre +' '+ consulta.user?.perfil_persona?.apellido }}
                             </p>
                             <span
                                 class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium"
