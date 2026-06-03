@@ -99,6 +99,13 @@ class PropiedadController extends Controller
      */
     public function update(Request $request, Propiedad $propiedad)
     {
+        abort_if($propiedad->usuario_id !== auth()->id(), 403);
+
+        if ($request->has('estado_propiedad') && count($request->all()) === 1) {
+            $propiedad->update(['estado_propiedad' => $request->estado_propiedad]);
+            return back();
+        }
+
         $validatedData = $request->validate(array_merge(
             $this->propiedadRules(),
             $this->ubicacionRules($propiedad->ubicacion->id),
