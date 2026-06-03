@@ -68,7 +68,7 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     public function consultas()
     {
-        return $this->hasMany(Consulta::class);
+        return $this->hasMany(Consulta::class, 'usuario_id');
     }
 
     public function imagenes_propiedad(): HasMany
