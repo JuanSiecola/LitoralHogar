@@ -45,7 +45,7 @@ class AgenteController extends Controller
     return Inertia::render('agente/Dashboard', [
         'agente'              => [
                 'id'     => $agente->id,
-                'nombre' => $agente->perfilPersona?->nombre,
+                'nombre' => $agente->perfil_persona?->nombre,
             ],
         'propsActivas'        => $propsActivas,
         'consultasPendientes' => $consultasPendientes,
@@ -68,7 +68,7 @@ class AgenteController extends Controller
     public function consultasRecibidas()
     {
         $consultas = Consulta::whereIn('propiedad_id', auth()->user()->propiedades()->pluck('id'))
-            ->with(['propiedad', 'user'])
+            ->with(['user.perfil_persona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
             ->latest()
             ->paginate(15);
 

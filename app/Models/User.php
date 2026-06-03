@@ -53,7 +53,7 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     public function perfil_persona(): HasOne
     {
-        return $this->hasOne(PerfilPersona::class, 'usuario_id');
+        return $this->hasOne(\App\Models\PerfilPersona::class, 'usuario_id');
     }
 
     public function rol_usuario(): BelongsToMany

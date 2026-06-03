@@ -9,7 +9,9 @@
           <div>
             <h3 class="font-semibold text-gray-800">{{ consulta.propiedad.titulo }}</h3>
             <p class="text-sm text-gray-600 mt-1">
-              <strong>De:</strong> {{ consulta.user.name }}
+              <strong>De:</strong> {{ consulta.user?.perfil_persona
+                  ? consulta.user.perfil_persona.nombre + ' ' + consulta.user.perfil_persona.apellido
+                  : (consulta.user?.name ?? 'Usuario desconocido') }}
             </p>
             <p class="text-sm text-gray-500 mt-1">{{ consulta.mensaje }}</p>
           </div>

@@ -9,7 +9,7 @@ class Consulta extends Model
 {
     protected $table = 'consultas';
 
-    protected $fillable = ['usuario_id', 'propiedad_id', 'mensaje', 'respuesta', 'estado'];
+    protected $fillable = ['user_id', 'propiedad_id', 'mensaje', 'respuesta', 'estado'];
 
     public function propiedad(): BelongsTo
     {
@@ -18,6 +18,6 @@ class Consulta extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'usuario_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

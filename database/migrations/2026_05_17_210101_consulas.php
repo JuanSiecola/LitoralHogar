@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('consultas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('propiedad_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('propiedad_id')->constrained('propiedad')->cascadeOnDelete();
             $table->text('mensaje');
             $table->enum('estado', ['pendiente', 'respondida'])->default('pendiente');
             $table->text('respuesta')->nullable();
