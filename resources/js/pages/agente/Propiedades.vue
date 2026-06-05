@@ -10,6 +10,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Bed, Home, MapPin, ShowerHead, Square } from 'lucide-vue-next';
+import { formatPrecio } from '@/lib/currency';
 
 defineOptions({ layout: PublicLayout });
 
@@ -50,13 +51,10 @@ const propiedadSeleccionada = ref<Propiedad | null>(null);
 const precioSeleccionado = computed(() => {
     if (!propiedadSeleccionada.value) return '';
 
-    const num = new Intl.NumberFormat('es-UY').format(
+    return formatPrecio(
         propiedadSeleccionada.value.precio,
+        propiedadSeleccionada.value.tipo_operacion,
     );
-
-    return propiedadSeleccionada.value.tipo_operacion === 'Alquiler'
-        ? `USD ${num}/mes`
-        : `USD ${num}`;
 });
 
 function paginationLabel(label: string) {

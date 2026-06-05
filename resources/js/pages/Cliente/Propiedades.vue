@@ -16,6 +16,7 @@ import {
     ShowerHead,
     Square,
 } from 'lucide-vue-next';
+import { etiquetaMoneda, formatNumero, formatPrecio } from '@/lib/currency';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -100,14 +101,13 @@ L.Icon.Default.mergeOptions({
 const precioSeleccionado = computed(() => {
     if (!propiedadSeleccionada.value) return '';
 
-    const num = new Intl.NumberFormat('es-UY').format(
+    return formatPrecio(
         propiedadSeleccionada.value.precio,
+        propiedadSeleccionada.value.tipo_operacion,
     );
-
-    return propiedadSeleccionada.value.tipo_operacion === 'Alquiler'
-        ? `USD ${num}/mes`
-        : `USD ${num}`;
 });
+
+const monedaFiltro = computed(() => etiquetaMoneda(filtros.tipo_operacion));
 
 const coordenadasSeleccionadas = computed<[number, number] | null>(() => {
     const propiedad = propiedadSeleccionada.value;
@@ -133,9 +133,10 @@ const hayFiltrosActivos = computed(() =>
 
 const precioMaximoFormateado = computed(() => {
     const valor = Number(filtros.precio_max);
-    const precio = new Intl.NumberFormat('es-UY').format(valor);
+    const precio = formatNumero(valor);
+    const sufijo = valor >= Number(precioMaximoTope) ? '+' : '';
 
-    return valor >= Number(precioMaximoTope) ? `USD ${precio}+` : `USD ${precio}`;
+    return `${monedaFiltro.value} ${precio}${sufijo}`;
 });
 
 function filtrosLimpios() {
@@ -317,8 +318,8 @@ onBeforeUnmount(destruirMapa);
                         class="w-full cursor-pointer accent-primary"
                     />
                     <div class="mt-2 flex justify-between text-xs text-muted-foreground">
-                        <span>USD 0</span>
-                        <span>USD 1.000.000</span>
+                        <span>{{ monedaFiltro }} 0</span>
+                        <span>{{ monedaFiltro }} 1.000.000</span>
                     </div>
                 </div>
 

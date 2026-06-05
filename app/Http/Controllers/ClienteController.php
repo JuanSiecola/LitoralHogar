@@ -38,7 +38,14 @@ class ClienteController extends Controller
 
     public function favoritos()
     {
-        $favoritos = auth()->user()->favoritos()->with('imagenes')->paginate(12);
+        $favoritos = auth()->user()
+            ->favoritos()
+            ->with([
+                'imagenes',
+                'detalle_propiedad:propiedad_id,precio',
+                'ubicacion.localidad:id,nombre',
+            ])
+            ->paginate(12);
 
         return inertia('Cliente/Favoritos', compact('favoritos'));
     }

@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FormMessage } from '@/components/ui/form'
 import AmenidadesSelector from '@/components/AmenidadesSelector.vue'
 import { Home, MapPin, ImageIcon, PawPrint, DollarSign, Sparkles, X } from 'lucide-vue-next'
+import { computed } from 'vue'
 import InputError from '@/components/InputError.vue'
 import FormSection from '@/components/FormSection.vue'
+import { etiquetaMoneda } from '@/lib/currency'
 
 interface Amenidad {
     id: number
@@ -62,6 +64,12 @@ const props = defineProps<{
 const emit = defineEmits<{ submit: [] }>()
 
 const { previews, onImagenesChange, eliminarImagen } = useImagenes(props.form)
+
+const monedaPrecio = computed(() => etiquetaMoneda(props.form.tipo_operacion))
+const precioLabel = computed(() => `Precio (${monedaPrecio.value})`)
+const precioPlaceholder = computed(() =>
+    props.form.tipo_operacion === 'Alquiler' ? '35000' : '200000',
+)
 
 function handleSubmit() {
     props.form.amenidades = props.form.amenidades.map(Number)
@@ -190,7 +198,7 @@ function toggleEliminarImagen(id: number) {
                 <Input id="superficie_total" label="Superficie (m²)" required placeholder="240" :min="1"
                     v-model="form.superficie_total" />
                 <InputError :message="form.errors.superficie_total" />
-                <Input id="precio" type="number" label="Precio (USD)" required placeholder="200000" :min="0"
+                <Input id="precio" type="number" :label="precioLabel" required :placeholder="precioPlaceholder" :min="0"
                     v-model="form.precio" />
                 <InputError :message="form.errors.precio" />
                 <Input id="anio_construccion" label="Año construcción" type="number" required :min="1900"

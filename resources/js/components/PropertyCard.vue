@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Bed, ShowerHead, Square } from 'lucide-vue-next';
+import { formatPrecio } from '@/lib/currency';
 
 interface Props {
     id: number;
@@ -31,12 +32,9 @@ const emit = defineEmits<{
     select: [propiedad: Omit<Props, 'selectable'>];
 }>();
 
-const precioFormateado = computed(() => {
-    const num = new Intl.NumberFormat('es-UY').format(props.precio);
-    return props.tipo_operacion === 'Alquiler'
-        ? `USD ${num}/mes`
-        : `USD ${num}`;
-});
+const precioFormateado = computed(() =>
+    formatPrecio(props.precio, props.tipo_operacion),
+);
 
 function seleccionar() {
     if (!props.selectable) return;
