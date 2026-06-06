@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\GeocodeController;
 use App\Http\Controllers\PropiedadPublicaController;
+use App\Http\Controllers\EstadisticasController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'verified', 'role:inmobiliaria'])->prefix('inmobiliar
     Route::get('/perfil', [InmobiliariaController::class, 'perfil'])->name('perfil');
     Route::get('/consultas', [InmobiliariaController::class, 'consultasRecibidas'])->name('consultas');
     Route::post('/consultas/{consulta}/responder', [InmobiliariaController::class, 'responderConsulta'])->name('consultas.responder');
+    Route::get('/estadisticas', [EstadisticasController::class, 'inmobiliaria'])->name('estadisticas');
     });
 
 Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')->group(function () {
