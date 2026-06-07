@@ -11,8 +11,10 @@
 
         <div class="p-4">
           <h3 class="font-semibold text-gray-800">{{ prop.titulo }}</h3>
-          <p class="text-blue-600 font-bold mt-1">${{ prop.precio.toLocaleString() }}</p>
-          <p class="text-sm text-gray-500">{{ prop.localidad }}</p>
+          <p class="text-blue-600 font-bold mt-1">
+            {{ formatPrecio(prop.detalle_propiedad?.precio ?? 0, prop.tipo_operacion) }}
+          </p>
+          <p class="text-sm text-gray-500">{{ prop.ubicacion?.localidad?.nombre ?? '' }}</p>
 
           <!-- Botón quitar -->
           <button @click="quitarFavorito(prop.id)"
@@ -31,6 +33,7 @@
 import { router } from '@inertiajs/vue3'
 import PanelLayout from '@/layouts/PanelLayout.vue';
 import { useClienteNav } from '@/composables/useClienteNav';
+import { formatPrecio } from '@/lib/currency';
 
 defineProps(['favoritos'])
 

@@ -32,6 +32,9 @@ createInertiaApp({
                 case name.startsWith('Cliente/'):
                     // cada página maneja su propio layout via PanelLayout
                     break;
+                case name.startsWith('Propiedad/'):
+                    module.default.layout = PublicLayout;
+                    break;
                 default:
                     module.default.layout = AppLayout;
             }

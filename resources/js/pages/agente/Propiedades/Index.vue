@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
 import { Plus, Search, Pencil, Trash2, PauseCircle, PlayCircle, LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next'
+import { formatPrecio } from '@/lib/currency'
 
 interface Propiedad {
     id: number
@@ -45,11 +46,6 @@ const propiedadesFiltradas = computed(() => {
 
 function imagenPrincipal(imagenes: Propiedad['imagenes']): string | null {
     return imagenes.find(i => i.es_principal)?.url ?? imagenes[0]?.url ?? null
-}
-
-function formatPrecio(precio: number, op: string): string {
-    const n = new Intl.NumberFormat('es-UY').format(precio)
-    return op === 'Alquiler' ? `USD ${n}/mes` : `USD ${n}`
 }
 
 function estadoClass(estado: string): string {
