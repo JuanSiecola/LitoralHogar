@@ -64,6 +64,9 @@ Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->g
     Route::get('/consultas', [AgenteController::class, 'consultasRecibidas'])->name('consultas');
     Route::post('/consultas/{consulta}/responder', [AgenteController::class, 'responderConsulta'])->name('consultas.responder');
     Route::get('/perfil', [AgenteController::class, 'perfil'])->name('perfil');
+
+    // Estadísticas
+    Route::get('/estadisticas', [EstadisticasController::class, 'agente'])->name('estadisticas');
 });
 
 Route::post('/contact', [LandingController::class, 'sendContact'])->name('contact.send');
