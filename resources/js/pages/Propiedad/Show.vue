@@ -6,7 +6,7 @@ import { formatPrecio } from '@/lib/currency';
 import {
     Bed, ShowerHead, Square, Car, Layers, CalendarDays,
     Hammer, PawPrint, MapPin, ChevronLeft, ChevronRight,
-    Mail, Phone, User,
+    Mail, MessageCircle, User,
 } from 'lucide-vue-next';
 import { onMounted, onUnmounted } from 'vue';
 interface Imagen {
@@ -66,6 +66,25 @@ function siguiente() {
 const precioFormateado = computed(() =>
     formatPrecio(props.propiedad.precio, props.propiedad.tipo_operacion)
 );
+
+const whatsappHref = computed(() => {
+    const phone = props.propiedad.contacto?.phone;
+    if (!phone) return '';
+
+    let digits = phone.replace(/\D/g, '');
+
+    if (digits.startsWith('00')) {
+        digits = digits.slice(2);
+    }
+
+    if (digits.startsWith('0')) {
+        digits = `598${digits.replace(/^0+/, '')}`;
+    } else if (!digits.startsWith('598') && digits.length <= 9) {
+        digits = `598${digits}`;
+    }
+
+    return `https://wa.me/${digits}`;
+});
 
 // Formulario consulta
 const form = useForm({
@@ -319,21 +338,35 @@ onUnmounted(() => {
                             <p class="text-xs capitalize text-muted-foreground">{{ propiedad.contacto.tipo }}</p>
                         </div>
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-3">
                         <a
                             :href="`mailto:${propiedad.contacto.email}`"
-                            class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition"
+                            class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                            title="Enviar correo"
                         >
-                            <Mail class="h-4 w-4" />
-                            {{ propiedad.contacto.email }}
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                <Mail class="h-4 w-4" />
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block text-xs text-muted-foreground">Correo</span>
+                                <span class="block truncate">{{ propiedad.contacto.email }}</span>
+                            </span>
                         </a>
                         <a
                             v-if="propiedad.contacto.phone"
-                            :href="`tel:${propiedad.contacto.phone}`"
-                            class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition"
+                            :href="whatsappHref"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800 transition hover:border-green-400 hover:bg-green-100"
+                            title="Enviar mensaje por WhatsApp"
                         >
-                            <Phone class="h-4 w-4" />
-                            {{ propiedad.contacto.phone }}
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600 text-white">
+                                <MessageCircle class="h-4 w-4" />
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block text-xs text-green-700/80">WhatsApp</span>
+                                <span class="block truncate">{{ propiedad.contacto.phone }}</span>
+                            </span>
                         </a>
                     </div>
                 </div>

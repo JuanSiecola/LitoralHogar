@@ -174,7 +174,13 @@ function confirmarEliminar() {
                     <tbody class="divide-y divide-neutral-100">
                         <tr v-for="p in propiedadesFiltradas" :key="p.id" class="hover:bg-neutral-50 transition-colors">
                             <td class="px-4 py-3">
-                                <div class="flex items-center gap-3">
+                                <a
+                                    :href="`/propiedades/${p.id}`"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="flex items-center gap-3 rounded-md transition-colors hover:text-primary"
+                                    title="Ver propiedad en una pestaña nueva"
+                                >
                                     <div class="w-14 h-10 rounded-md overflow-hidden bg-neutral-100 shrink-0">
                                         <img v-if="imagenPrincipal(p.imagenes)" :src="imagenPrincipal(p.imagenes)!"
                                             :alt="p.titulo" class="w-full h-full object-cover" />
@@ -190,7 +196,7 @@ function confirmarEliminar() {
                                         <p class="font-medium text-neutral-800 truncate max-w-48">{{ p.titulo }}</p>
                                         <p class="text-xs text-neutral-400 mt-0.5">{{ p.tipo_propiedad }}</p>
                                     </div>
-                                </div>
+                                </a>
                             </td>
 
                             <td class="px-4 py-3 hidden sm:table-cell">
