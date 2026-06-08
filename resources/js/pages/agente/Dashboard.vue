@@ -95,6 +95,7 @@
 import { Link } from '@inertiajs/vue3'
 import { LayoutDashboard, Home, MessageSquare, Eye, Plus } from 'lucide-vue-next'
 import PanelLayout from '@/layouts/PanelLayout.vue'
+import { useAgenteNav } from '@/composables/useAgenteNav'
 
 defineProps({
     propsActivas:        { type: Number, default: 0 },
@@ -104,9 +105,6 @@ defineProps({
     agente:              { type: Object, default: null },
 })
 
-const navLinks = [
-    { label: 'Dashboard',           href: '/agente/dashboard',   icon: LayoutDashboard },
-    { label: 'Mis Propiedades',     href: '/agente/propiedades', icon: Home },
-    { label: 'Consultas Recibidas', href: '/agente/consultas',   icon: MessageSquare },
-]
+const navLinks = useAgenteNav()
+
 </script>

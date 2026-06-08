@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
 import { Plus, Search, Pencil, Trash2, PauseCircle, PlayCircle, LayoutDashboard, Home, MessageSquare } from 'lucide-vue-next'
 import { formatPrecio } from '@/lib/currency'
+import { useAgenteNav } from '@/composables/useAgenteNav'
 
 interface Propiedad {
     id: number
@@ -15,31 +16,31 @@ interface Propiedad {
     tipo_operacion: 'Venta' | 'Alquiler'
     tipo_propiedad: string
     estado_propiedad: string
-    ubicacion: { localidad: string; departamento: string; direccion: string } | null
+    ubicacion: {
+        direccion: string
+        departamento: { id: number; nombre: string } | null
+        localidad: { id: number; nombre: string } | null
+    } | null
     detalle_propiedad: { precio: number; nro_habitaciones: number; nro_banios: number; nro_garage: number; superficie_total: number } | null
     imagenes: { url: string; es_principal: boolean }[]
 }
 
 const props = defineProps<{ propiedades: Propiedad[] }>()
 
-const navLinks = [
-    { label: 'Dashboard',           href: '/agente/dashboard',   icon: LayoutDashboard },
-    { label: 'Mis Propiedades',     href: '/agente/propiedades', icon: Home },
-    { label: 'Consultas Recibidas', href: '/agente/consultas',   icon: MessageSquare },
-]
+const navLinks = useAgenteNav()
 
-const busqueda    = ref('')
+const busqueda = ref('')
 const filtroEstado = ref('todos')
-const filtroOp    = ref('todos')
-const filtroTipo  = ref('todos')
+const filtroOp = ref('todos')
+const filtroTipo = ref('todos')
 
 const propiedadesFiltradas = computed(() => {
     return props.propiedades.filter(p => {
         const q = busqueda.value.toLowerCase()
-        const okBusqueda = !q || p.titulo.toLowerCase().includes(q) || (p.ubicacion?.localidad ?? '').toLowerCase().includes(q)
-        const okEstado   = filtroEstado.value === 'todos' || p.estado_propiedad === filtroEstado.value
-        const okOp       = filtroOp.value === 'todos' || p.tipo_operacion === filtroOp.value
-        const okTipo     = filtroTipo.value === 'todos' || p.tipo_propiedad === filtroTipo.value
+        const okBusqueda = !q || p.titulo.toLowerCase().includes(q) || (p.ubicacion?.localidad?.nombre ?? '').toLowerCase().includes(q)
+        const okEstado = filtroEstado.value === 'todos' || p.estado_propiedad === filtroEstado.value
+        const okOp = filtroOp.value === 'todos' || p.tipo_operacion === filtroOp.value
+        const okTipo = filtroTipo.value === 'todos' || p.tipo_propiedad === filtroTipo.value
         return okBusqueda && okEstado && okOp && okTipo
     })
 })
@@ -51,10 +52,10 @@ function imagenPrincipal(imagenes: Propiedad['imagenes']): string | null {
 function estadoClass(estado: string): string {
     const map: Record<string, string> = {
         Disponible: 'bg-green-100 text-green-700 border-green-200',
-        Reservada:  'bg-yellow-100 text-yellow-700 border-yellow-200',
-        Vendida:    'bg-blue-100 text-blue-700 border-blue-200',
-        Alquilada:  'bg-purple-100 text-purple-700 border-purple-200',
-        Pausada:    'bg-neutral-100 text-neutral-500 border-neutral-200',
+        Reservada: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+        Vendida: 'bg-blue-100 text-blue-700 border-blue-200',
+        Alquilada: 'bg-purple-100 text-purple-700 border-purple-200',
+        Pausada: 'bg-neutral-100 text-neutral-500 border-neutral-200',
     }
     return map[estado] ?? 'bg-neutral-100 text-neutral-500 border-neutral-200'
 }
@@ -112,13 +113,10 @@ function confirmarEliminar() {
             <!-- Filtros -->
             <div class="mb-5 flex flex-wrap gap-3">
                 <div class="relative min-w-48 flex-1">
-                    <Search class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-                    <input
-                        v-model="busqueda"
-                        type="text"
-                        placeholder="Buscar por título o localidad..."
-                        class="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring"
-                    />
+                    <Search
+                        class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                    <input v-model="busqueda" type="text" placeholder="Buscar por título o localidad..."
+                        class="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring" />
                 </div>
 
                 <Select v-model="filtroEstado">
@@ -165,7 +163,8 @@ function confirmarEliminar() {
             <div class="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-neutral-200 bg-neutral-50 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                        <tr
+                            class="border-b border-neutral-200 bg-neutral-50 text-xs font-semibold uppercase tracking-wide text-neutral-500">
                             <th class="px-4 py-3 text-left">Propiedad</th>
                             <th class="hidden px-4 py-3 text-left sm:table-cell">Operación</th>
                             <th class="hidden px-4 py-3 text-left md:table-cell">Ubicación</th>
@@ -186,15 +185,13 @@ function confirmarEliminar() {
                                     title="Ver propiedad en una pestaña nueva"
                                 >
                                     <div class="h-10 w-14 shrink-0 overflow-hidden rounded-md bg-neutral-100">
-                                        <img
-                                            v-if="imagenPrincipal(p.imagenes)"
-                                            :src="imagenPrincipal(p.imagenes)!"
-                                            :alt="p.titulo"
-                                            class="h-full w-full object-cover"
-                                        />
-                                        <div v-else class="flex h-full w-full items-center justify-center text-neutral-300">
+                                        <img v-if="imagenPrincipal(p.imagenes)" :src="imagenPrincipal(p.imagenes)!"
+                                            :alt="p.titulo" class="h-full w-full object-cover" />
+                                        <div v-else
+                                            class="flex h-full w-full items-center justify-center text-neutral-300">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9.75L12 3l9 6.75V21H3V9.75z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                    d="M3 9.75L12 3l9 6.75V21H3V9.75z" />
                                             </svg>
                                         </div>
                                     </div>
@@ -214,11 +211,12 @@ function confirmarEliminar() {
                             </td>
 
                             <td class="hidden px-4 py-3 text-neutral-500 md:table-cell">
-                                {{ p.ubicacion?.localidad ?? '—' }}, {{ p.ubicacion?.departamento ?? '' }}
+                                {{ p.ubicacion?.localidad?.nombre ?? '—' }}, {{ p.ubicacion?.departamento?.nombre ?? '' }}
                             </td>
 
                             <td class="hidden px-4 py-3 font-medium text-neutral-700 lg:table-cell">
-                                {{ p.detalle_propiedad ? formatPrecio(p.detalle_propiedad.precio, p.tipo_operacion) : '—' }}
+                                {{ p.detalle_propiedad ? formatPrecio(p.detalle_propiedad.precio, p.tipo_operacion) :
+                                '—' }}
                             </td>
 
                             <td class="px-4 py-3">
@@ -229,33 +227,26 @@ function confirmarEliminar() {
 
                             <td class="px-4 py-3">
                                 <div class="flex items-center justify-end gap-1">
-                                    <Link
-                                        :href="`/agente/propiedades/${p.id}/editar`"
+                                    <Link :href="`/agente/propiedades/${p.id}/editar`"
                                         class="flex h-8 w-8 items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
-                                        title="Editar"
-                                    >
+                                        title="Editar">
                                         <Pencil class="h-4 w-4" />
                                     </Link>
 
-                                    <button
-                                        type="button"
+                                    <button type="button"
                                         class="flex h-8 w-8 items-center justify-center rounded-md transition-colors"
                                         :class="p.estado_propiedad === 'Pausada'
                                             ? 'text-amber-500 hover:bg-amber-50 hover:text-amber-700'
                                             : 'text-neutral-400 hover:bg-amber-50 hover:text-amber-600'"
                                         :title="p.estado_propiedad === 'Pausada' ? 'Activar' : 'Pausar'"
-                                        @click="toggleEstado(p)"
-                                    >
-                                        <PlayCircle  v-if="p.estado_propiedad === 'Pausada'" class="h-4 w-4" />
+                                        @click="toggleEstado(p)">
+                                        <PlayCircle v-if="p.estado_propiedad === 'Pausada'" class="h-4 w-4" />
                                         <PauseCircle v-else class="h-4 w-4" />
                                     </button>
 
-                                    <button
-                                        type="button"
+                                    <button type="button"
                                         class="flex h-8 w-8 items-center justify-center rounded-md text-neutral-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                                        title="Eliminar"
-                                        @click="eliminar(p.id)"
-                                    >
+                                        title="Eliminar" @click="eliminar(p.id)">
                                         <Trash2 class="h-4 w-4" />
                                     </button>
                                 </div>
@@ -270,7 +261,8 @@ function confirmarEliminar() {
                 </div>
             </div>
 
-            <p v-if="propiedadesFiltradas.length !== propiedades.length" class="mt-3 text-right text-xs text-neutral-400">
+            <p v-if="propiedadesFiltradas.length !== propiedades.length"
+                class="mt-3 text-right text-xs text-neutral-400">
                 Mostrando {{ propiedadesFiltradas.length }} de {{ propiedades.length }} propiedades
             </p>
         </template>
@@ -281,7 +273,8 @@ function confirmarEliminar() {
                 <DialogHeader>
                     <DialogTitle>Eliminar propiedad</DialogTitle>
                     <DialogDescription>
-                        Esta acción es permanente y no se puede deshacer. ¿Estás seguro que querés eliminar esta propiedad?
+                        Esta acción es permanente y no se puede deshacer. ¿Estás seguro que querés eliminar esta
+                        propiedad?
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter class="gap-4 sm:gap-2">

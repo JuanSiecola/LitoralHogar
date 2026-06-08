@@ -1,32 +1,39 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import PanelLayout from '@/layouts/PanelLayout.vue'
-import PropiedadForm from './PropiedadForm.vue'  // ruta relativa
-import { Home, MessageSquare, LayoutDashboard } from 'lucide-vue-next'
+import { useAgenteNav } from '@/composables/useAgenteNav'
+import { store } from '@/routes/agente/propiedades'
+import PropiedadForm from './PropiedadForm.vue'
 
 interface Amenidad {
     id: number
     nombre: string
 }
 
-defineProps<{ amenidades: Amenidad[] }>()
+interface Departamento {
+    id: number
+    nombre: string
+}
 
-const navLinks = [
-    { label: 'Dashboard',           href: '/agente/dashboard',   icon: LayoutDashboard },
-    { label: 'Mis Propiedades',     href: '/agente/propiedades', icon: Home },
-    { label: 'Consultas Recibidas', href: '/agente/consultas',   icon: MessageSquare },
-]
+const props = defineProps<{
+    amenidades: Amenidad[]
+    departamentos: Departamento[]
+}>()
+
+const navLinks = useAgenteNav()
 
 const form = useForm({
     titulo: '',
     tipo_propiedad: '',
     tipo_operacion: '',
     estado_propiedad: 'Disponible',
-    direccion: '',
-    localidad: '',
-    departamento: '',
-    latitud: undefined as number | undefined,
-    longitud: undefined as number | undefined,
+    ubicacion: {
+        direccion: '',
+        departamento_id: null as number | null,
+        localidad_id: null as number | null,
+        latitud: null as number | null,
+        longitud: null as number | null,
+    },
     nro_habitaciones: 0,
     nro_banios: 0,
     nro_garage: 0,
@@ -46,25 +53,23 @@ const form = useForm({
 })
 
 function submit() {
-    form.post('/agente/propiedades')
+    form.post(store.url())
 }
 </script>
 
 <template>
-    <PanelLayout :nav-links="navLinks">
-
+    <PanelLayout :navLinks="navLinks">
         <div class="mb-6">
-            <h1 class="text-2xl font-semibold text-foreground">Nueva propiedad</h1>
-            <p class="mt-1 text-sm text-muted-foreground">Completá todos los datos para publicar la propiedad.</p>
+            <h1 class="text-2xl font-semibold text-gray-900">Crear Propiedad</h1>
+            <p class="text-sm text-gray-500 mt-1">Completá todos los datos para publicar la propiedad.</p>
         </div>
 
         <PropiedadForm
             :form="form"
             :amenidades="amenidades"
+            :departamentos="departamentos"
             submit-label="Publicar propiedad"
-            cancel-href="/agente/propiedades"
             @submit="submit"
         />
-
     </PanelLayout>
 </template>
