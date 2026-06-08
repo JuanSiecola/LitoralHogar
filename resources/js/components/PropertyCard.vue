@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Link } from '@inertiajs/vue3';
 import { Bed, ShowerHead, Square } from 'lucide-vue-next';
 import { formatPrecio } from '@/lib/currency';
 
@@ -13,56 +12,26 @@ interface Props {
     nro_habitaciones: number;
     nro_banios: number;
     superficie_total: number;
-    localidad: {
-        type: [String, null],
-        default: null
-    }
+    localidad: string | null;
     departamento: string;
     latitud?: number | string | null;
     longitud?: number | string | null;
     imagen_url?: string | null;
-    selectable?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    selectable: false,
-});
-
-const emit = defineEmits<{
-    select: [propiedad: Omit<Props, 'selectable'>];
-}>();
+const props = defineProps<Props>();
 
 const precioFormateado = computed(() =>
     formatPrecio(props.precio, props.tipo_operacion),
 );
-
-function seleccionar() {
-    if (!props.selectable) return;
-    emit('select', {
-        id: props.id,
-        titulo: props.titulo,
-        tipo_operacion: props.tipo_operacion,
-        tipo_propiedad: props.tipo_propiedad,
-        precio: props.precio,
-        nro_habitaciones: props.nro_habitaciones,
-        nro_banios: props.nro_banios,
-        superficie_total: props.superficie_total,
-        localidad: props.localidad,
-        departamento: props.departamento,
-        latitud: props.latitud,
-        longitud: props.longitud,
-        imagen_url: props.imagen_url,
-    });
-}
 </script>
 
 <template>
-    <component
-        :is="selectable ? 'button' : Link"
+    <a
         :href="`/propiedades/${id}`"
-        :type="selectable ? 'button' : undefined"
+        target="_blank"
+        rel="noopener noreferrer"
         class="group block w-full overflow-hidden rounded-xl border border-border bg-card text-left shadow-card transition-shadow duration-200 hover:shadow-md"
-        @click="seleccionar"
     >
         <!-- Imagen -->
         <div class="relative aspect-4/3 overflow-hidden bg-muted">
@@ -116,5 +85,5 @@ function seleccionar() {
                 </span>
             </div>
         </div>
-    </component>
+    </a>
 </template>
