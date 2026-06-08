@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Link, useForm } from '@inertiajs/vue3';
+import { Link, useForm, router } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { formatPrecio } from '@/lib/currency';
 import {
@@ -141,6 +141,22 @@ onMounted(async () => {
 onUnmounted(() => {
     mapInstance?.remove();
 });
+
+// Comparador
+const mostrarComparador = ref(false);
+const linkComparar = ref('');
+const errorLink = ref('');
+
+function irAComparar() {
+    const match = linkComparar.value.match(/propiedades\/(\d+)/);
+    if (!match) {
+        errorLink.value = 'Link inválido. Pegá la URL de otra propiedad.';
+        return;
+    }
+    errorLink.value = '';
+    const otroId = match[1];
+    router.visit(`/propiedades/comparar?ids[]=${props.propiedad.id}&ids[]=${otroId}`);
+}
 </script>
 
 <template>
@@ -307,6 +323,33 @@ onUnmounted(() => {
                         </span>
                     </div>
                 </div>
+                
+                <!-- Comparar con otra propiedad -->
+                <div class="rounded-xl border border-border bg-card p-6">
+                    <h2 class="mb-3 text-lg font-semibold text-foreground">Comparar</h2>
+                    <button
+                        @click="mostrarComparador = !mostrarComparador"
+                        class="w-full rounded-xl border border-primary px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+                    >
+                        {{ mostrarComparador ? 'Cancelar' : 'Comparar con otra publicación' }}
+                    </button>
+
+                    <div v-if="mostrarComparador" class="mt-4 space-y-3">
+                        <input
+                            v-model="linkComparar"
+                            placeholder="Pegá el link de la otra propiedad..."
+                            class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+                        <p v-if="errorLink" class="text-xs text-destructive">{{ errorLink }}</p>
+                        <button
+                            @click="irAComparar"
+                            class="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                        >
+                            Comparar
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Mapa -->
                 <div
                     v-if="propiedad.latitud && propiedad.longitud"

@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\GeocodeController;
 use App\Http\Controllers\PropiedadPublicaController;
+use App\Http\Controllers\ComparadorController;
 use App\Http\Controllers\EstadisticasController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
@@ -70,6 +71,8 @@ Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->g
 });
 
 Route::post('/contact', [LandingController::class, 'sendContact'])->name('contact.send');
+
+Route::get('/propiedades/comparar', [ComparadorController::class, 'comparar'])->name('propiedades.comparar');
 
 Route::get('/departamentos/{departamento}/localidades', [LocalidadController::class, 'porDepartamento'])->name('departamentos.localidades.index');
 Route::get('/propiedades/{propiedad}', [PropiedadPublicaController::class, 'show'])->name('propiedades.show');
