@@ -8,6 +8,7 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 import PublicLayout from '@/layouts/PublicLayout.vue';
+import VueApexCharts from 'vue3-apexcharts';
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -32,6 +33,9 @@ createInertiaApp({
                 case name.startsWith('Cliente/'):
                     // cada página maneja su propio layout via PanelLayout
                     break;
+                case name.startsWith('Propiedad/'):
+                    module.default.layout = PublicLayout;
+                    break;
                 default:
                     module.default.layout = AppLayout;
             }
@@ -42,6 +46,7 @@ createInertiaApp({
         if (typeof window === 'undefined') return;
         createApp({ render: () => h(App, props) })
             .use(plugin)
+            .use(VueApexCharts)
             .mount(el);
     },
     progress: {

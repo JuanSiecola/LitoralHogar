@@ -96,8 +96,6 @@ function cerrarDetalle(open: boolean) {
                 v-for="propiedad in propiedades.data"
                 :key="propiedad.id"
                 v-bind="propiedad"
-                selectable
-                @select="propiedadSeleccionada = $event"
             />
         </div>
 

@@ -46,4 +46,14 @@ class Propiedad extends Model
     {
         return $this->belongsToMany(User::class, 'favorito', 'propiedad_id', 'usuario_id');
     }
+
+        public function vistas(): HasMany
+    {
+        return $this->hasMany(PropiedadVista::class, 'propiedad_id');
+    }
+
+    public function consultas(): HasMany
+    {
+        return $this->hasMany(Consulta::class, 'propiedad_id');
+    }
 }

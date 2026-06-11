@@ -11,6 +11,9 @@ use App\Http\Controllers\AgenteController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\GeocodeController;
+use App\Http\Controllers\PropiedadPublicaController;
+use App\Http\Controllers\ComparadorController;
+use App\Http\Controllers\EstadisticasController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
@@ -35,6 +38,7 @@ Route::middleware(['auth', 'verified', 'role:inmobiliaria'])->prefix('inmobiliar
     Route::get('/perfil', [InmobiliariaController::class, 'perfil'])->name('perfil');
     Route::get('/consultas', [InmobiliariaController::class, 'consultasRecibidas'])->name('consultas');
     Route::post('/consultas/{consulta}/responder', [InmobiliariaController::class, 'responderConsulta'])->name('consultas.responder');
+    Route::get('/estadisticas', [EstadisticasController::class, 'inmobiliaria'])->name('estadisticas');
     });
 
 Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')->group(function () {
@@ -61,12 +65,16 @@ Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->g
     Route::get('/consultas', [AgenteController::class, 'consultasRecibidas'])->name('consultas');
     Route::post('/consultas/{consulta}/responder', [AgenteController::class, 'responderConsulta'])->name('consultas.responder');
     Route::get('/perfil', [AgenteController::class, 'perfil'])->name('perfil');
+
+    // Estadísticas
+    Route::get('/estadisticas', [EstadisticasController::class, 'agente'])->name('estadisticas');
 });
 
 Route::post('/contact', [LandingController::class, 'sendContact'])->name('contact.send');
 
+Route::get('/propiedades/comparar', [ComparadorController::class, 'comparar'])->name('propiedades.comparar');
+
 Route::get('/departamentos/{departamento}/localidades', [LocalidadController::class, 'porDepartamento'])->name('departamentos.localidades.index');
-
-
+Route::get('/propiedades/{propiedad}', [PropiedadPublicaController::class, 'show'])->name('propiedades.show');
 Route::get('/geocode', [GeocodeController::class, 'buscar'])->name('geocode');
 require __DIR__ . '/settings.php';

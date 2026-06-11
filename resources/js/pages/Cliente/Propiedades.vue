@@ -2,7 +2,7 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import PropertyCard from '@/components/PropertyCard.vue';
-import PublicLayout from '@/layouts/PublicLayout.vue';
+import PanelLayout from '@/layouts/PanelLayout.vue';
 import {
     Dialog,
     DialogContent,
@@ -22,8 +22,9 @@ import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import { useClienteNav } from '@/composables/useClienteNav';
 
-defineOptions({ layout: PublicLayout });
+const navLinks = useClienteNav();
 
 interface Propiedad {
     id: number;
@@ -227,9 +228,10 @@ onBeforeUnmount(destruirMapa);
 </script>
 
 <template>
+    <PanelLayout :nav-links="navLinks">
     <Head title="Propiedades"/>
 
-    <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <section class="mx-auto max-w-7xl">
         <div class="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-foreground">Propiedades</h1>
@@ -382,8 +384,6 @@ onBeforeUnmount(destruirMapa);
                 v-for="propiedad in propiedades.data"
                 :key="propiedad.id"
                 v-bind="propiedad"
-                selectable
-                @select="propiedadSeleccionada = $event"
             />
         </div>
 
@@ -567,4 +567,5 @@ onBeforeUnmount(destruirMapa);
             </DialogContent>
         </Dialog>
     </section>
+    </PanelLayout>
 </template>
