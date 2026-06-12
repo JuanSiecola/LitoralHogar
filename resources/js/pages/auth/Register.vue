@@ -5,6 +5,7 @@ import { Building2, Briefcase, KeyRound } from 'lucide-vue-next';
 import InputError from '@/components/InputError.vue';
 import FileUpload from '@/components/FileUpload.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
+import PasswordRequirements from '@/components/PasswordRequirements.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +29,7 @@ type TipoUsuario = 'inmobiliaria' | 'agente' | 'cliente';
 
 const paso = ref<1 | 2>(1);
 const tipo = ref<TipoUsuario | null>(null);
+const password = ref('');
 
 const opciones = [
     {
@@ -203,8 +205,9 @@ function volver() {
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <Label for="password">Contraseña</Label>
-                    <PasswordInput id="password" required autocomplete="new-password" name="password"
+                    <PasswordInput id="password" v-model="password" required autocomplete="new-password" name="password"
                         placeholder="Contraseña" />
+                    <PasswordRequirements :password="password" />
                     <InputError :message="errors.password" />
                 </div>
                 <div class="grid gap-2">

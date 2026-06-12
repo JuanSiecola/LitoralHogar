@@ -5,28 +5,12 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class ProfileController extends Controller
 {
-    public function view(Request $request): Response
-    {
-        return Inertia::render('settings/Profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => $request->session()->get('status'),
-        ]);
-    }
-
-    public function edit(): RedirectResponse
-    {
-        return to_route('profile.view');
-    }
-
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
@@ -69,8 +53,7 @@ class ProfileController extends Controller
             return to_route('agente.perfil');
         if ($isCliente)
             return to_route('cliente.perfil');
-        return to_route('profile.view');
-
+        return back();
     }
 
     public function destroy(ProfileDeleteRequest $request): RedirectResponse
