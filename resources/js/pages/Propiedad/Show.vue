@@ -67,6 +67,30 @@ const precioFormateado = computed(() =>
     formatPrecio(props.propiedad.precio, props.propiedad.tipo_operacion)
 );
 
+const mensajeContacto = computed(() => {
+    const ubicacion = [props.propiedad.direccion, props.propiedad.localidad, props.propiedad.departamento]
+        .filter(Boolean)
+        .join(', ');
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+
+    return [
+        `Hola, me interesa la propiedad "${props.propiedad.titulo}" publicada en Litoral Hogar.`,
+        `Operacion: ${props.propiedad.tipo_operacion}`,
+        `Tipo: ${props.propiedad.tipo_propiedad}`,
+        ubicacion ? `Ubicacion: ${ubicacion}` : '',
+        url ? `Link: ${url}` : '',
+        '',
+        'Quisiera recibir mas informacion y coordinar una consulta. Gracias.',
+    ].filter((line) => line !== '').join('\n');
+});
+
+const emailHref = computed(() => {
+    const email = props.propiedad.contacto?.email;
+    const subject = `Consulta por ${props.propiedad.titulo}`;
+
+    return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mensajeContacto.value)}`;
+});
+
 const whatsappHref = computed(() => {
     const phone = props.propiedad.contacto?.phone;
     if (!phone) return '';
@@ -83,7 +107,7 @@ const whatsappHref = computed(() => {
         digits = `598${digits}`;
     }
 
-    return `https://wa.me/${digits}`;
+    return `https://wa.me/${digits}?text=${encodeURIComponent(mensajeContacto.value)}`;
 });
 
 // Formulario consulta
@@ -340,7 +364,7 @@ onUnmounted(() => {
                     </div>
                     <div class="space-y-3">
                         <a
-                            :href="`mailto:${propiedad.contacto.email}`"
+                            :href="emailHref"
                             class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
                             title="Enviar correo"
                         >
