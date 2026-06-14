@@ -19,7 +19,7 @@ class LoginResponse implements LoginResponseContract
             return redirect()->route('inmobiliaria.dashboard');
         }
         if (in_array('cliente', $roles)) {
-            return redirect()->route('cliente.dashboard');
+            return redirect()->intended(route('home'));
         }
         if (in_array('agente', $roles)) {
             return redirect()->route('agente.dashboard');
