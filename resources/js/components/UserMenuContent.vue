@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import UserInfo from '@/components/UserInfo.vue';
 import { logout } from '@/routes';
-import { view } from '@/routes/profile';
+import { edit as editSecurity } from '@/routes/security';
 import type { User } from '@/types';
 
 type Props = {
@@ -68,7 +68,7 @@ const handleLogout = () => {
 
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full cursor-pointer" :href="view()" prefetch>
+            <Link class="block w-full cursor-pointer" :href="editSecurity()" prefetch>
                 <Settings class="mr-2 h-4 w-4" />
                 Configuración
             </Link>

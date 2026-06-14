@@ -1,4 +1,4 @@
-import { Building2, LayoutDashboard, Plus, Settings, MessageSquare } from 'lucide-vue-next'
+import { Building2, LayoutDashboard, Plus, Settings, MessageSquare, BarChart3 } from 'lucide-vue-next'
 import inmobiliaria from '@/routes/inmobiliaria' 
 import type { Component } from 'vue'
 
@@ -11,6 +11,7 @@ export interface NavLink {
 export function useInmobiliariaNav(): NavLink[] {
     return [
         { label: 'Dashboard',       href: inmobiliaria.dashboard.url(),  icon: LayoutDashboard },
+        { label: 'Estadísticas', href: '/inmobiliaria/estadisticas', icon: BarChart3 },
         { label: 'Mis Propiedades', href: inmobiliaria.propiedades.url(),  icon: Building2 },
         { label: 'Crear Propiedad', href: inmobiliaria.propiedades.create.url(),  icon: Plus },
         { label: 'Consultas Recibidas', href: inmobiliaria.consultas.url(), icon: MessageSquare },

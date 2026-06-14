@@ -14,7 +14,7 @@ trait PasswordValidationRules
      */
     protected function passwordRules(): array
     {
-        return ['required', 'string', Password::min(8)->mixedCase()->letters()->numbers()->symbols(), 'confirmed'];
+        return ['required', 'string', Password::min(8)->mixedCase()->symbols(), 'confirmed'];
     }
 
     /**
@@ -24,7 +24,7 @@ trait PasswordValidationRules
      */
     protected function currentPasswordRules(): array
     {
-        return ['required', 'string', Password::min(8)->mixedCase()->letters()->numbers()->symbols(), 'current_password'];
+        return ['required', 'string', Password::min(8)->mixedCase()->symbols(), 'current_password'];
     }
 
     protected function passwordMessages(): array
@@ -34,8 +34,6 @@ trait PasswordValidationRules
             'password.string' => 'La contraseña debe ser una cadena de texto.',
             'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
             'password.mixedCase' => 'La contraseña debe contener al menos una letra mayúscula y una letra minúscula.',
-            'password.letters' => 'La contraseña debe contener al menos una letra.',
-            'password.numbers' => 'La contraseña debe contener al menos un número.',
             'password.symbols' => 'La contraseña debe contener al menos un símbolo.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
         ];

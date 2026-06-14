@@ -11,6 +11,7 @@ import { Home, MapPin, ImageIcon, PawPrint, DollarSign, Sparkles, X } from 'luci
 import { computed } from 'vue'
 import InputError from '@/components/InputError.vue'
 import FormSection from '@/components/FormSection.vue'
+import UbicacionInput from '@/components/UbicacionInput.vue'
 import { etiquetaMoneda } from '@/lib/currency'
 
 interface Amenidad {
@@ -25,16 +26,23 @@ interface ImagenExistente {
     orden: number
 }
 
+interface Departamento {
+    id: number
+    nombre: string
+}
+
 interface FormData {
     titulo: string
     tipo_propiedad: string
     tipo_operacion: string
     estado_propiedad: string
-    direccion: string
-    localidad: string
-    departamento: string
-    latitud: number | undefined
-    longitud: number | undefined
+    ubicacion: {
+        direccion: string
+        departamento_id: number | null
+        localidad_id: number | null
+        latitud: number | null
+        longitud: number | null
+    }
     nro_habitaciones: number
     nro_banios: number
     nro_garage: number
@@ -56,6 +64,7 @@ interface FormData {
 const props = defineProps<{
     form: InertiaForm<FormData>
     amenidades: Amenidad[]
+    departamentos: Departamento[]
     imagenesPrevias?: ImagenExistente[]
     submitLabel: string
     cancelHref?: string
@@ -90,7 +99,8 @@ function toggleEliminarImagen(id: number) {
 <template>
     <form @submit.prevent="handleSubmit">
 
-        <FormSection :icon="Home" title="Datos principales" description="Completa los datos principales de la propiedad.">
+        <FormSection :icon="Home" title="Datos principales"
+            description="Completa los datos principales de la propiedad.">
             <div class="flex flex-col gap-4">
                 <div class="flex flex-col gap-1.5">
                     <Input id="titulo" type="text" label="Titulo" required v-model="form.titulo"
@@ -148,35 +158,13 @@ function toggleEliminarImagen(id: number) {
         </FormSection>
 
         <FormSection :icon="MapPin" title="Ubicación" description="Dirección y coordenadas">
-            <div class="flex flex-col gap-4">
-                <div class="flex flex-col gap-1.5">
-                    <Input id="direccion" type="text" label="Dirección" required placeholder="Ej: Av. Italia 1234"
-                        v-model="form.direccion" />
-                    <InputError :message="form.errors.direccion" />
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="flex flex-col gap-1.5">
-                        <Input id="localidad" type="text" label="Localidad" required v-model="form.localidad"
-                            placeholder="Ej: Paysandú" />
-                        <InputError :message="form.errors.localidad" />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <Input id="departamento" type="text" label="Departamento" required
-                            v-model="form.departamento" placeholder="Ej: Paysandú" />
-                        <InputError :message="form.errors.departamento" />
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="flex flex-col gap-1.5">
-                        <Input id="latitud" type="number" label="Latitud" v-model="form.latitud" placeholder="-32.3" />
-                        <InputError :message="form.errors.latitud" />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <Input id="longitud" type="number" label="Longitud" v-model="form.longitud" placeholder="-58.0" />
-                        <InputError :message="form.errors.longitud" />
-                    </div>
-                </div>
-            </div>
+            <UbicacionInput v-model="form.ubicacion" :departamentos="departamentos" :errors="{
+                direccion: form.errors['ubicacion.direccion'],
+                departamento_id: form.errors['ubicacion.departamento_id'],
+                localidad_id: form.errors['ubicacion.localidad_id'],
+                latitud: form.errors['ubicacion.latitud'],
+                longitud: form.errors['ubicacion.longitud'],
+            }" />
         </FormSection>
 
         <FormSection :icon="DollarSign" title="Detalles de la propiedad" description="Características físicas y precio">
@@ -224,12 +212,9 @@ function toggleEliminarImagen(id: number) {
                 <label for="acepta_mascotas"
                     class="flex items-center gap-2.5 p-3 rounded-lg border border-neutral-200 cursor-pointer hover:bg-neutral-50 transition-colors w-fit"
                     :class="{ 'border-primary bg-primary/5': form.acepta_mascotas }">
-                    <input
-                        id="acepta_mascotas"
-                        type="checkbox"
+                    <input id="acepta_mascotas" type="checkbox"
                         class="size-4 rounded border-neutral-300 text-primary focus:ring-primary"
-                        v-model="form.acepta_mascotas"
-                    />
+                        v-model="form.acepta_mascotas" />
                     <span class="flex items-center gap-1.5 text-sm text-neutral-700 select-none">
                         <PawPrint class="w-3.5 h-3.5 text-neutral-400" />
                         Acepta mascotas
@@ -258,7 +243,8 @@ function toggleEliminarImagen(id: number) {
             </p>
         </FormSection>
 
-        <FormSection v-if="amenidades.length" :icon="Sparkles" title="Comodidades" description="Seleccioná las comodidades disponibles">
+        <FormSection v-if="amenidades.length" :icon="Sparkles" title="Comodidades"
+            description="Seleccioná las comodidades disponibles">
             <AmenidadesSelector v-model="form.amenidades" :amenidades="amenidades" />
         </FormSection>
 
@@ -268,14 +254,12 @@ function toggleEliminarImagen(id: number) {
             <template v-if="imagenesPrevias !== undefined">
                 <p class="text-xs font-medium text-neutral-500 mb-3">
                     Fotos actuales
-                    <span v-if="imagenesPrevias.length" class="text-neutral-400 font-normal"> — hacé clic en la X para marcar para eliminar</span>
+                    <span v-if="imagenesPrevias.length" class="text-neutral-400 font-normal"> — hacé clic en la X para
+                        marcar para eliminar</span>
                 </p>
                 <div v-if="imagenesPrevias.length" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
-                    <div
-                        v-for="imagen in imagenesPrevias"
-                        :key="imagen.id"
-                        class="relative group rounded-xl overflow-hidden border-2 transition-all duration-200"
-                        :class="form.imagenes_a_eliminar.includes(imagen.id)
+                    <div v-for="imagen in imagenesPrevias" :key="imagen.id"
+                        class="relative group rounded-xl overflow-hidden border-2 transition-all duration-200" :class="form.imagenes_a_eliminar.includes(imagen.id)
                             ? 'border-red-400 opacity-60'
                             : imagen.es_principal ? 'border-primary ring-2 ring-primary/30' : 'border-neutral-200'">
                         <img :src="imagen.url" class="w-full aspect-4/3 object-cover" />
@@ -287,8 +271,7 @@ function toggleEliminarImagen(id: number) {
                             class="absolute inset-0 bg-red-500/50 flex items-center justify-center">
                             <span class="text-white text-xs font-semibold">Se eliminará</span>
                         </div>
-                        <button
-                            type="button"
+                        <button type="button"
                             class="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded-full text-white transition-all"
                             :class="form.imagenes_a_eliminar.includes(imagen.id)
                                 ? 'bg-red-600 opacity-100'
@@ -316,13 +299,13 @@ function toggleEliminarImagen(id: number) {
 
             <div v-if="previews.length" class="space-y-3 mt-3">
                 <p class="text-xs text-neutral-500">
-                    <span class="font-medium">{{ previews.length }}</span> foto{{ previews.length !== 1 ? 's' : '' }} nueva{{ previews.length !== 1 ? 's' : '' }}
+                    <span class="font-medium">{{ previews.length }}</span> foto{{ previews.length !== 1 ? 's' : '' }}
+                    nueva{{
+                        previews.length !== 1 ? 's' : '' }}
                     — hacé clic en una para definir la portada.
                 </p>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    <div
-                        v-for="(preview, index) in previews"
-                        :key="index"
+                    <div v-for="(preview, index) in previews" :key="index"
                         class="relative group rounded-xl overflow-hidden border-2 cursor-pointer transition-all duration-200"
                         :class="form.imagen_principal_index === index
                             ? 'border-primary ring-2 ring-primary/30'
@@ -347,16 +330,12 @@ function toggleEliminarImagen(id: number) {
         </FormSection>
 
         <div class="flex items-center gap-3">
-            <button
-                type="submit"
-                :disabled="form.processing"
+            <button type="submit" :disabled="form.processing"
                 class="h-11 px-8 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                 {{ form.processing ? 'Guardando...' : submitLabel }}
             </button>
 
-            <Link
-                v-if="cancelHref"
-                :href="cancelHref"
+            <Link v-if="cancelHref" :href="cancelHref"
                 class="h-11 px-6 inline-flex items-center rounded-md border border-neutral-200 bg-white text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800 transition-colors">
                 Cancelar
             </Link>

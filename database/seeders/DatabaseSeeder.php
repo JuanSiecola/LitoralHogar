@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             DepartamentoSeeder::class,
             LocalidadSeeder::class,
             PropiedadesSeeder::class,
+            PropiedadVistaSeeder::class,
         ]);
     }
 }
