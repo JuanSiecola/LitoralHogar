@@ -6,7 +6,7 @@ import { formatPrecio } from '@/lib/currency';
 import {
     Bed, ShowerHead, Square, Car, Layers, CalendarDays,
     Hammer, PawPrint, MapPin, ChevronLeft, ChevronRight,
-    Mail, MessageCircle, User,
+    Mail, MessageCircle, User, Banknote, Landmark,
 } from 'lucide-vue-next';
 import { onMounted, onUnmounted } from 'vue';
 interface Imagen {
@@ -98,8 +98,8 @@ function enviarConsulta() {
     enviando.value = true;
     form.post('/contact', {
         onSuccess: () => {
-            toast.success('¡Consulta enviada! Te contactaremos pronto.');
             form.reset();
+            mostrarDialogConsulta.value = true;
         },
         onError: () => toast.error('Hubo un error al enviar.'),
         onFinish: () => { enviando.value = false; },
@@ -142,6 +142,9 @@ onUnmounted(() => {
     mapInstance?.remove();
 });
 
+// Dialog confirmación consulta
+const mostrarDialogConsulta = ref(false);
+
 // Comparador
 const mostrarComparador = ref(false);
 const linkComparar = ref('');
@@ -163,14 +166,23 @@ function irAComparar() {
 
     <div class="mx-auto max-w-7xl px-4 py-8">
 
-        <!-- Breadcrumb -->
-        <nav class="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-            <Link href="/" class="hover:text-foreground">Inicio</Link>
-            <span>/</span>
-            <Link href="/propiedades" class="hover:text-foreground">Propiedades</Link>
-            <span>/</span>
-            <span class="text-foreground">{{ propiedad.titulo }}</span>
-        </nav>
+        <!-- Breadcrumb + Volver -->
+        <div class="mb-6 flex items-center justify-between">
+            <nav class="flex items-center gap-2 text-sm text-muted-foreground">
+                <Link href="/" class="hover:text-foreground">Inicio</Link>
+                <span>/</span>
+                <Link href="/propiedades" class="hover:text-foreground">Propiedades</Link>
+                <span>/</span>
+                <span class="text-foreground">{{ propiedad.titulo }}</span>
+            </nav>
+            <button
+                @click="() => router.visit('/')"
+                class="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+            >
+                <ChevronLeft class="h-4 w-4" />
+                Volver
+            </button>
+        </div>
 
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
 
@@ -272,32 +284,34 @@ function irAComparar() {
                 <div class="rounded-xl border border-border bg-card p-6">
                     <h2 class="mb-4 text-lg font-semibold text-foreground">Detalles de la propiedad</h2>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div class="flex items-center gap-3 text-sm">
-                            <Layers class="h-5 w-5 text-muted-foreground" />
+                        <div class="flex items-center justify-center gap-3 text-sm">
+                            <Layers class="h-5 w-5 shrink-0 text-muted-foreground" />
                             <span class="text-muted-foreground">Pisos:</span>
                             <span class="font-medium text-foreground">{{ propiedad.pisos }}</span>
                         </div>
-                        <div class="flex items-center gap-3 text-sm">
-                            <CalendarDays class="h-5 w-5 text-muted-foreground" />
+                        <div class="flex items-center justify-center gap-3 text-sm">
+                            <CalendarDays class="h-5 w-5 shrink-0 text-muted-foreground" />
                             <span class="text-muted-foreground">Año de construcción:</span>
                             <span class="font-medium text-foreground">{{ propiedad.anio_construccion }}</span>
                         </div>
-                        <div class="flex items-center gap-3 text-sm">
-                            <Hammer class="h-5 w-5 text-muted-foreground" />
+                        <div class="flex items-center justify-center gap-3 text-sm">
+                            <Hammer class="h-5 w-5 shrink-0 text-muted-foreground" />
                             <span class="text-muted-foreground">Estado:</span>
                             <span class="font-medium text-foreground">{{ propiedad.estado_construccion }}</span>
                         </div>
-                        <div class="flex items-center gap-3 text-sm">
-                            <PawPrint class="h-5 w-5 text-muted-foreground" />
+                        <div class="flex items-center justify-center gap-3 text-sm">
+                            <PawPrint class="h-5 w-5 shrink-0 text-muted-foreground" />
                             <span class="text-muted-foreground">Mascotas:</span>
                             <span class="font-medium text-foreground">{{ propiedad.acepta_mascotas ? 'Acepta' : 'No acepta' }}</span>
                         </div>
                         <template v-if="propiedad.tipo_operacion === 'Alquiler'">
-                            <div v-if="propiedad.expensas" class="flex items-center gap-3 text-sm">
+                            <div v-if="propiedad.expensas" class="flex items-center justify-center gap-3 text-sm">
+                                <Banknote class="h-5 w-5 shrink-0 text-muted-foreground" />
                                 <span class="text-muted-foreground">Expensas:</span>
                                 <span class="font-medium text-foreground">$ {{ propiedad.expensas }}</span>
                             </div>
-                            <div v-if="propiedad.deposito" class="flex items-center gap-3 text-sm">
+                            <div v-if="propiedad.deposito" class="flex items-center justify-center gap-3 text-sm">
+                                <Landmark class="h-5 w-5 shrink-0 text-muted-foreground" />
                                 <span class="text-muted-foreground">Depósito:</span>
                                 <span class="font-medium text-foreground">
                                     $ {{ propiedad.deposito }}
@@ -469,4 +483,37 @@ function irAComparar() {
             </div>
         </div>
     </div>
+
+    <!-- Dialog confirmación consulta enviada -->
+    <Transition name="dialog-fade">
+        <div
+            v-if="mostrarDialogConsulta"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+            <!-- Backdrop -->
+            <div
+                class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                @click="mostrarDialogConsulta = false"
+            />
+            <!-- Panel -->
+            <div class="relative z-10 w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center shadow-xl">
+                <!-- Ícono -->
+                <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                    <svg class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 class="mb-2 text-xl font-bold text-foreground">¡Consulta enviada!</h3>
+                <p class="mb-6 text-sm text-muted-foreground">
+                    Tu mensaje fue enviado correctamente. Nos pondremos en contacto con vos a la brevedad.
+                </p>
+                <button
+                    @click="mostrarDialogConsulta = false"
+                    class="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                >
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </Transition>
 </template>
