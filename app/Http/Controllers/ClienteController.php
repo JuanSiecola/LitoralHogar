@@ -50,6 +50,13 @@ class ClienteController extends Controller
         return inertia('Cliente/Favoritos', compact('favoritos'));
     }
 
+    public function agregarFavorito(Propiedad $propiedad)
+    {
+        auth()->user()->favoritos()->syncWithoutDetaching($propiedad->id);
+
+        return back();
+    }
+
     public function quitarFavorito(Propiedad $propiedad)
     {
         auth()->user()->favoritos()->detach($propiedad->id);

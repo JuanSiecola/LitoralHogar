@@ -25,6 +25,9 @@ class PropiedadPublicaController extends Controller
         return Inertia::render('Propiedad/Show', [
             'propiedad' => [
                 'id' => $propiedad->id,
+                'es_favorito' => $request->user()
+                    ? $request->user()->favoritos()->where('propiedad.id', $propiedad->id)->exists()
+                    : false,
                 'titulo' => $propiedad->titulo,
                 'tipo_operacion' => $propiedad->tipo_operacion,
                 'tipo_propiedad' => $propiedad->tipo_propiedad,
