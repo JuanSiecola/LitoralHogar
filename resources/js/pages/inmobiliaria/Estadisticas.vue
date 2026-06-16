@@ -8,17 +8,37 @@
 
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <!-- Selector de propiedad -->
-                <div class="flex flex-col gap-1">
+                <div class="relative flex flex-col gap-1">
                     <label for="filtro-propiedad" class="text-xs font-medium text-muted-foreground">Propiedad</label>
-                    <select
+                    <input
                         id="filtro-propiedad"
-                        :value="propiedadId ?? ''"
-                        @change="cambiarPropiedad"
-                        class="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
+                        type="text"
+                        v-model="busqueda"
+                        @focus="abierto = true"
+                        @blur="cerrarConDelay"
+                        placeholder="Buscar propiedad..."
+                        autocomplete="off"
+                        class="w-80 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
+                    />
+                    <ul
+                        v-if="abierto && propiedadesFiltradas.length"
+                        class="absolute top-full z-20 mt-1 max-h-60 w-80 overflow-auto rounded-lg border border-border bg-card shadow-lg"
                     >
-                        <option value="">Todas las propiedades</option>
-                        <option v-for="p in propiedades" :key="p.id" :value="p.id">{{ p.titulo }}</option>
-                    </select>
+                        <li
+                            @mousedown.prevent="seleccionar(null)"
+                            class="cursor-pointer px-3 py-2 text-sm text-muted-foreground hover:bg-muted"
+                        >
+                            Todas las propiedades
+                        </li>
+                        <li
+                            v-for="p in propiedadesFiltradas"
+                            :key="p.id"
+                            @mousedown.prevent="seleccionar(p)"
+                            class="cursor-pointer px-3 py-2 text-sm text-foreground hover:bg-muted"
+                        >
+                            {{ p.titulo }}
+                        </li>
+                    </ul>
                 </div>
 
                 <!-- Botonera de período -->
@@ -50,6 +70,7 @@
 </template>
 
 <script setup>
+import { ref, computed, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
 import PanelLayout from '@/layouts/PanelLayout.vue'
 import EstadisticasPanel from '@/components/estadisticas/EstadisticasPanel.vue'
@@ -82,7 +103,29 @@ function cambiarPeriodo(dias) {
     visitar({ dias, propiedad_id: props.propiedadId ?? undefined })
 }
 
-function cambiarPropiedad(event) {
-    visitar({ dias: props.dias, propiedad_id: event.target.value || undefined })
+// --- Buscador de propiedad en tiempo real (filtra la lista ya cargada) ---
+const busqueda = ref('')
+const abierto = ref(false)
+
+// Mantener el texto del input sincronizado con la propiedad seleccionada
+const seleccionada = computed(() => props.propiedades.find((p) => p.id === props.propiedadId))
+watch(() => props.propiedadId, () => {
+    busqueda.value = seleccionada.value?.titulo ?? ''
+}, { immediate: true })
+
+const propiedadesFiltradas = computed(() => {
+    const q = busqueda.value.trim().toLowerCase()
+    if (!q) return props.propiedades
+    return props.propiedades.filter((p) => p.titulo.toLowerCase().includes(q))
+})
+
+function seleccionar(p) {
+    abierto.value = false
+    busqueda.value = p?.titulo ?? ''
+    visitar({ dias: props.dias, propiedad_id: p?.id ?? undefined })
+}
+
+function cerrarConDelay() {
+    setTimeout(() => (abierto.value = false), 100)
 }
 </script>
