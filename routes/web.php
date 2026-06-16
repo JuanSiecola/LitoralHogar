@@ -46,6 +46,7 @@ Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')
     Route::get('/favoritos', [ClienteController::class, 'favoritos'])->name('favoritos');
     Route::get('/consultas', [ClienteController::class, 'consultas'])->name('consultas');
     Route::get('/propiedades', [ClienteController::class, 'propiedades'])->name('propiedades');
+    Route::post('/favoritos/{propiedad}', [ClienteController::class, 'agregarFavorito'])->name('favoritos.agregar');
     Route::delete('/favoritos/{propiedad}', [ClienteController::class, 'quitarFavorito'])->name('favoritos.quitar');
     Route::get('/perfil', [ClienteController::class, 'perfil'])->name('perfil');
 });
