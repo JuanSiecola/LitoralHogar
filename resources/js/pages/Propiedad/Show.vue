@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Link, useForm, router } from '@inertiajs/vue3';
+import { Link, useForm, router, usePage } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { formatPrecio } from '@/lib/currency';
 import {
     Bed, ShowerHead, Square, Car, Layers, CalendarDays,
     Hammer, PawPrint, MapPin, ChevronLeft, ChevronRight,
-    Mail, MessageCircle, User,
+    Mail, MessageCircle, User, Banknote, Landmark, Heart,
+    Router
 } from 'lucide-vue-next';
 import { onMounted, onUnmounted } from 'vue';
 interface Imagen {
@@ -20,6 +21,7 @@ interface Propiedad {
     titulo: string;
     tipo_operacion: 'Venta' | 'Alquiler';
     tipo_propiedad: string;
+    es_favorito: boolean;
     estado_propiedad: string;
     precio: number;
     nro_habitaciones: number;
@@ -50,6 +52,41 @@ interface Propiedad {
 
 const props = defineProps<{ propiedad: Propiedad }>();
 
+const page = usePage();
+
+const esCliente = computed(() =>
+    (page.props.auth as any)?.user?.rol_usuario?.some(
+        (r: any) => r.nombre?.toLowerCase() === 'cliente'
+    ) ?? false
+);
+
+const esFavorito = ref(props.propiedad.es_favorito);
+const guardandoFavorito = ref(false);
+
+ function toggleFavorito() {
+      if (guardandoFavorito.value) return;
+      guardandoFavorito.value = true;
+
+      const url = `/cliente/favoritos/${props.propiedad.id}`;
+
+      const opciones = {
+          preserveScroll: true,
+          preserveState: true,
+          onSuccess: () => {
+              esFavorito.value = !esFavorito.value;
+              toast.success(esFavorito.value ? 'Agregado a favoritos' : 'Quitado de favoritos');
+          },
+          onError: () => toast.error('No se pudo actualizar el favorito.'),
+          onFinish: () => { guardandoFavorito.value = false; },
+      };
+
+      if (esFavorito.value) {
+          router.delete(url, opciones);
+      } else {
+          router.post(url, {}, opciones);
+      }
+  }
+
 // Carousel
 const imagenActual = ref(0);
 const imagenes = computed(() =>
@@ -67,6 +104,30 @@ const precioFormateado = computed(() =>
     formatPrecio(props.propiedad.precio, props.propiedad.tipo_operacion)
 );
 
+const mensajeContacto = computed(() => {
+    const ubicacion = [props.propiedad.direccion, props.propiedad.localidad, props.propiedad.departamento]
+        .filter(Boolean)
+        .join(', ');
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+
+    return [
+        `Hola, me interesa la propiedad "${props.propiedad.titulo}" publicada en Litoral Hogar.`,
+        `Operacion: ${props.propiedad.tipo_operacion}`,
+        `Tipo: ${props.propiedad.tipo_propiedad}`,
+        ubicacion ? `Ubicacion: ${ubicacion}` : '',
+        url ? `Link: ${url}` : '',
+        '',
+        'Quisiera recibir mas informacion y coordinar una consulta. Gracias.',
+    ].filter((line) => line !== '').join('\n');
+});
+
+const emailHref = computed(() => {
+    const email = props.propiedad.contacto?.email;
+    const subject = `Consulta por ${props.propiedad.titulo}`;
+
+    return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mensajeContacto.value)}`;
+});
+
 const whatsappHref = computed(() => {
     const phone = props.propiedad.contacto?.phone;
     if (!phone) return '';
@@ -83,7 +144,7 @@ const whatsappHref = computed(() => {
         digits = `598${digits}`;
     }
 
-    return `https://wa.me/${digits}`;
+    return `https://wa.me/${digits}?text=${encodeURIComponent(mensajeContacto.value)}`;
 });
 
 // Formulario consulta
@@ -98,8 +159,8 @@ function enviarConsulta() {
     enviando.value = true;
     form.post('/contact', {
         onSuccess: () => {
-            toast.success('¡Consulta enviada! Te contactaremos pronto.');
             form.reset();
+            mostrarDialogConsulta.value = true;
         },
         onError: () => toast.error('Hubo un error al enviar.'),
         onFinish: () => { enviando.value = false; },
@@ -142,6 +203,9 @@ onUnmounted(() => {
     mapInstance?.remove();
 });
 
+// Dialog confirmación consulta
+const mostrarDialogConsulta = ref(false);
+
 // Comparador
 const mostrarComparador = ref(false);
 const linkComparar = ref('');
@@ -163,14 +227,21 @@ function irAComparar() {
 
     <div class="mx-auto max-w-7xl px-4 py-8">
 
-        <!-- Breadcrumb -->
-        <nav class="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-            <Link href="/" class="hover:text-foreground">Inicio</Link>
-            <span>/</span>
-            <Link href="/propiedades" class="hover:text-foreground">Propiedades</Link>
-            <span>/</span>
-            <span class="text-foreground">{{ propiedad.titulo }}</span>
-        </nav>
+        <!-- Breadcrumb + Volver -->
+        <div class="mb-6 flex items-center justify-between">
+            <nav class="flex items-center gap-2 text-sm text-muted-foreground">
+                <Link href="/" class="hover:text-foreground">Inicio</Link>
+                <span>/</span>
+                <Link href="/propiedades" class="hover:text-foreground">Propiedades</Link>
+                <span>/</span>
+                <span class="text-foreground">{{ propiedad.titulo }}</span>
+            </nav>
+            <button @click="() => router.visit('/')"
+                class="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary">
+                <ChevronLeft class="h-4 w-4" />
+                Volver
+            </button>
+        </div>
 
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
 
@@ -180,46 +251,36 @@ function irAComparar() {
                 <!-- Carousel de imágenes -->
                 <div class="relative aspect-video overflow-hidden rounded-2xl bg-muted">
                     <template v-if="imagenes.length > 0">
-                        <img
-                            :src="imagenes[imagenActual].url"
-                            :alt="propiedad.titulo"
-                            class="h-full w-full object-cover"
-                        />
+                        <img :src="imagenes[imagenActual].url" :alt="propiedad.titulo"
+                            class="h-full w-full object-cover" />
                         <template v-if="imagenes.length > 1">
-                            <button
-                                @click="anterior"
-                                class="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition"
-                            >
+                            <button @click="anterior"
+                                class="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition">
                                 <ChevronLeft class="h-5 w-5" />
                             </button>
-                            <button
-                                @click="siguiente"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition"
-                            >
+                            <button @click="siguiente"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition">
                                 <ChevronRight class="h-5 w-5" />
                             </button>
                             <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-                                <button
-                                    v-for="(_, i) in imagenes"
-                                    :key="i"
-                                    @click="imagenActual = i"
+                                <button v-for="(_, i) in imagenes" :key="i" @click="imagenActual = i"
                                     class="h-2 w-2 rounded-full transition"
-                                    :class="i === imagenActual ? 'bg-white' : 'bg-white/40'"
-                                />
+                                    :class="i === imagenActual ? 'bg-white' : 'bg-white/40'" />
                             </div>
                         </template>
                     </template>
                     <div v-else class="flex h-full w-full items-center justify-center text-muted-foreground">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9.75L12 3l9 6.75V21H3V9.75z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M3 9.75L12 3l9 6.75V21H3V9.75z" />
                         </svg>
                     </div>
 
                     <!-- Badge operación -->
                     <span
                         class="absolute top-4 left-4 rounded-full px-3 py-1 text-sm font-semibold text-primary-foreground"
-                        :class="propiedad.tipo_operacion === 'Venta' ? 'bg-primary' : 'bg-secondary'"
-                    >
+                        :class="propiedad.tipo_operacion === 'Venta' ? 'bg-primary' : 'bg-secondary'">
                         {{ propiedad.tipo_operacion }}
                     </span>
                 </div>
@@ -228,7 +289,16 @@ function irAComparar() {
                 <div>
                     <div class="flex flex-wrap items-start justify-between gap-2">
                         <h1 class="text-2xl font-bold text-foreground">{{ propiedad.titulo }}</h1>
-                        <p class="text-2xl font-bold text-primary">{{ precioFormateado }}</p>
+                        <div class="flex items-center gap-3">
+                            <button v-if="esCliente" @click="toggleFavorito" :disabled="guardandoFavorito"
+                                :title="esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'" class="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium
+  transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60"
+                                :class="esFavorito ? 'text-red-500' : 'text-foreground'">
+                                <Heart class="h-5 w-5" :class="esFavorito ? 'fill-current' : ''" />
+                                <span class="hidden sm:inline">{{ esFavorito ? 'Favorito' : 'Favorito' }}</span>
+                            </button>
+                            <p class="text-2xl font-bold text-primary">{{ precioFormateado }}</p>
+                        </div>
                     </div>
                     <p class="mt-2 flex items-center gap-1 text-muted-foreground">
                         <MapPin class="h-4 w-4" />
@@ -272,32 +342,34 @@ function irAComparar() {
                 <div class="rounded-xl border border-border bg-card p-6">
                     <h2 class="mb-4 text-lg font-semibold text-foreground">Detalles de la propiedad</h2>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div class="flex items-center gap-3 text-sm">
-                            <Layers class="h-5 w-5 text-muted-foreground" />
+                        <div class="flex items-center justify-center gap-3 text-sm">
+                            <Layers class="h-5 w-5 shrink-0 text-muted-foreground" />
                             <span class="text-muted-foreground">Pisos:</span>
                             <span class="font-medium text-foreground">{{ propiedad.pisos }}</span>
                         </div>
-                        <div class="flex items-center gap-3 text-sm">
-                            <CalendarDays class="h-5 w-5 text-muted-foreground" />
+                        <div class="flex items-center justify-center gap-3 text-sm">
+                            <CalendarDays class="h-5 w-5 shrink-0 text-muted-foreground" />
                             <span class="text-muted-foreground">Año de construcción:</span>
                             <span class="font-medium text-foreground">{{ propiedad.anio_construccion }}</span>
                         </div>
-                        <div class="flex items-center gap-3 text-sm">
-                            <Hammer class="h-5 w-5 text-muted-foreground" />
+                        <div class="flex items-center justify-center gap-3 text-sm">
+                            <Hammer class="h-5 w-5 shrink-0 text-muted-foreground" />
                             <span class="text-muted-foreground">Estado:</span>
                             <span class="font-medium text-foreground">{{ propiedad.estado_construccion }}</span>
                         </div>
-                        <div class="flex items-center gap-3 text-sm">
-                            <PawPrint class="h-5 w-5 text-muted-foreground" />
+                        <div class="flex items-center justify-center gap-3 text-sm">
+                            <PawPrint class="h-5 w-5 shrink-0 text-muted-foreground" />
                             <span class="text-muted-foreground">Mascotas:</span>
                             <span class="font-medium text-foreground">{{ propiedad.acepta_mascotas ? 'Acepta' : 'No acepta' }}</span>
                         </div>
                         <template v-if="propiedad.tipo_operacion === 'Alquiler'">
-                            <div v-if="propiedad.expensas" class="flex items-center gap-3 text-sm">
+                            <div v-if="propiedad.expensas" class="flex items-center justify-center gap-3 text-sm">
+                                <Banknote class="h-5 w-5 shrink-0 text-muted-foreground" />
                                 <span class="text-muted-foreground">Expensas:</span>
                                 <span class="font-medium text-foreground">$ {{ propiedad.expensas }}</span>
                             </div>
-                            <div v-if="propiedad.deposito" class="flex items-center gap-3 text-sm">
+                            <div v-if="propiedad.deposito" class="flex items-center justify-center gap-3 text-sm">
+                                <Landmark class="h-5 w-5 shrink-0 text-muted-foreground" />
                                 <span class="text-muted-foreground">Depósito:</span>
                                 <span class="font-medium text-foreground">
                                     $ {{ propiedad.deposito }}
@@ -314,55 +386,43 @@ function irAComparar() {
                 <div v-if="propiedad.amenidades.length > 0" class="rounded-xl border border-border bg-card p-6">
                     <h2 class="mb-4 text-lg font-semibold text-foreground">Amenidades</h2>
                     <div class="flex flex-wrap gap-2">
-                        <span
-                            v-for="amenidad in propiedad.amenidades"
-                            :key="amenidad"
-                            class="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
-                        >
+                        <span v-for="amenidad in propiedad.amenidades" :key="amenidad"
+                            class="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
                             {{ amenidad }}
                         </span>
                     </div>
                 </div>
-                
+
                 <!-- Comparar con otra propiedad -->
                 <div class="rounded-xl border border-border bg-card p-6">
                     <h2 class="mb-3 text-lg font-semibold text-foreground">Comparar</h2>
-                    <button
-                        @click="mostrarComparador = !mostrarComparador"
-                        class="w-full rounded-xl border border-primary px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
-                    >
+                    <button @click="mostrarComparador = !mostrarComparador"
+                        class="w-full rounded-xl border border-primary px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground">
                         {{ mostrarComparador ? 'Cancelar' : 'Comparar con otra publicación' }}
                     </button>
 
                     <div v-if="mostrarComparador" class="mt-4 space-y-3">
-                        <input
-                            v-model="linkComparar"
-                            placeholder="Pegá el link de la otra propiedad..."
-                            class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                        />
+                        <input v-model="linkComparar" placeholder="Pegá el link de la otra propiedad..."
+                            class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                         <p v-if="errorLink" class="text-xs text-destructive">{{ errorLink }}</p>
-                        <button
-                            @click="irAComparar"
-                            class="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-                        >
+                        <button @click="irAComparar"
+                            class="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">
                             Comparar
                         </button>
                     </div>
                 </div>
 
                 <!-- Mapa -->
-                <div
-                    v-if="propiedad.latitud && propiedad.longitud"
-                    class="rounded-xl border border-border bg-card overflow-hidden"
-                >
-                <div class="p-6 pb-3">
-                    <h2 class="text-lg font-semibold text-foreground">Ubicación</h2>
-                    <p class="text-sm text-muted-foreground mt-1">
-                        {{ propiedad.direccion }}, {{ propiedad.localidad }}, {{ propiedad.departamento }}
-                    </p>
+                <div v-if="propiedad.latitud && propiedad.longitud"
+                    class="rounded-xl border border-border bg-card overflow-hidden">
+                    <div class="p-6 pb-3">
+                        <h2 class="text-lg font-semibold text-foreground">Ubicación</h2>
+                        <p class="text-sm text-muted-foreground mt-1">
+                            {{ propiedad.direccion }}, {{ propiedad.localidad }}, {{ propiedad.departamento }}
+                        </p>
+                    </div>
+                    <div id="mapa-propiedad" class="h-72 w-full z-0" />
                 </div>
-                <div id="mapa-propiedad" class="h-72 w-full z-0" />
-            </div>
 
             </div>
 
@@ -382,12 +442,11 @@ function irAComparar() {
                         </div>
                     </div>
                     <div class="space-y-3">
-                        <a
-                            :href="`mailto:${propiedad.contacto.email}`"
+                        <a :href="emailHref"
                             class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
-                            title="Enviar correo"
-                        >
-                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                            title="Enviar correo">
+                            <span
+                                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                                 <Mail class="h-4 w-4" />
                             </span>
                             <span class="min-w-0">
@@ -395,15 +454,12 @@ function irAComparar() {
                                 <span class="block truncate">{{ propiedad.contacto.email }}</span>
                             </span>
                         </a>
-                        <a
-                            v-if="propiedad.contacto.phone"
-                            :href="whatsappHref"
-                            target="_blank"
+                        <a v-if="propiedad.contacto.phone" :href="whatsappHref" target="_blank"
                             rel="noopener noreferrer"
                             class="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800 transition hover:border-green-400 hover:bg-green-100"
-                            title="Enviar mensaje por WhatsApp"
-                        >
-                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600 text-white">
+                            title="Enviar mensaje por WhatsApp">
+                            <span
+                                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600 text-white">
                                 <MessageCircle class="h-4 w-4" />
                             </span>
                             <span class="min-w-0">
@@ -419,48 +475,28 @@ function irAComparar() {
                     <h2 class="mb-4 text-lg font-semibold text-foreground">Enviá una consulta</h2>
                     <form @submit.prevent="enviarConsulta" class="space-y-4">
                         <div>
-                            <input
-                                v-model="form.name"
-                                type="text"
-                                placeholder="Tu nombre"
-                                required
-                                class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                            />
+                            <input v-model="form.name" type="text" placeholder="Tu nombre" required
+                                class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                             <p v-if="form.errors.name" class="mt-1 text-xs text-destructive">{{ form.errors.name }}</p>
                         </div>
                         <div>
-                            <input
-                                v-model="form.email"
-                                type="email"
-                                placeholder="Tu email"
-                                required
-                                class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                            />
-                            <p v-if="form.errors.email" class="mt-1 text-xs text-destructive">{{ form.errors.email }}</p>
+                            <input v-model="form.email" type="email" placeholder="Tu email" required
+                                class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                            <p v-if="form.errors.email" class="mt-1 text-xs text-destructive">{{ form.errors.email }}
+                            </p>
                         </div>
                         <div>
-                            <input
-                                v-model="form.phone"
-                                type="tel"
-                                placeholder="Teléfono / WhatsApp"
-                                class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                            />
+                            <input v-model="form.phone" type="tel" placeholder="Teléfono / WhatsApp"
+                                class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                         </div>
                         <div>
-                            <textarea
-                                v-model="form.message"
-                                rows="4"
-                                placeholder="¿En qué podemos ayudarte?"
-                                required
-                                class="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                            />
-                            <p v-if="form.errors.message" class="mt-1 text-xs text-destructive">{{ form.errors.message }}</p>
+                            <textarea v-model="form.message" rows="4" placeholder="¿En qué podemos ayudarte?" required
+                                class="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                            <p v-if="form.errors.message" class="mt-1 text-xs text-destructive">{{ form.errors.message
+                            }}</p>
                         </div>
-                        <button
-                            type="submit"
-                            :disabled="enviando"
-                            class="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
+                        <button type="submit" :disabled="enviando"
+                            class="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60">
                             {{ enviando ? 'Enviando...' : 'Enviar consulta' }}
                         </button>
                     </form>
@@ -469,4 +505,31 @@ function irAComparar() {
             </div>
         </div>
     </div>
+
+    <!-- Dialog confirmación consulta enviada -->
+    <Transition name="dialog-fade">
+        <div v-if="mostrarDialogConsulta" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <!-- Backdrop -->
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="mostrarDialogConsulta = false" />
+            <!-- Panel -->
+            <div
+                class="relative z-10 w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center shadow-xl">
+                <!-- Ícono -->
+                <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                    <svg class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 class="mb-2 text-xl font-bold text-foreground">¡Consulta enviada!</h3>
+                <p class="mb-6 text-sm text-muted-foreground">
+                    Tu mensaje fue enviado correctamente. Nos pondremos en contacto con vos a la brevedad.
+                </p>
+                <button @click="mostrarDialogConsulta = false"
+                    class="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </Transition>
 </template>

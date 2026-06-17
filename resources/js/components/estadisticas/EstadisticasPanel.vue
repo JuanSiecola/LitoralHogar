@@ -35,7 +35,9 @@ const lineaOptions = computed(() => {
         dataLabels: { enabled: false },
     }
 })
-const lineaSeries = computed(() => props.estadisticas.serieTemporal.series)
+const lineaSeries = computed(() =>
+    props.estadisticas.serieTemporal.series.filter((s) => s.name !== 'Contactos')
+)
 const lineaVacia = computed(() => lineaSeries.value.every((s) => s.data.every((n) => n === 0)))
 
 const estadoOptions = computed(() => ({
@@ -55,7 +57,7 @@ const estadoVacio = computed(() => estadoSeries.value.reduce((a, b) => a + b, 0)
 
 <template>
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <EstadisticaCard title="Actividad de las publicaciones" subtitle="Visitas, favoritos y contactos por día"
+        <EstadisticaCard title="Actividad de las publicaciones" subtitle="Visitas y favoritos por día"
             :vacio="lineaVacia" class="lg:col-span-2">
             <apexchart type="line" height="320" :options="lineaOptions" :series="lineaSeries" />
         </EstadisticaCard>

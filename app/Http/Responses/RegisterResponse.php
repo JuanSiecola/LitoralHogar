@@ -2,12 +2,12 @@
 namespace App\Http\Responses;
 
 use Laravel\Fortify\Contracts\RegisterResponse as RegisterResponseContract;
-
+use Illuminate\Support\Facades\Auth;
 class RegisterResponse implements RegisterResponseContract
 {
     public function toResponse($request)
     {
-        $user = auth()->user()->load('rol_usuario');
+        $user = Auth::user()->load('rol_usuario');
 
         $roles = $user->rol_usuario
             ->pluck('nombre')
@@ -15,11 +15,13 @@ class RegisterResponse implements RegisterResponseContract
             ->toArray();
 
         if (in_array('inmobiliaria', $roles)) {
-            
-            return redirect()->intended(route('inmobiliaria.dashboard'));
+            return redirect()->route('inmobiliaria.dashboard');
         }
-
-        // cliente y/o agente nos manda a landing page sape
-        return redirect()->intended(route('home'));
+        if (in_array('cliente', $roles)) {
+            return redirect()->route('cliente.dashboard');
+        }
+        if (in_array('agente', $roles)) {
+            return redirect()->route('agente.dashboard');
+        }
     }
 }
