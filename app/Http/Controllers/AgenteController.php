@@ -72,25 +72,23 @@ class AgenteController extends Controller
     // Listar consultas recibidas en propiedades del agente
     public function consultasRecibidas()
     {
+        $agenteId = auth()->id();
+
         $consultas = Consulta::whereIn('propiedad_id', auth()->user()->propiedades()->pluck('id'))
-            ->with(['propiedad', 'user.perfil_persona:id,nombre,apellido,usuario_id'])
+            ->with([
+                'propiedad',
+                'user.perfil_persona:id,nombre,apellido,usuario_id',
+                'mensajes.user.perfil_persona:id,nombre,apellido,usuario_id',
+            ])
             ->latest()
             ->paginate(15);
 
+        $consultas->getCollection()->transform(function ($consulta) use ($agenteId) {
+            $consulta->no_leidos = $consulta->noLeidosPara($agenteId);
+            return $consulta;
+        });
+
         return inertia('agente/ConsultasRecibidas', compact('consultas'));
-    }
-
-    // Endpoint para responder
-    public function responderConsulta(Request $request, Consulta $consulta)
-    {
-        $request->validate(['respuesta' => 'required|string|max:1000']);
-
-        $consulta->update([
-            'respuesta' => $request->respuesta,
-            'estado' => 'respondida',
-        ]);
-
-        return back()->with('success', 'Respuesta enviada.');
     }
 
     public function create()

@@ -66,11 +66,21 @@ class ClienteController extends Controller
 
     public function consultas()
     {
-        $consultas = auth()->user()
+        $usuario = auth()->user();
+
+        $consultas = $usuario
             ->consultas()
-            ->with('propiedad')
+            ->with([
+                'propiedad',
+                'mensajes.user.perfil_persona:id,nombre,apellido,usuario_id',
+            ])
             ->latest()
             ->paginate(12);
+
+        $consultas->getCollection()->transform(function ($consulta) use ($usuario) {
+            $consulta->no_leidos = $consulta->noLeidosPara($usuario->id);
+            return $consulta;
+        });
 
         return inertia('Cliente/Consultas', compact('consultas'));
     }
@@ -157,4 +167,3 @@ class ClienteController extends Controller
         ]);
     }
 }
-

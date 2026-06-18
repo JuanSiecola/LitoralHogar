@@ -53,9 +53,18 @@ class InmobiliariaController extends Controller
         $usuario = Auth::user();
 
         $consultas = Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $usuario->id))
-            ->with(['user.perfil_persona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
+            ->with([
+                'user.perfil_persona:id,nombre,apellido,usuario_id',
+                'propiedad:id,titulo',
+                'mensajes.user.perfil_persona:id,nombre,apellido,usuario_id',
+            ])
             ->latest()
             ->paginate(10);
+
+        $consultas->getCollection()->transform(function ($consulta) use ($usuario) {
+            $consulta->no_leidos = $consulta->noLeidosPara($usuario->id);
+            return $consulta;
+        });
 
         return Inertia::render('inmobiliaria/ConsultasRecibidas', compact('consultas'));
     }

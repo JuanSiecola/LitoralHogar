@@ -27,6 +27,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     /* Route::inertia('dashboard', 'Dashboard')->name('dashboard'); */
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/consultas', [ConsultaController::class, 'store'])->name('consultas.store');
+    Route::post('/consultas/{consulta}/mensajes', [ConsultaController::class, 'enviarMensaje'])->name('consultas.mensajes.store');
+    Route::post('/consultas/{consulta}/leido', [ConsultaController::class, 'marcarLeido'])->name('consultas.leido');
 });
 
 Route::middleware(['auth', 'verified', 'role:inmobiliaria'])->prefix('inmobiliaria')->name('inmobiliaria.')->group(function () {
@@ -39,7 +41,6 @@ Route::middleware(['auth', 'verified', 'role:inmobiliaria'])->prefix('inmobiliar
     Route::delete('/propiedades/{propiedad}', [PropiedadController::class, 'destroy'])->name('propiedades.destroy');
     Route::get('/perfil', [InmobiliariaController::class, 'perfil'])->name('perfil');
     Route::get('/consultas', [InmobiliariaController::class, 'consultasRecibidas'])->name('consultas');
-    Route::post('/consultas/{consulta}/responder', [InmobiliariaController::class, 'responderConsulta'])->name('consultas.responder');
     Route::get('/estadisticas', [EstadisticasController::class, 'inmobiliaria'])->name('estadisticas');
     });
 
@@ -66,7 +67,6 @@ Route::middleware(['auth', 'role:agente'])->prefix('agente')->name('agente.')->g
     
     // Consultas
     Route::get('/consultas', [AgenteController::class, 'consultasRecibidas'])->name('consultas');
-    Route::post('/consultas/{consulta}/responder', [AgenteController::class, 'responderConsulta'])->name('consultas.responder');
     Route::get('/perfil', [AgenteController::class, 'perfil'])->name('perfil');
 
     // Estadísticas
