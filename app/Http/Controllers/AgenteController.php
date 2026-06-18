@@ -37,7 +37,7 @@ class AgenteController extends Controller
             ->count();
 
         $ultimasConsultas = Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $agente->id))
-            ->with(['user.perfilPersona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
+            ->with(['user.perfil_persona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
             ->latest()
             ->take(5)
             ->get();
@@ -73,7 +73,7 @@ class AgenteController extends Controller
     public function consultasRecibidas()
     {
         $consultas = Consulta::whereIn('propiedad_id', auth()->user()->propiedades()->pluck('id'))
-            ->with(['propiedad', 'user'])
+            ->with(['propiedad', 'user.perfil_persona:id,nombre,apellido,usuario_id'])
             ->latest()
             ->paginate(15);
 

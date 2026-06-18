@@ -14,6 +14,7 @@ use App\Http\Controllers\GeocodeController;
 use App\Http\Controllers\PropiedadPublicaController;
 use App\Http\Controllers\ComparadorController;
 use App\Http\Controllers\EstadisticasController;
+use App\Http\Controllers\ConsultaController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
@@ -25,6 +26,7 @@ Route::get('/propiedades', [ClienteController::class, 'redirigirPropiedades'])
 Route::middleware(['auth', 'verified'])->group(function () {
     /* Route::inertia('dashboard', 'Dashboard')->name('dashboard'); */
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/consultas', [ConsultaController::class, 'store'])->name('consultas.store');
 });
 
 Route::middleware(['auth', 'verified', 'role:inmobiliaria'])->prefix('inmobiliaria')->name('inmobiliaria.')->group(function () {
