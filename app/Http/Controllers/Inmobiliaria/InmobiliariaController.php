@@ -29,7 +29,7 @@ class InmobiliariaController extends Controller
 
         // 3. Obtener las últimas 5 consultas
         $ultimasConsultas = Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $usuario->id))
-            ->with(['user.perfilPersona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
+            ->with(['user.perfil_persona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
             ->latest()
             ->take(5)
             ->get();
@@ -53,9 +53,18 @@ class InmobiliariaController extends Controller
         $usuario = Auth::user();
 
         $consultas = Consulta::whereHas('propiedad', fn($q) => $q->where('usuario_id', $usuario->id))
-            ->with(['user.perfilPersona:id,nombre,apellido,usuario_id', 'propiedad:id,titulo'])
+            ->with([
+                'user.perfil_persona:id,nombre,apellido,usuario_id',
+                'propiedad:id,titulo',
+                'mensajes.user.perfil_persona:id,nombre,apellido,usuario_id',
+            ])
             ->latest()
             ->paginate(10);
+
+        $consultas->getCollection()->transform(function ($consulta) use ($usuario) {
+            $consulta->no_leidos = $consulta->noLeidosPara($usuario->id);
+            return $consulta;
+        });
 
         return Inertia::render('inmobiliaria/ConsultasRecibidas', compact('consultas'));
     }

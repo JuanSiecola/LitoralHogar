@@ -60,6 +60,9 @@ const esCliente = computed(() =>
     ) ?? false
 );
 
+const estaAutenticado = computed(() => !!(page.props.auth as any)?.user);
+
+
 const esFavorito = ref(props.propiedad.es_favorito);
 const guardandoFavorito = ref(false);
 
@@ -149,17 +152,15 @@ const whatsappHref = computed(() => {
 
 // Formulario consulta
 const form = useForm({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
+    propiedad_id: props.propiedad.id,
+    mensaje: '',
 });
 const enviando = ref(false);
 function enviarConsulta() {
     enviando.value = true;
-    form.post('/contact', {
+    form.post('/consultas', {
         onSuccess: () => {
-            form.reset();
+            form.reset('mensaje');
             mostrarDialogConsulta.value = true;
         },
         onError: () => toast.error('Hubo un error al enviar.'),
@@ -473,26 +474,12 @@ function irAComparar() {
                 <!-- Formulario consulta -->
                 <div class="rounded-xl border border-border bg-card p-6">
                     <h2 class="mb-4 text-lg font-semibold text-foreground">Enviá una consulta</h2>
-                    <form @submit.prevent="enviarConsulta" class="space-y-4">
+ 
+                    <form v-if="estaAutenticado" @submit.prevent="enviarConsulta" class="space-y-4">
                         <div>
-                            <input v-model="form.name" type="text" placeholder="Tu nombre" required
-                                class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                            <p v-if="form.errors.name" class="mt-1 text-xs text-destructive">{{ form.errors.name }}</p>
-                        </div>
-                        <div>
-                            <input v-model="form.email" type="email" placeholder="Tu email" required
-                                class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                            <p v-if="form.errors.email" class="mt-1 text-xs text-destructive">{{ form.errors.email }}
-                            </p>
-                        </div>
-                        <div>
-                            <input v-model="form.phone" type="tel" placeholder="Teléfono / WhatsApp"
-                                class="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                        </div>
-                        <div>
-                            <textarea v-model="form.message" rows="4" placeholder="¿En qué podemos ayudarte?" required
+                            <textarea v-model="form.mensaje" rows="4" placeholder="¿En qué podemos ayudarte?" required
                                 class="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                            <p v-if="form.errors.message" class="mt-1 text-xs text-destructive">{{ form.errors.message
+                            <p v-if="form.errors.mensaje" class="mt-1 text-xs text-destructive">{{ form.errors.mensaje
                             }}</p>
                         </div>
                         <button type="submit" :disabled="enviando"
@@ -500,6 +487,12 @@ function irAComparar() {
                             {{ enviando ? 'Enviando...' : 'Enviar consulta' }}
                         </button>
                     </form>
+ 
+                    <div v-else class="text-sm text-muted-foreground">
+                        Necesitás
+                        <Link href="/login" class="font-medium text-primary hover:underline">iniciar sesión</Link>
+                        para enviar una consulta sobre esta propiedad.
+                    </div>
                 </div>
 
             </div>
