@@ -45,7 +45,7 @@ interface Propiedad {
     contacto: {
         tipo: string;
         nombre: string;
-        email: string;
+        email: string | null;
         phone: string | null;
     };
 }
@@ -59,6 +59,13 @@ const esCliente = computed(() =>
         (r: any) => r.nombre?.toLowerCase() === 'cliente'
     ) ?? false
 );
+
+
+const loginUrl = computed(() => {
+    if (typeof window === 'undefined') return '/login';
+    const aqui = window.location.pathname + window.location.search;
+    return `/login?redirect=${encodeURIComponent(aqui)}`;
+})
 
 const estaAutenticado = computed(() => !!(page.props.auth as any)?.user);
 
@@ -125,11 +132,12 @@ const mensajeContacto = computed(() => {
 });
 
 const emailHref = computed(() => {
-    const email = props.propiedad.contacto?.email;
-    const subject = `Consulta por ${props.propiedad.titulo}`;
+      const email = props.propiedad.contacto?.email;
+      if (!email) return '';
+      const subject = `Consulta por ${props.propiedad.titulo}`;
 
-    return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mensajeContacto.value)}`;
-});
+      return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mensajeContacto.value)}`;
+  });
 
 const whatsappHref = computed(() => {
     const phone = props.propiedad.contacto?.phone;
@@ -442,10 +450,9 @@ function irAComparar() {
                             <p class="text-xs capitalize text-muted-foreground">{{ propiedad.contacto.tipo }}</p>
                         </div>
                     </div>
-                    <div class="space-y-3">
-                        <a :href="emailHref"
-                            class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
-                            title="Enviar correo">
+
+                    <div v-if="estaAutenticado" class="space-y-3">
+                        <a v-if="propiedad.contacto.email" :href="emailHref" class="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary" title="Enviar correo">
                             <span
                                 class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                                 <Mail class="h-4 w-4" />
@@ -456,9 +463,7 @@ function irAComparar() {
                             </span>
                         </a>
                         <a v-if="propiedad.contacto.phone" :href="whatsappHref" target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800 transition hover:border-green-400 hover:bg-green-100"
-                            title="Enviar mensaje por WhatsApp">
+                            rel="noopener noreferrer" class="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800 transition hover:border-green-400 hover:bg-green-100" title="Enviar mensaje por WhatsApp">
                             <span
                                 class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600 text-white">
                                 <MessageCircle class="h-4 w-4" />
@@ -468,6 +473,15 @@ function irAComparar() {
                                 <span class="block truncate">{{ propiedad.contacto.phone }}</span>
                             </span>
                         </a>
+                    </div>
+
+                    <div v-else class="space-y-3">
+                        <p class="text-sm text-muted-foreground">
+                            Iniciá sesión para ver el correo y WhatsApp del anunciante.
+                        </p>
+                        <Link :href="loginUrl" class="block w-full rounded-xl bg-primary py-3 text-center text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">
+                            Ver más detalles
+                        </Link>
                     </div>
                 </div>
 
@@ -488,10 +502,14 @@ function irAComparar() {
                         </button>
                     </form>
  
-                    <div v-else class="text-sm text-muted-foreground">
-                        Necesitás
-                        <Link href="/login" class="font-medium text-primary hover:underline">iniciar sesión</Link>
-                        para enviar una consulta sobre esta propiedad.
+                   <div v-else class="space-y-3">
+                        <p class="text-sm text-muted-foreground">
+                            Necesitás iniciar sesión para enviar una consulta sobre esta propiedad.
+                        </p>
+                        <Link :href="loginUrl" class="block w-full rounded-xl bg-primary py-3 text-center text-sm font-semibold text-primary-foreground
+  transition hover:bg-primary/90">
+                            Iniciar sesión para consultar
+                        </Link>
                     </div>
                 </div>
 

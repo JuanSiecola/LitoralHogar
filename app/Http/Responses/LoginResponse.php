@@ -15,15 +15,15 @@ class LoginResponse implements LoginResponseContract
             ->toArray();
 
         if (in_array('inmobiliaria', $roles)) {
-            
-            return redirect()->route('inmobiliaria.dashboard');
+            return redirect()->intended(route('inmobiliaria.dashboard'));
         }
         if (in_array('cliente', $roles)) {
             return redirect()->intended(route('home'));
         }
         if (in_array('agente', $roles)) {
-            return redirect()->route('agente.dashboard');
+            return redirect()->intended(route('agente.dashboard'));
         }
 
+        return redirect()->intended(route('home'));
     }
 }

@@ -55,12 +55,12 @@ class PropiedadPublicaController extends Controller
                     'es_principal' => $img->es_principal,
                 ]),
                 'amenidades' => $propiedad->amenidades->pluck('nombre'),
-                'contacto' => $this->resolverContacto($propiedad),
+                'contacto' => $this->resolverContacto($propiedad, $request->user() !== null),
             ],
         ]);
     }
 
-    private function resolverContacto(Propiedad $propiedad): array
+    private function resolverContacto(Propiedad $propiedad, bool $autenticado = false): array
     {
         $usuario = $propiedad->usuario;
         if (!$usuario)
@@ -70,8 +70,8 @@ class PropiedadPublicaController extends Controller
             return [
                 'tipo' => 'inmobiliaria',
                 'nombre' => $usuario->inmobiliaria->nombre_comercial ?? $usuario->email,
-                'email' => $usuario->email,
-                'phone' => $usuario->inmobiliaria->telefono ?? null,
+                'email' => $autenticado ? $usuario->email : null,
+                'phone' => $autenticado ? ($usuario->inmobiliaria->telefono ?? null) : null,
             ];
         }
 
@@ -79,15 +79,15 @@ class PropiedadPublicaController extends Controller
             return [
                 'tipo' => 'agente',
                 'nombre' => $usuario->perfil_persona->nombre . ' ' . $usuario->perfil_persona->apellido,
-                'email' => $usuario->email,
-                'phone' => $usuario->perfil_persona->telefono ?? null,
+                'email' => $autenticado ? $usuario->email : null,
+                'phone' => $autenticado ? ($usuario->perfil_persona->telefono ?? null) : null,
             ];
         }
 
         return [
             'tipo' => 'usuario',
-            'nombre' => $usuario->email,
-            'email' => $usuario->email,
+            'nombre' => $autenticado ? $usuario->email : 'Usuario',
+            'email' => $autenticado ? $usuario->email : null,
             'phone' => null,
         ];
     }
