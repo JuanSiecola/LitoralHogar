@@ -1,10 +1,31 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, router , usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import LandingUserMenu from '@/components/LandingUserMenu.vue';
 
 const page = usePage();
 const auth = computed(() => page.props.auth as { user: any | null });
+
+function irADestacadas(e: MouseEvent) {
+    e.preventDefault();
+ 
+    const scrollToDestacadas = () => {
+        document.getElementById('destacadas')?.scrollIntoView({ behavior: 'smooth' });
+    };
+ 
+    if (page.url === '/' || page.url.startsWith('/#')) {
+        // Ya estamos en la landing, solo hacemos scroll
+        scrollToDestacadas();
+    } else {
+        // Navegamos a la landing y luego hacemos scroll cuando termine
+        router.visit('/', {
+            onFinish: () => {
+                requestAnimationFrame(() => scrollToDestacadas());
+            },
+        });
+    }
+}
+
 </script>
 
 <template>
@@ -26,8 +47,9 @@ const auth = computed(() => page.props.auth as { user: any | null });
                 class="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex"
             >
                 <a
-                    href="#destacadas"
+                    href="/#destacadas"
                     class="transition-colors hover:text-foreground"
+                    @click="irADestacadas"
                     >Destacadas</a
                 >
                 <a
