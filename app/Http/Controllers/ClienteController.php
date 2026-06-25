@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Propiedad;
+use App\Models\Departamento;
 use Inertia\Response;
 use Inertia\Inertia;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -87,6 +88,10 @@ class ClienteController extends Controller
 
     public function propiedades(Request $request)
     {
+        $perPage = in_array((int) $request->input('per_page'), [12, 24, 48], true)
+            ? (int) $request->input('per_page')
+            : 12;
+
         $propiedades = Propiedad::with([
             'detalle_propiedad',
             'ubicacion.departamento:id,nombre',
@@ -98,12 +103,12 @@ class ClienteController extends Controller
                 ->where('tipo_operacion', (string) $request->input('tipo_operacion')))
             ->when($request->filled('tipo_propiedad'), fn($query) => $query
                 ->where('tipo_propiedad', (string) $request->input('tipo_propiedad')))
-            ->when($request->filled('localidad'), fn($query) => $query
+            ->when($request->filled('departamento_id'), fn($query) => $query
                 ->whereHas('ubicacion', fn($ubicacion) => $ubicacion
-                    ->where('localidad', 'like', '%' . $request->input('localidad') . '%')))
-            ->when($request->filled('departamento'), fn($query) => $query
+                    ->where('departamento_id', (int) $request->input('departamento_id'))))
+            ->when($request->filled('localidad_id'), fn($query) => $query
                 ->whereHas('ubicacion', fn($ubicacion) => $ubicacion
-                    ->where('departamento', 'like', '%' . $request->input('departamento') . '%')))
+                    ->where('localidad_id', (int) $request->input('localidad_id'))))
             ->when(
                 $request->filled('nro_habitaciones')
                 || $request->filled('nro_banios')
@@ -125,7 +130,7 @@ class ClienteController extends Controller
                 })
             )
             ->orderByDesc('fecha_publicacion')
-            ->paginate(12)
+            ->paginate($perPage)
             ->withQueryString()
             ->through(fn($propiedad) => [
                 'id' => $propiedad->id,
@@ -148,14 +153,16 @@ class ClienteController extends Controller
             'filters' => $request->only([
                 'tipo_operacion',
                 'tipo_propiedad',
-                'localidad',
-                'departamento',
+                'departamento_id',
+                'localidad_id',
                 'nro_habitaciones',
                 'nro_banios',
                 'precio_min',
                 'precio_max',
                 'superficie_min',
+                'per_page',
             ]),
+            'departamentos' => Departamento::orderBy('nombre')->get(['id', 'nombre']),
         ]);
     }
 
